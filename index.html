@@ -211,6 +211,7 @@ try{
   .field input[type=text],
   .field input[type=number],
   .field input[type=date],
+  .field input[type=email],
   .field select,
   .field textarea{
     width:100%;padding:11px 13px;border-radius:11px;border:1.5px solid var(--border);font-family:inherit;
@@ -218,6 +219,19 @@ try{
   }
   .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--purple);background:#fff;}
   .field input::placeholder,.field textarea::placeholder{text-transform:none;color:#B7B6CC;}
+  .field input[type=email]::placeholder{text-transform:none;}
+  .field select{
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8AA3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px;
+  }
+  html[data-theme="dark"] .field select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239997B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
+  .field input[type=date]{color-scheme:light;}
+  html[data-theme="dark"] .field input[type=date]{color-scheme:dark;}
+  .field input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer;border-radius:6px;padding:3px;}
+  .field input[type=date]::-webkit-calendar-picker-indicator:hover{background:var(--purple-light);}
   .field small.hint{display:block;margin-top:5px;color:var(--text-mut);font-size:11px;text-transform:none;}
   .field.invalid input{border-color:var(--red);background:var(--red-bg);}
 
@@ -286,8 +300,26 @@ try{
 
   .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .filters select,.filters input{
-    padding:9px 12px;border-radius:10px;border:1px solid var(--border);font-family:inherit;font-size:12.5px;background:#fff;
+    padding:10px 13px;border-radius:11px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;
+    background:#FBFBFE;color:var(--text);height:42px;box-sizing:border-box;
   }
+  .filters select:focus,.filters input:focus{outline:none;border-color:var(--purple);background:#fff;}
+  html[data-theme="dark"] .filters select,html[data-theme="dark"] .filters input{background:#181826;}
+  html[data-theme="dark"] .filters select:focus,html[data-theme="dark"] .filters input:focus{background:#20202f;}
+  .filters select{
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8AA3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px;
+  }
+  html[data-theme="dark"] .filters select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239997B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
+  .filters input[type=date]{color-scheme:light;}
+  html[data-theme="dark"] .filters input[type=date]{color-scheme:dark;}
+  .th-sort{cursor:pointer;user-select:none;white-space:nowrap;}
+  .th-sort:hover{color:var(--purple);}
+  .th-sort .sort-arrow{display:inline-block;margin-left:4px;opacity:.5;font-size:10px;}
+  .th-sort.sort-active .sort-arrow{opacity:1;color:var(--purple);}
 
   /* MENU MOVIL (hamburguesa + panel deslizable) */
   .mobile-menu-btn{
@@ -322,10 +354,17 @@ try{
     .field input[type=text],
     .field input[type=number],
     .field input[type=date],
+    .field input[type=email],
     .field select,
-    .field textarea{
+    .field textarea,
+    .filters select,
+    .filters input{
       font-size:16px;min-height:44px;
     }
+    .filters{width:100%;}
+    .filters select,.filters input{flex:1 1 160px;}
+    .filters .btn{flex:0 0 auto;}
+    .filters .spacer{display:none;}
     .pill-nav{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;}
     .pill-nav button{white-space:nowrap;flex-shrink:0;padding:10px 14px;font-size:12.5px;}
     .card table th, .card table td{padding:9px 10px;font-size:12px;}
@@ -333,6 +372,11 @@ try{
     .modal-actions{flex-wrap:wrap;}
     .modal-actions .btn{flex:1 1 auto;justify-content:center;}
     .total-bar{flex-wrap:wrap;gap:6px;}
+    /* Documento de planilla (vista previa del PDF): se reduce de escala en vez de
+       forzar scroll horizontal de toda la pagina (eso hacia que iOS "encogiera"
+       toda la app para que quepa el documento ancho). Ver fitPlanillaDoc() en JS. */
+    .doc-scale-wrap{overflow:hidden;}
+    .planilla-doc{transform-origin:top left;}
   }
 
   @media (max-width:480px){
@@ -367,6 +411,8 @@ try{
   .planilla-doc .sig-box{margin-top:50px;text-align:center;}
   .planilla-doc .sig-box img{height:100px;width:auto;max-width:280px;display:block;margin:0 auto 8px;object-fit:contain;image-rendering:auto;}
   .planilla-doc .sig-line{border-top:1px solid #111;width:260px;margin:0 auto;padding-top:6px;font-size:11px;font-weight:700;}
+  .doc-scale-wrap{width:100%;overflow:hidden;}
+  .doc-scale-wrap .planilla-doc{transform-origin:top left;margin:0;}
 
   /* ============================================================
      MODO OSCURO
@@ -387,6 +433,7 @@ try{
   html[data-theme="dark"] .field input[type=text],
   html[data-theme="dark"] .field input[type=number],
   html[data-theme="dark"] .field input[type=date],
+  html[data-theme="dark"] .field input[type=email],
   html[data-theme="dark"] .field select,
   html[data-theme="dark"] .field textarea{background:#181826;color:var(--text);border-color:var(--border);}
   html[data-theme="dark"] .field input:focus,
@@ -657,14 +704,24 @@ try{
 
       <div class="card" style="margin-top:18px;">
         <div class="filters" style="margin-bottom:16px;">
+          <select id="filterTrabajador" onchange="renderHistorial()"></select>
           <select id="filterPeriodo" onchange="renderHistorial()"><option value="">TODOS LOS PERIODOS</option></select>
-          <input type="text" id="filterMotivo" placeholder="BUSCAR POR MOTIVO O DISTRITO..." oninput="renderHistorial()">
+          <input type="text" id="filterMotivo" placeholder="BUSCAR POR MOTIVO, DISTRITO O CORRELATIVO..." oninput="renderHistorial()">
+          <button class="btn btn-outline btn-sm" onclick="limpiarFiltrosHistorial()">&#10005; Limpiar filtros</button>
           <div class="spacer" style="flex:1;"></div>
+          <button class="btn btn-ghost btn-sm" onclick="refrescarHistorial()" id="btnRefrescarHistorial">&#8635; Actualizar</button>
           <button class="btn btn-outline btn-sm" onclick="exportExcel()">&#11015; Exportar Excel</button>
           <button class="btn btn-outline btn-sm" onclick="exportJson()">&#11015; Exportar Copia (JSON)</button>
         </div>
         <table>
-          <thead><tr><th>Correlativo</th><th>Fecha</th><th>Motivo</th><th>Partida</th><th>Llegada</th><th>Importe</th><th>Obs.</th><th>Estado</th></tr></thead>
+          <thead><tr>
+            <th class="th-sort" data-sort="correlativo" onclick="setHistorialSort('correlativo')">Correlativo<span class="sort-arrow">&#8645;</span></th>
+            <th class="th-sort" data-sort="fecha" onclick="setHistorialSort('fecha')">Fecha<span class="sort-arrow">&#8645;</span></th>
+            <th id="thTrabajador" class="th-sort" data-sort="trabajador" onclick="setHistorialSort('trabajador')" style="display:none;">Trabajador<span class="sort-arrow">&#8645;</span></th>
+            <th class="th-sort" data-sort="motivo" onclick="setHistorialSort('motivo')">Motivo<span class="sort-arrow">&#8645;</span></th>
+            <th>Partida</th><th>Llegada</th>
+            <th class="th-sort" data-sort="importe" onclick="setHistorialSort('importe')">Importe<span class="sort-arrow">&#8645;</span></th>
+            <th>Obs.</th><th>Estado</th></tr></thead>
           <tbody id="historialBody"></tbody>
         </table>
         <div id="historialEmpty" class="empty-state" style="display:none;">
@@ -724,9 +781,13 @@ try{
         <div class="card" style="margin-top:16px;display:none;" id="planCandidatosCard">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
             <h3 style="margin:0;font-size:15px;" id="planCandidatosTitle">Movilidades pendientes de incluir</h3>
-            <label style="font-size:12px;display:flex;align-items:center;gap:6px;color:var(--text-mut);">
-              <input type="checkbox" id="selAllCandidatos" checked onchange="toggleAllCandidatos(this.checked)"> Seleccionar todas
-            </label>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" id="btnSortPlanCandidatos" onclick="togglePlanCandidatosSort()">&#8593; Fecha</button>
+              <button class="btn btn-ghost btn-sm" id="btnRefrescarPlanNueva" onclick="refrescarPlanNueva()">&#8635; Actualizar</button>
+              <label style="font-size:12px;display:flex;align-items:center;gap:6px;color:var(--text-mut);">
+                <input type="checkbox" id="selAllCandidatos" checked onchange="toggleAllCandidatos(this.checked)"> Seleccionar todas
+              </label>
+            </div>
           </div>
           <table>
             <thead><tr><th style="width:34px;"></th><th>Correlativo</th><th>Fecha</th><th>Motivo</th><th>Partida</th><th>Llegada</th><th>Importe</th></tr></thead>
@@ -749,6 +810,9 @@ try{
 
       <div id="planHistorialView" style="display:none;">
         <div class="card">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+            <button class="btn btn-ghost btn-sm" id="btnRefrescarPlanHist" onclick="refrescarPlanillasHistorial()">&#8635; Actualizar</button>
+          </div>
           <table>
             <thead><tr><th>N&deg; Planilla</th><th>Colaborador</th><th>Rango</th><th>Total</th><th>Generada</th><th></th></tr></thead>
             <tbody id="planillasHistBody"></tbody>
@@ -1791,27 +1855,104 @@ async function deleteMovilidad(id){
 /* ============================================================
    HISTORIAL
    ============================================================ */
-function populatePeriodoFilter(){
+function historialScopedList(){
   const user = getCurrentUser();
+  if(!user) return [];
+  // Un administrador ve las movilidades de todo el personal; un colaborador
+  // regular solo ve las suyas (ademas, asi es como llegan desde el servidor).
+  return user.isAdmin ? DB.movilidades.slice() : DB.movilidades.filter(m=>m.colaboradorId===user.id);
+}
+function populateTrabajadorFilter(){
+  const user = getCurrentUser();
+  const sel = document.getElementById('filterTrabajador');
+  const thTrabajador = document.getElementById('thTrabajador');
+  if(!sel || !user) return;
+  if(!user.isAdmin){
+    sel.style.display = 'none';
+    if(thTrabajador) thTrabajador.style.display = 'none';
+    return;
+  }
+  sel.style.display = '';
+  if(thTrabajador) thTrabajador.style.display = '';
+  const cur = sel.value;
+  const opciones = DB.colaboradores.slice().sort((a,b)=>nombreCompleto(a).localeCompare(nombreCompleto(b)));
+  sel.innerHTML = '<option value="">TODOS LOS TRABAJADORES</option>' + opciones.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+  sel.value = cur;
+}
+function populatePeriodoFilter(){
   const sel = document.getElementById('filterPeriodo');
   const cur = sel.value;
-  const periodos = [...new Set(DB.movilidades.filter(m=>m.colaboradorId===user.id).map(m=>m.periodo))];
+  const periodos = [...new Set(historialScopedList().map(m=>m.periodo))].sort().reverse();
   sel.innerHTML = '<option value="">TODOS LOS PERIODOS</option>' + periodos.map(p=>`<option value="${p}">${p}</option>`).join('');
   sel.value = cur;
+}
+let historialSort = { field:'fecha', dir:'desc' };
+function setHistorialSort(field){
+  if(historialSort.field === field){
+    historialSort.dir = historialSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    historialSort = { field, dir: (field==='fecha'||field==='importe') ? 'desc' : 'asc' };
+  }
+  renderHistorial();
+}
+function limpiarFiltrosHistorial(){
+  document.getElementById('filterTrabajador').value = '';
+  document.getElementById('filterPeriodo').value = '';
+  document.getElementById('filterMotivo').value = '';
+  historialSort = { field:'fecha', dir:'desc' };
+  renderHistorial();
+  toast('Filtros limpiados');
+}
+async function refrescarHistorial(){
+  const btn = document.getElementById('btnRefrescarHistorial');
+  if(btn) btn.disabled = true;
+  await refreshMovilidades();
+  await refreshPlanillas();
+  if(btn) btn.disabled = false;
+  renderHistorial();
+  toast('Historial actualizado');
+}
+function historialFilteredSortedList(){
+  const periodo = document.getElementById('filterPeriodo').value;
+  const trabajadorId = document.getElementById('filterTrabajador') ? document.getElementById('filterTrabajador').value : '';
+  const q = up(document.getElementById('filterMotivo').value);
+  let list = historialScopedList();
+  if(periodo) list = list.filter(m=>m.periodo===periodo);
+  if(trabajadorId) list = list.filter(m=>m.colaboradorId===trabajadorId);
+  if(q) list = list.filter(m=> m.motivo.includes(q) || m.partida.includes(q) || m.llegada.includes(q) || m.correlativo.includes(q));
+
+  const colabNombre = {};
+  DB.colaboradores.forEach(c=>{ colabNombre[c.id] = nombreCompleto(c); });
+
+  const { field, dir } = historialSort;
+  const mult = dir === 'asc' ? 1 : -1;
+  list.sort((a,b)=>{
+    let va, vb;
+    if(field === 'trabajador'){ va = colabNombre[a.colaboradorId]||''; vb = colabNombre[b.colaboradorId]||''; }
+    else if(field === 'importe'){ va = Number(a.importe)||0; vb = Number(b.importe)||0; }
+    else { va = a[field]||''; vb = b[field]||''; }
+    if(va < vb) return -1*mult;
+    if(va > vb) return 1*mult;
+    return 0;
+  });
+  return { list, colabNombre };
 }
 function renderHistorial(){
   const user = getCurrentUser();
   if(!user) return;
+  populateTrabajadorFilter();
   populatePeriodoFilter();
-  const periodo = document.getElementById('filterPeriodo').value;
-  const q = up(document.getElementById('filterMotivo').value);
-  let mine = DB.movilidades.filter(m=>m.colaboradorId===user.id);
-  if(periodo) mine = mine.filter(m=>m.periodo===periodo);
-  if(q) mine = mine.filter(m=> m.motivo.includes(q) || m.partida.includes(q) || m.llegada.includes(q) || m.correlativo.includes(q));
-  mine.sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||''));
+  const { list, colabNombre } = historialFilteredSortedList();
+
+  document.querySelectorAll('.th-sort').forEach(th=>{
+    const active = th.dataset.sort === historialSort.field;
+    th.classList.toggle('sort-active', active);
+    const arrow = th.querySelector('.sort-arrow');
+    if(arrow) arrow.innerHTML = active ? (historialSort.dir==='asc' ? '&#8593;' : '&#8595;') : '&#8645;';
+  });
 
   const body = document.getElementById('historialBody');
-  body.innerHTML = mine.map(m=>{
+  body.innerHTML = list.map(m=>{
     const planilla = m.planillaId ? getPlanilla(m.planillaId) : null;
     const estadoCell = planilla
       ? `<span class="badge purple" title="Incluida en planilla ${planilla.correlativo}">EN PLANILLA</span>`
@@ -1819,10 +1960,12 @@ function renderHistorial(){
           <button class="icon-action" title="Editar" onclick="editMovilidad('${m.id}')">&#9998;</button>
           <button class="icon-action danger" title="Eliminar" onclick="deleteMovilidad('${m.id}')">&#128465;</button>
         </div>`;
+    const trabajadorCell = user.isAdmin ? `<td>${colabNombre[m.colaboradorId]||'—'}</td>` : '';
     return `
     <tr>
       <td class="mono">${m.correlativo}</td>
       <td>${fmtFecha(m.fecha)}</td>
+      ${trabajadorCell}
       <td>${m.motivo}</td>
       <td><span class="badge purple">${m.partida}</span></td>
       <td><span class="badge orange">${m.llegada}</span></td>
@@ -1831,24 +1974,63 @@ function renderHistorial(){
       <td>${estadoCell}</td>
     </tr>`;
   }).join('');
-  document.getElementById('historialEmpty').style.display = mine.length? 'none':'block';
+  document.getElementById('historialEmpty').style.display = list.length? 'none':'block';
 }
 function exportExcel(){
   const user = getCurrentUser();
-  const mine = DB.movilidades.filter(m=>m.colaboradorId===user.id).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
-  if(mine.length===0){ toast('No hay movilidades para exportar', true); return; }
-  let csv = 'CORRELATIVO;FECHA;COLABORADOR;DNI;MOTIVO;PARTIDA;LLEGADA;IMPORTE;OBSERVACIONES;PERIODO;ESTADO\n';
-  mine.forEach(m=>{
-    const estado = m.planillaId ? ('EN PLANILLA ' + (getPlanilla(m.planillaId)||{}).correlativo) : 'PENDIENTE';
-    csv += [m.correlativo, fmtFecha(m.fecha), nombreCompleto(user), user.dni, m.motivo, m.partida, m.llegada, Number(m.importe).toFixed(2), (m.observaciones||''), m.periodo, estado].join(';') + '\n';
-  });
-  downloadFile('movilidades_' + user.dni + '.csv', csv, 'text/csv;charset=utf-8;');
-  toast('Excel (CSV) exportado');
+  const { list, colabNombre } = historialFilteredSortedList();
+  if(list.length===0){ toast('No hay movilidades para exportar', true); return; }
+  const dniPorColab = {};
+  DB.colaboradores.forEach(c=>{ dniPorColab[c.id] = c.dni; });
+  const total = list.reduce((s,m)=>s+Number(m.importe||0),0);
+  const fechaGeneracion = new Date();
+  const fechaGenStr = String(fechaGeneracion.getDate()).padStart(2,'0')+'/'+String(fechaGeneracion.getMonth()+1).padStart(2,'0')+'/'+fechaGeneracion.getFullYear();
+
+  const cols = user.isAdmin
+    ? ['Correlativo','Fecha','Trabajador','DNI','Motivo','Partida','Llegada','Importe (S/)','Observaciones','Periodo','Estado']
+    : ['Correlativo','Fecha','Motivo','Partida','Llegada','Importe (S/)','Observaciones','Periodo','Estado'];
+
+  const rowsHtml = list.map((m,i)=>{
+    const planilla = m.planillaId ? getPlanilla(m.planillaId) : null;
+    const estado = planilla ? ('EN PLANILLA ' + planilla.correlativo) : 'PENDIENTE';
+    const bg = i % 2 === 0 ? '#FFFFFF' : '#F4F2FC';
+    const estadoColor = planilla ? '#6C5DD3' : '#C77700';
+    const cells = user.isAdmin
+      ? [m.correlativo, fmtFecha(m.fecha), colabNombre[m.colaboradorId]||'', dniPorColab[m.colaboradorId]||'', m.motivo, m.partida, m.llegada, Number(m.importe).toFixed(2), (m.observaciones||''), m.periodo, estado]
+      : [m.correlativo, fmtFecha(m.fecha), m.motivo, m.partida, m.llegada, Number(m.importe).toFixed(2), (m.observaciones||''), m.periodo, estado];
+    const importeIdx = user.isAdmin ? 7 : 5;
+    const estadoIdx = cells.length - 1;
+    return '<tr style="background:'+bg+';">' + cells.map((c,ci)=>{
+      const align = ci===importeIdx ? 'right' : (ci===0 ? 'center' : 'left');
+      const color = ci===estadoIdx ? ('color:'+estadoColor+';font-weight:bold;') : '';
+      const fontWeight = (ci===importeIdx) ? 'font-weight:bold;' : '';
+      return `<td style="padding:7px 10px;border:1px solid #E4E1F5;text-align:${align};font-size:12px;${color}${fontWeight}">${c}</td>`;
+    }).join('') + '</tr>';
+  }).join('');
+
+  const totalRow = `<tr style="background:#1B1B2F;">
+    <td colspan="${cols.length-2}" style="padding:9px 10px;border:1px solid #E4E1F5;color:#fff;font-weight:bold;text-align:right;font-size:12.5px;">TOTAL</td>
+    <td style="padding:9px 10px;border:1px solid #E4E1F5;color:#fff;font-weight:bold;text-align:right;font-size:12.5px;">S/ ${total.toFixed(2)}</td>
+    <td style="padding:9px 10px;border:1px solid #E4E1F5;"></td>
+  </tr>`;
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:Calibri,Arial,sans-serif;">
+    <table style="border-collapse:collapse;">
+      <tr><td colspan="${cols.length}" style="padding:6px 10px;font-size:16px;font-weight:bold;color:#1B1B2F;">MANGRO SAC &middot; Movilidades ${user.isAdmin ? '(todo el personal)' : ''}</td></tr>
+      <tr><td colspan="${cols.length}" style="padding:0 10px 10px;font-size:11px;color:#8A8AA3;">Exportado el ${fechaGenStr} &middot; ${list.length} registro(s)</td></tr>
+      <tr>${cols.map(c=>`<th style="background:#6C5DD3;color:#fff;padding:9px 10px;border:1px solid #5843C9;font-size:12px;text-align:left;">${c}</th>`).join('')}</tr>
+      ${rowsHtml}
+      ${totalRow}
+    </table>
+  </body></html>`;
+
+  downloadFile('movilidades_' + (user.isAdmin ? 'mangro_todos' : user.dni) + '.xls', html, 'application/vnd.ms-excel;charset=utf-8;');
+  toast('Excel exportado');
 }
 function exportJson(){
+  const { list } = historialFilteredSortedList();
   const user = getCurrentUser();
-  const mine = DB.movilidades.filter(m=>m.colaboradorId===user.id);
-  downloadFile('movilidades_' + user.dni + '.json', JSON.stringify(mine, null, 2), 'application/json');
+  downloadFile('movilidades_' + user.dni + '.json', JSON.stringify(list, null, 2), 'application/json');
   toast('Copia JSON exportada');
 }
 function downloadFile(filename, content, type){
@@ -2081,9 +2263,27 @@ function populatePlanColab(){
   sel.innerHTML = DB.colaboradores.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
   if(cur){ sel.value = cur; }
   else { const user = getCurrentUser(); if(user) sel.value = user.id; }
+  // Al entrar al modulo, mostrar de una vez las movilidades pendientes del
+  // colaborador seleccionado (antes solo se veian tras tocar manualmente el
+  // filtro, porque cambiar el <select> por codigo no dispara "onchange").
+  buscarMovilidadesPendientes();
 }
 function onPlanFiltroChange(){
   document.getElementById('planPreviewCard').style.display = 'none';
+  buscarMovilidadesPendientes();
+}
+async function refrescarPlanNueva(){
+  const btn = document.getElementById('btnRefrescarPlanNueva');
+  if(btn) btn.disabled = true;
+  await refreshMovilidades();
+  await refreshPlanillas();
+  if(btn) btn.disabled = false;
+  buscarMovilidadesPendientes();
+  toast('Movilidades pendientes actualizadas');
+}
+let planCandidatosSortDir = 'asc';
+function togglePlanCandidatosSort(){
+  planCandidatosSortDir = planCandidatosSortDir === 'asc' ? 'desc' : 'asc';
   buscarMovilidadesPendientes();
 }
 function buscarMovilidadesPendientes(){
@@ -2099,7 +2299,9 @@ function buscarMovilidadesPendientes(){
   let list = DB.movilidades.filter(m=> m.colaboradorId===colabId && (!m.planillaId || (editing && m.planillaId===editing.id)));
   if(fi) list = list.filter(m=>m.fecha>=fi);
   if(ff) list = list.filter(m=>m.fecha<=ff);
-  list.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  list.sort((a,b)=> planCandidatosSortDir==='asc' ? a.fecha.localeCompare(b.fecha) : b.fecha.localeCompare(a.fecha));
+  const sortBtn = document.getElementById('btnSortPlanCandidatos');
+  if(sortBtn) sortBtn.innerHTML = planCandidatosSortDir==='asc' ? '&#8593; Fecha' : '&#8595; Fecha';
 
   document.getElementById('planCandidatosTitle').textContent = editing
     ? ('Editando planilla ' + editing.correlativo + ': movilidades incluidas y pendientes')
@@ -2325,7 +2527,47 @@ function mostrarPreviewPlanilla(planilla, cardId){
   card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <h3 style="margin:0;font-size:16px;">Vista previa &middot; ${planilla.correlativo}</h3>
       <button class="btn btn-purple btn-sm" onclick="descargarPDF('${planilla.id}')">&#11015; Descargar PDF</button>
-    </div>` + html;
+    </div>
+    <div class="doc-scale-wrap" id="docwrap-${cardId}">${html}</div>`;
+  requestAnimationFrame(function(){ fitPlanillaDoc(cardId); });
+}
+// Reduce a escala el documento de la planilla (que tiene un ancho fijo de 1000px,
+// pensado para el PDF) para que quepa dentro de pantallas angostas sin obligar a
+// hacer scroll horizontal de toda la app ni que el navegador "encoja" la pagina.
+function fitPlanillaDoc(cardId){
+  const wrap = document.getElementById('docwrap-' + cardId);
+  if(!wrap) return;
+  const doc = wrap.querySelector('.planilla-doc');
+  if(!doc) return;
+  doc.style.transform = '';
+  wrap.style.height = '';
+  const naturalWidth = doc.offsetWidth || 1000;
+  const naturalHeight = doc.offsetHeight;
+  const available = wrap.clientWidth;
+  if(available > 0 && available < naturalWidth){
+    const scale = available / naturalWidth;
+    doc.style.transform = 'scale(' + scale + ')';
+    wrap.style.height = Math.ceil(naturalHeight * scale) + 'px';
+  }
+}
+let _fitDocResizeTimer = null;
+window.addEventListener('resize', function(){
+  clearTimeout(_fitDocResizeTimer);
+  _fitDocResizeTimer = setTimeout(function(){
+    ['planPreviewCard','planHistPreviewCard'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el && el.style.display !== 'none') fitPlanillaDoc(id);
+    });
+  }, 150);
+});
+async function refrescarPlanillasHistorial(){
+  const btn = document.getElementById('btnRefrescarPlanHist');
+  if(btn) btn.disabled = true;
+  await refreshMovilidades();
+  await refreshPlanillas();
+  if(btn) btn.disabled = false;
+  renderPlanillasHistorial();
+  toast('Planillas actualizadas');
 }
 function renderPlanillasHistorial(){
   const body = document.getElementById('planillasHistBody');

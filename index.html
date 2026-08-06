@@ -130,6 +130,47 @@ try{
     display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mut);font-size:16px;position:relative;
   }
   .icon-btn .dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--red);}
+  .notif-wrap{position:relative;}
+  .notif-panel{
+    display:none;position:absolute;top:50px;right:0;width:340px;max-width:calc(100vw - 32px);
+    background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 14px 36px rgba(30,20,60,.18);
+    z-index:500;overflow:hidden;
+  }
+  .notif-panel.open{display:block;}
+  .notif-header{padding:14px 16px 10px;font-weight:700;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);}
+  .notif-list{max-height:320px;overflow-y:auto;}
+  .notif-item{padding:11px 16px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text);}
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item b{color:var(--purple);}
+  .notif-motivo{color:var(--text-mut);}
+  .notif-more{padding:10px 16px;font-size:12px;color:var(--text-mut);text-align:center;}
+  .notif-empty{padding:22px 16px;font-size:12.5px;color:var(--text-mut);text-align:center;}
+  .notif-cta{width:calc(100% - 32px);margin:12px 16px 16px;justify-content:center;}
+  /* Calendario propio para los campos de fecha (reemplaza el calendario nativo
+     del navegador, que no se puede rediseñar por completo con CSS). */
+  .date-picker-panel{
+    position:fixed;z-index:1000;background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+    box-shadow:0 16px 40px rgba(30,20,60,.2);padding:14px;width:280px;display:none;font-family:inherit;
+  }
+  .date-picker-panel.open{display:block;}
+  .dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .dp-title{font-weight:700;font-size:13.5px;color:var(--text);text-transform:capitalize;}
+  .dp-nav{background:var(--purple-light);border:none;color:var(--purple);width:28px;height:28px;border-radius:9px;
+    cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .dp-nav:hover{background:var(--purple);color:#fff;}
+  .dp-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10.5px;font-weight:700;
+    color:var(--text-mut);margin-bottom:4px;}
+  .dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .dp-day{text-align:center;padding:7px 0;font-size:12.5px;border-radius:9px;cursor:pointer;color:var(--text);}
+  .dp-day:hover{background:var(--purple-light);}
+  .dp-day.dp-muted{color:var(--text-mut);opacity:.4;cursor:default;}
+  .dp-day.dp-muted:hover{background:none;}
+  .dp-day.dp-today{font-weight:700;box-shadow:inset 0 0 0 1.5px var(--purple);}
+  .dp-day.dp-selected{background:var(--purple);color:#fff;font-weight:700;}
+  .dp-footer{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+  .dp-link{background:none;border:none;color:var(--purple);font-weight:700;font-size:12.5px;cursor:pointer;padding:4px 6px;}
+  .dp-link:hover{text-decoration:underline;}
+  @media (max-width:380px){ .date-picker-panel{width:calc(100vw - 24px);} }
   .user-chip{
     display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);
     padding:6px 14px 6px 6px;border-radius:30px;cursor:pointer;
@@ -210,14 +251,13 @@ try{
   .field label{display:block;font-size:12.5px;font-weight:600;color:var(--text-mut);margin-bottom:7px;text-transform:uppercase;letter-spacing:.02em;}
   .field input[type=text],
   .field input[type=number],
-  .field input[type=date],
   .field input[type=email],
   .field select,
   .field textarea{
     width:100%;padding:11px 13px;border-radius:11px;border:1.5px solid var(--border);font-family:inherit;
     font-size:13.5px;background:#FBFBFE;color:var(--text);text-transform:uppercase;
   }
-  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--purple);background:#fff;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--purple);background-color:#fff;}
   .field input::placeholder,.field textarea::placeholder{text-transform:none;color:#B7B6CC;}
   .field input[type=email]::placeholder{text-transform:none;}
   .field select{
@@ -228,10 +268,17 @@ try{
   html[data-theme="dark"] .field select{
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239997B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   }
-  .field input[type=date]{color-scheme:light;}
-  html[data-theme="dark"] .field input[type=date]{color-scheme:dark;}
-  .field input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer;border-radius:6px;padding:3px;}
-  .field input[type=date]::-webkit-calendar-picker-indicator:hover{background:var(--purple-light);}
+  /* Selector de fecha propio (no el calendario nativo del navegador, que no se
+     puede rediseñar por completo): mismo look que el resto de campos, con un
+     icono de calendario y el desplegable .date-picker-panel (ver mas abajo). */
+  .field input.date-input,
+  .filters input.date-input{
+    width:100%;padding:11px 13px;border-radius:11px;border:1.5px solid var(--border);font-family:inherit;
+    font-size:13.5px;background:#FBFBFE;color:var(--text);cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5DD3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;background-size:17px;padding-right:38px;
+  }
+  .field input.date-input:focus,.filters input.date-input:focus{outline:none;border-color:var(--purple);background-color:#fff;}
   .field small.hint{display:block;margin-top:5px;color:var(--text-mut);font-size:11px;text-transform:none;}
   .field.invalid input{border-color:var(--red);background:var(--red-bg);}
 
@@ -314,8 +361,6 @@ try{
   html[data-theme="dark"] .filters select{
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239997B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   }
-  .filters input[type=date]{color-scheme:light;}
-  html[data-theme="dark"] .filters input[type=date]{color-scheme:dark;}
   .th-sort{cursor:pointer;user-select:none;white-space:nowrap;}
   .th-sort:hover{color:var(--purple);}
   .th-sort .sort-arrow{display:inline-block;margin-left:4px;opacity:.5;font-size:10px;}
@@ -353,10 +398,10 @@ try{
        "gigante" al tocarlo. */
     .field input[type=text],
     .field input[type=number],
-    .field input[type=date],
     .field input[type=email],
     .field select,
     .field textarea,
+    .field input.date-input,
     .filters select,
     .filters input{
       font-size:16px;min-height:44px;
@@ -432,13 +477,14 @@ try{
   html[data-theme="dark"] .btn-outline:hover{background:#262638;}
   html[data-theme="dark"] .field input[type=text],
   html[data-theme="dark"] .field input[type=number],
-  html[data-theme="dark"] .field input[type=date],
   html[data-theme="dark"] .field input[type=email],
   html[data-theme="dark"] .field select,
-  html[data-theme="dark"] .field textarea{background:#181826;color:var(--text);border-color:var(--border);}
+  html[data-theme="dark"] .field textarea,
+  html[data-theme="dark"] .field input.date-input{background-color:#181826;color:var(--text);border-color:var(--border);}
   html[data-theme="dark"] .field input:focus,
   html[data-theme="dark"] .field select:focus,
-  html[data-theme="dark"] .field textarea:focus{background:#20202f;}
+  html[data-theme="dark"] .field textarea:focus{background-color:#20202f;}
+  html[data-theme="dark"] .field input.date-input:focus{background-color:#20202f;}
   html[data-theme="dark"] .field input::placeholder,
   html[data-theme="dark"] .field textarea::placeholder{color:#57567A;}
   html[data-theme="dark"] .icon-action{background:#1D1D2C;border-color:var(--border);}
@@ -589,7 +635,13 @@ try{
       </div>
       <div class="topbar-right">
         <button class="btn btn-purple" onclick="showSection('nueva')">+ Nueva Movilidad</button>
-        <div class="icon-btn" title="Notificaciones">&#128276;<span class="dot"></span></div>
+        <div class="notif-wrap">
+          <button class="icon-btn" id="notifBellBtn" title="Notificaciones" onclick="toggleNotifPanel(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="dot" id="notifDot" style="display:none;"></span>
+          </button>
+          <div class="notif-panel" id="notifPanel"></div>
+        </div>
         <div class="user-chip" id="userChip" onclick="showSection('colaboradores')">
           <div class="avatar" id="currentAvatar">--</div>
           <div>
@@ -663,7 +715,7 @@ try{
           </div>
           <div class="field">
             <label>Fecha</label>
-            <input type="date" id="formFecha" onchange="updateSaldoInfo()">
+            <input type="text" class="date-input" id="formFecha" readonly placeholder="Selecciona una fecha" onchange="updateSaldoInfo()">
           </div>
           <div class="field" id="importeField">
             <label>Importe (S/)</label>
@@ -768,11 +820,11 @@ try{
             <div class="field"></div>
             <div class="field">
               <label>Filtrar desde (opcional)</label>
-              <input type="date" id="planFechaInicio" onchange="onPlanFiltroChange()">
+              <input type="text" class="date-input" id="planFechaInicio" readonly placeholder="Selecciona una fecha" onchange="onPlanFiltroChange()">
             </div>
             <div class="field">
               <label>Filtrar hasta (opcional)</label>
-              <input type="date" id="planFechaFin" onchange="onPlanFiltroChange()">
+              <input type="text" class="date-input" id="planFechaFin" readonly placeholder="Selecciona una fecha" onchange="onPlanFiltroChange()">
             </div>
           </div>
           <small class="hint" style="display:block;margin-top:4px;">Por defecto se muestran TODAS las movilidades pendientes de ese colaborador. Usa las fechas solo si quieres acotar la busqueda.</small>
@@ -1444,11 +1496,13 @@ async function refreshMovilidades(){
   const { data, error } = await sb.from('movilidades').select('*');
   if(error){ console.error('refreshMovilidades', error); toast('No se pudo cargar las movilidades', true); return; }
   cache.movilidades = (data||[]).map(rowToMovilidad);
+  if(typeof updateNotifDot === 'function') updateNotifDot();
 }
 async function refreshPlanillas(){
   const { data, error } = await sb.from('planillas').select('*');
   if(error){ console.error('refreshPlanillas', error); toast('No se pudo cargar las planillas', true); return; }
   cache.planillas = (data||[]).map(r=>rowToPlanilla(r, cache.movilidades));
+  if(typeof updateNotifDot === 'function') updateNotifDot();
 }
 async function refreshConfig(){
   const { data, error } = await sb.from('config').select('*').eq('id',1).maybeSingle();
@@ -1473,6 +1527,18 @@ const DB = {
 // compartida (no un contador guardado por dispositivo). Asi se evita que dos celulares
 // generen el mismo numero por partir cada uno desde cero.
 async function nextCorrelativo(){
+  // El correlativo debe ser unico para TODA la empresa, pero un colaborador
+  // regular solo puede VER sus propias movilidades (por seguridad, a nivel de
+  // base de datos). Calcularlo aqui mirando solo lo visible quedaba atrasado
+  // respecto al numero real mas alto y chocaba siempre con lo de otros
+  // colaboradores. Por eso se calcula del lado del servidor (funcion
+  // next_movilidad_correlativo, ver supabase_fix_correlativo.sql), que si
+  // mira TODA la tabla sin restriccion y con bloqueo para evitar carreras.
+  const { data, error } = await sb.rpc('next_movilidad_correlativo');
+  if(!error && data) return data;
+  console.error('nextCorrelativo RPC', error);
+  // Respaldo (solo si aun no se ejecuto supabase_fix_correlativo.sql en Supabase):
+  // calculo con los datos visibles, puede seguir fallando para no-administradores.
   await refreshMovilidades();
   let maxN = 0;
   cache.movilidades.forEach(m=>{
@@ -1484,13 +1550,15 @@ async function nextCorrelativo(){
   return 'MOV-' + String(maxN+1).padStart(5,'0');
 }
 
-function nextPlanillaNumero(anio){
-  // Correlativo global MOV-{anio}{secuencia de 4 digitos}, sin importar que
-  // colaborador genera la planilla. Se calcula como el maximo existente para
-  // ese anio + 1 (no un contador persistido aparte): asi, si se anula/elimina
-  // la ULTIMA planilla del anio, el numero se reutiliza en la siguiente que se
-  // genere; si se anula una que no es la ultima, el siguiente numero sigue
-  // despues del maximo real (no rellena el hueco).
+async function nextPlanillaNumero(anio){
+  // Mismo problema y misma solucion que nextCorrelativo(): se calcula del
+  // lado del servidor (funcion next_planilla_correlativo) para que siempre
+  // vea TODAS las planillas del anio, no solo las que el usuario que genera
+  // puede ver.
+  const { data, error } = await sb.rpc('next_planilla_correlativo', { anio: String(anio) });
+  if(!error && data) return data;
+  console.error('nextPlanillaNumero RPC', error);
+  // Respaldo (solo si aun no se ejecuto supabase_fix_correlativo.sql):
   const prefix = 'MOV-' + anio;
   let maxSeq = 0;
   DB.planillas.forEach(p=>{
@@ -1561,6 +1629,131 @@ function currentPeriodoKey(){
   return meses[now.getMonth()] + '-' + now.getFullYear();
 }
 function fmtFecha(dstr){ return dstr ? dstr.split('-').reverse().join('/') : ''; }
+// Fecha de HOY en la zona horaria LOCAL del dispositivo (no UTC). Usar
+// new Date().toISOString() aqui era el bug: toISOString() siempre da la fecha
+// en UTC, asi que en Peru (UTC-5) despues de las 7pm ya "amanecia" al dia
+// siguiente segun UTC y el formulario preseleccionaba manana en vez de hoy.
+function todayLocalISO(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* ============================================================
+   SELECTOR DE FECHA PROPIO (reemplaza el calendario nativo del navegador,
+   que no se puede rediseñar por completo con CSS y ademas cambia de un
+   navegador/celular a otro). El input se vuelve de solo lectura y al
+   tocarlo abre este panel; al elegir un dia se guarda como texto ISO
+   (YYYY-MM-DD) en el mismo input, igual que antes, asi que el resto del
+   codigo que lee ese .value no cambia.
+   ============================================================ */
+let _dpInput = null;
+let _dpViewDate = null;
+function parseISODateLocal(iso){
+  const [y,m,d] = iso.split('-').map(Number);
+  return new Date(y, (m||1)-1, d||1);
+}
+function setupDatePicker(input){
+  if(!input || input._dpReady) return;
+  input._dpReady = true;
+  input.setAttribute('readonly','readonly');
+  input.addEventListener('click', ()=> openDatePickerFor(input));
+  input.addEventListener('keydown', function(e){
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDatePickerFor(input); }
+  });
+}
+function openDatePickerFor(input){
+  closeDatePicker();
+  _dpInput = input;
+  const base = input.value ? parseISODateLocal(input.value) : new Date();
+  _dpViewDate = new Date(base.getFullYear(), base.getMonth(), 1);
+  renderDatePickerPanel();
+  const panel = document.getElementById('customDatePickerPanel');
+  const r = input.getBoundingClientRect();
+  const panelW = panel.offsetWidth || 280;
+  let left = r.left;
+  const maxLeft = document.documentElement.clientWidth - panelW - 10;
+  if(left > maxLeft) left = Math.max(10, maxLeft);
+  let top = r.bottom + 6;
+  const panelH = panel.offsetHeight || 330;
+  if(top + panelH > document.documentElement.clientHeight - 8){ top = Math.max(8, r.top - panelH - 6); }
+  panel.style.left = left + 'px';
+  panel.style.top = top + 'px';
+  panel.classList.add('open');
+  setTimeout(()=> document.addEventListener('click', dpOutsideClick), 0);
+}
+function renderDatePickerPanel(){
+  let panel = document.getElementById('customDatePickerPanel');
+  if(!panel){
+    panel = document.createElement('div');
+    panel.id = 'customDatePickerPanel';
+    panel.className = 'date-picker-panel';
+    document.body.appendChild(panel);
+  }
+  const y = _dpViewDate.getFullYear(), m = _dpViewDate.getMonth();
+  const meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+  const firstDay = new Date(y,m,1);
+  const startWeekday = (firstDay.getDay()+6)%7; // Lunes=0 ... Domingo=6
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const daysInPrevMonth = new Date(y,m,0).getDate();
+  const todayIso = todayLocalISO();
+  const selectedIso = (_dpInput && _dpInput.value) || '';
+
+  let cells = '';
+  for(let i=0;i<startWeekday;i++){
+    cells += `<div class="dp-day dp-muted">${daysInPrevMonth-startWeekday+i+1}</div>`;
+  }
+  for(let d=1; d<=daysInMonth; d++){
+    const iso = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    let cls = 'dp-day';
+    if(iso===todayIso) cls += ' dp-today';
+    if(iso===selectedIso) cls += ' dp-selected';
+    cells += `<div class="${cls}" onclick="pickDate('${iso}')">${d}</div>`;
+  }
+  const trailing = (7 - ((startWeekday+daysInMonth) % 7)) % 7;
+  for(let i=1;i<=trailing;i++){ cells += `<div class="dp-day dp-muted">${i}</div>`; }
+
+  panel.innerHTML = `
+    <div class="dp-header">
+      <button type="button" class="dp-nav" onclick="dpChangeMonth(-1)">&#8249;</button>
+      <div class="dp-title">${meses[m].charAt(0)+meses[m].slice(1).toLowerCase()} ${y}</div>
+      <button type="button" class="dp-nav" onclick="dpChangeMonth(1)">&#8250;</button>
+    </div>
+    <div class="dp-weekdays"><span>LU</span><span>MA</span><span>MI</span><span>JU</span><span>VI</span><span>SA</span><span>DO</span></div>
+    <div class="dp-grid">${cells}</div>
+    <div class="dp-footer">
+      <button type="button" class="dp-link" onclick="clearDatePicker()">Borrar</button>
+      <button type="button" class="dp-link" onclick="pickDate(todayLocalISO())">Hoy</button>
+    </div>`;
+}
+function dpChangeMonth(delta){
+  _dpViewDate = new Date(_dpViewDate.getFullYear(), _dpViewDate.getMonth()+delta, 1);
+  renderDatePickerPanel();
+}
+function pickDate(iso){
+  if(!_dpInput) return;
+  _dpInput.value = iso;
+  _dpInput.dispatchEvent(new Event('change', {bubbles:true}));
+  closeDatePicker();
+}
+function clearDatePicker(){
+  if(!_dpInput) return;
+  _dpInput.value = '';
+  _dpInput.dispatchEvent(new Event('change', {bubbles:true}));
+  closeDatePicker();
+}
+function dpOutsideClick(e){
+  const panel = document.getElementById('customDatePickerPanel');
+  if(!panel) return;
+  if(panel.contains(e.target) || (_dpInput && _dpInput.contains(e.target))) return;
+  closeDatePicker();
+}
+function closeDatePicker(){
+  const panel = document.getElementById('customDatePickerPanel');
+  if(panel) panel.classList.remove('open');
+  document.removeEventListener('click', dpOutsideClick);
+  _dpInput = null;
+}
+window.addEventListener('resize', closeDatePicker);
 function rangoLabel(items){
   if(items.length===0) return '';
   const fechas = items.map(m=>m.fecha).sort();
@@ -1654,7 +1847,7 @@ function renderDashboard(){
   document.getElementById('statTotal').textContent = mine.length;
   document.getElementById('statImporte').textContent = money(mine.reduce((s,m)=>s+Number(m.importe||0),0));
   document.getElementById('statLimite').textContent = DB.limiteDiario.toFixed(2);
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayLocalISO();
   document.getElementById('statHoy').textContent = money(dailyTotalForDate(user.id, today, null));
   document.getElementById('statColab').textContent = DB.colaboradores.filter(c=>c.activo).length;
 
@@ -1670,6 +1863,65 @@ function renderDashboard(){
       <td><b>${money(m.importe)}</b></td>
     </tr>`).join('');
   document.getElementById('dashboardEmpty').style.display = recent.length? 'none':'block';
+  updateNotifDot();
+}
+
+/* ============================================================
+   NOTIFICACIONES (campana): avisa si hay movilidades pendientes de
+   incluir en una planilla. Sin pendientes, no muestra nada. Un
+   administrador ve las de todos; un colaborador regular solo las suyas.
+   ============================================================ */
+function pendientesDeGenerarList(){
+  const user = getCurrentUser();
+  if(!user) return [];
+  const base = user.isAdmin ? DB.movilidades.slice() : DB.movilidades.filter(m=>m.colaboradorId===user.id);
+  return base.filter(m=>!m.planillaId);
+}
+function updateNotifDot(){
+  const dot = document.getElementById('notifDot');
+  if(!dot) return;
+  dot.style.display = pendientesDeGenerarList().length ? 'block' : 'none';
+}
+function toggleNotifPanel(e){
+  if(e) e.stopPropagation();
+  const panel = document.getElementById('notifPanel');
+  if(!panel) return;
+  if(panel.classList.contains('open')){ closeNotifPanel(); return; }
+  renderNotifPanel();
+  panel.classList.add('open');
+  setTimeout(()=> document.addEventListener('click', notifOutsideClick), 0);
+}
+function closeNotifPanel(){
+  const panel = document.getElementById('notifPanel');
+  if(panel) panel.classList.remove('open');
+  document.removeEventListener('click', notifOutsideClick);
+}
+function notifOutsideClick(e){
+  const panel = document.getElementById('notifPanel');
+  const btn = document.getElementById('notifBellBtn');
+  if(!panel) return;
+  if(panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+  closeNotifPanel();
+}
+function renderNotifPanel(){
+  const panel = document.getElementById('notifPanel');
+  if(!panel) return;
+  const user = getCurrentUser();
+  const list = pendientesDeGenerarList().sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  if(list.length===0){
+    panel.innerHTML = '<div class="notif-empty">&#10003; No hay movilidades pendientes de generar planilla.</div>';
+    return;
+  }
+  const rows = list.slice(0,8).map(m=>{
+    const colab = user && user.isAdmin ? DB.colaboradores.find(c=>c.id===m.colaboradorId) : null;
+    const colabTxt = colab ? (nombreCompleto(colab) + ' &middot; ') : '';
+    return `<div class="notif-item"><b>${m.correlativo}</b> &middot; ${colabTxt}${fmtFecha(m.fecha)}<br><span class="notif-motivo">${m.motivo}</span></div>`;
+  }).join('');
+  const extra = list.length>8 ? `<div class="notif-more">+ ${list.length-8} mas</div>` : '';
+  panel.innerHTML = `
+    <div class="notif-header">Pendientes de generar planilla (${list.length})</div>
+    <div class="notif-list">${rows}${extra}</div>
+    <button class="btn btn-purple btn-sm notif-cta" onclick="closeNotifPanel(); showSection('planillas');">Ir a Planillas</button>`;
 }
 
 /* ============================================================
@@ -1715,7 +1967,7 @@ function resetForm(keepFocus){
   document.getElementById('editId').value = '';
   document.getElementById('formColabDisplay').value = user? nombreCompleto(user) : '';
   document.getElementById('formDniDisplay').value = user? user.dni : '';
-  if(!keepFocus) document.getElementById('formFecha').value = new Date().toISOString().slice(0,10);
+  if(!keepFocus) document.getElementById('formFecha').value = todayLocalISO();
   document.getElementById('formImporte').value = '';
   document.getElementById('formMotivo').value = '';
   document.getElementById('formObs').value = '';
@@ -2405,33 +2657,109 @@ async function confirmarGenerarPlanilla(){
     return;
   }
 
-  const fechaEmisionNueva = fechaEmisionISOParaIds(ids);
-  const anio = new Date(fechaEmisionNueva).getFullYear();
+  // Una planilla fisica debe entrar en UNA sola hoja (para poder firmarla), asi
+  // que si lo seleccionado no cabe en una pagina A4, se reparte en varias
+  // planillas (cada una con su propio correlativo), en vez de generar una sola
+  // planilla de varias hojas. Ver splitIdsUnaHojaPorPlanilla().
+  const grupos = splitIdsUnaHojaPorPlanilla(ids);
+  const anioBase = new Date(fechaEmisionISOParaIds(ids)).getFullYear();
 
-  let correlativo = null, planillaId = null;
-  for(let attempt=0; attempt<3 && !planillaId; attempt++){
-    const candidato = nextPlanillaNumero(anio);
-    const { data, error } = await sb.from('planillas').insert({
-      correlativo: candidato, colaborador_id: colabId, fecha_emision: fechaEmisionNueva
-    }).select().single();
-    if(!error){ planillaId = data.id; correlativo = candidato; break; }
-    if(error.code !== '23505'){ if(btnGenerar) btnGenerar.disabled=false; toast('No se pudo generar la planilla', true); return; }
+  const planillasCreadas = [];
+  for(let gi=0; gi<grupos.length; gi++){
+    const grupoIds = grupos[gi];
+    const fechaEmisionGrupo = fechaEmisionISOParaIds(grupoIds);
+    const anio = new Date(fechaEmisionGrupo).getFullYear() || anioBase;
+
+    let correlativo = null, planillaId = null;
+    for(let attempt=0; attempt<3 && !planillaId; attempt++){
+      const candidato = await nextPlanillaNumero(anio);
+      const { data, error } = await sb.from('planillas').insert({
+        correlativo: candidato, colaborador_id: colabId, fecha_emision: fechaEmisionGrupo
+      }).select().single();
+      if(!error){ planillaId = data.id; correlativo = candidato; break; }
+      if(error.code !== '23505'){ if(btnGenerar) btnGenerar.disabled=false; toast('No se pudo generar la planilla', true); return; }
+      await refreshPlanillas();
+    }
+    if(!planillaId){
+      if(btnGenerar) btnGenerar.disabled=false;
+      toast(planillasCreadas.length ? ('Se generaron '+planillasCreadas.length+' planillas, pero una fallo. Vuelve a intentar con lo restante.') : 'No se pudo generar un numero de planilla unico, intenta de nuevo', true);
+      if(planillasCreadas.length){ await refreshMovilidades(); await refreshPlanillas(); buscarMovilidadesPendientes(); renderDashboard(); }
+      return;
+    }
+
+    const { error: errMov } = await sb.from('movilidades').update({ planilla_id: planillaId }).in('id', grupoIds);
+    if(errMov){
+      if(btnGenerar) btnGenerar.disabled=false;
+      toast('Una planilla se creo pero no se pudieron vincular sus movilidades', true);
+      await refreshMovilidades(); await refreshPlanillas(); buscarMovilidadesPendientes(); renderDashboard();
+      return;
+    }
+
+    await refreshMovilidades();
     await refreshPlanillas();
+    planillasCreadas.push({ id: planillaId, correlativo });
   }
-  if(!planillaId){ if(btnGenerar) btnGenerar.disabled=false; toast('No se pudo generar un numero de planilla unico, intenta de nuevo', true); return; }
 
-  const { error: errMov } = await sb.from('movilidades').update({ planilla_id: planillaId }).in('id', ids);
   if(btnGenerar) btnGenerar.disabled = false;
-  if(errMov){ toast('La planilla se creo pero no se pudieron vincular las movilidades', true); return; }
 
-  await refreshMovilidades();
-  await refreshPlanillas();
-
-  const planilla = getPlanilla(planillaId);
-  toast('Planilla generada: ' + correlativo);
-  mostrarPreviewPlanilla(planilla, 'planPreviewCard');
+  if(planillasCreadas.length === 1){
+    const planilla = getPlanilla(planillasCreadas[0].id);
+    toast('Planilla generada: ' + planillasCreadas[0].correlativo);
+    mostrarPreviewPlanilla(planilla, 'planPreviewCard');
+  } else {
+    toast('La seleccion no entraba en una sola hoja: se generaron ' + planillasCreadas.length + ' planillas (una hoja cada una) &middot; ' + planillasCreadas.map(p=>p.correlativo).join(', '));
+    mostrarPreviewPlanillasMultiples(planillasCreadas.map(p=>p.id), 'planPreviewCard');
+  }
   buscarMovilidadesPendientes();
   renderDashboard();
+}
+// Calcula cuantas filas de la tabla de la planilla entran en UNA pagina A4
+// (con el mismo layout que usa drawPlanillaPdf: margenes, ancho de columnas,
+// fuente y como se envuelve el texto) y reparte los ids seleccionados en
+// grupos que si entran completos, para que cada planilla generada quede en
+// una sola hoja fisica.
+function estimarAlturaFilaPlanilla(pdfMedidor, m, colW){
+  const cellPadX = 4, lineH = 9.6;
+  const motivoLines = pdfMedidor.splitTextToSize(up(m.motivo||''), colW[1]-cellPadX*2);
+  const partidaLines = pdfMedidor.splitTextToSize(up(m.partida||''), colW[2]-cellPadX*2);
+  const llegadaLines = pdfMedidor.splitTextToSize(up(m.llegada||''), colW[3]-cellPadX*2);
+  const nLines = Math.max(1, motivoLines.length, partidaLines.length, llegadaLines.length);
+  return Math.max(15.5, nLines*lineH + 5.5);
+}
+function splitIdsUnaHojaPorPlanilla(ids){
+  const { jsPDF } = window.jspdf;
+  const pdfMedidor = new jsPDF({ unit:'pt', format:'a4', orientation:'portrait' });
+  const M = 32;
+  const PAGE_H = pdfMedidor.internal.pageSize.getHeight();
+  const CW = pdfMedidor.internal.pageSize.getWidth() - 2*M;
+  const colPct = [12,40,18,19,11];
+  const colW = colPct.map(pc=>CW*pc/100);
+  pdfMedidor.setFont('courier','normal'); pdfMedidor.setFontSize(8.2);
+
+  // HEADER_H: espacio fijo que ocupan logo/titulo/datos/encabezado de tabla
+  // antes de la primera fila (igual en toda planilla). FOOTER_H: espacio
+  // reservado al final para el total y la firma. Ambos deben coincidir con
+  // drawPlanillaPdf; se deja margen de sobra para no quedar muy justo.
+  const HEADER_H = 280;
+  const FOOTER_H = 190;
+  const ALTURA_DISPONIBLE = (PAGE_H - M) - HEADER_H - FOOTER_H;
+
+  const items = ids.map(id=>DB.movilidades.find(m=>m.id===id)).filter(Boolean)
+                   .sort((a,b)=>a.fecha.localeCompare(b.fecha));
+
+  const grupos = [];
+  let actual = [], alturaActual = 0;
+  items.forEach(m=>{
+    const rh = estimarAlturaFilaPlanilla(pdfMedidor, m, colW);
+    if(actual.length && alturaActual + rh > ALTURA_DISPONIBLE){
+      grupos.push(actual);
+      actual = []; alturaActual = 0;
+    }
+    actual.push(m.id);
+    alturaActual += rh;
+  });
+  if(actual.length) grupos.push(actual);
+  return grupos;
 }
 function editarPlanilla(id){
   const p = getPlanilla(id);
@@ -2530,6 +2858,38 @@ function mostrarPreviewPlanilla(planilla, cardId){
     </div>
     <div class="doc-scale-wrap" id="docwrap-${cardId}">${html}</div>`;
   requestAnimationFrame(function(){ fitPlanillaDoc(cardId); });
+}
+// Cuando la seleccion no entraba en una sola hoja y se generaron varias
+// planillas de golpe: muestra cada una apilada (cada una descargable por su
+// cuenta) mas un boton para descargar TODAS juntas en un solo PDF (una hoja
+// por planilla, cada una con su propio correlativo y firma).
+function mostrarPreviewPlanillasMultiples(planillaIds, cardId){
+  const card = document.getElementById(cardId);
+  card.style.display = 'block';
+  const planillas = planillaIds.map(id=>getPlanilla(id)).filter(Boolean);
+  const idsLiteral = planillaIds.map(id=>`'${id}'`).join(',');
+
+  const bloques = planillas.map((p,i)=>{
+    const html = renderPlanillaDocHTML(p);
+    return `<div style="margin-top:${i===0?0:28}px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+        <h4 style="margin:0;font-size:14px;">Hoja ${i+1} de ${planillas.length} &middot; ${p.correlativo}</h4>
+        <button class="btn btn-outline btn-sm" onclick="descargarPDF('${p.id}')">&#11015; Descargar esta hoja</button>
+      </div>
+      <div class="doc-scale-wrap" id="docwrap-${cardId}-${i}">${html}</div>
+    </div>`;
+  }).join('');
+
+  card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:10px;">
+      <h3 style="margin:0;font-size:16px;">Vista previa &middot; ${planillas.length} planillas generadas</h3>
+      <button class="btn btn-purple btn-sm" onclick="descargarPDFMultiple([${idsLiteral}])">&#11015; Descargar todas en un solo PDF</button>
+    </div>
+    <p style="margin:0 0 14px;font-size:12.5px;color:var(--text-mut);">La seleccion no entraba en una sola hoja, asi que se genero una planilla distinta (con su propio correlativo) por cada hoja.</p>
+    ${bloques}`;
+
+  requestAnimationFrame(function(){
+    planillas.forEach((p,i)=> fitPlanillaDoc(cardId + '-' + i));
+  });
 }
 // Reduce a escala el documento de la planilla (que tiene un ancho fijo de 1000px,
 // pensado para el PDF) para que quepa dentro de pantallas angostas sin obligar a
@@ -2841,6 +3201,27 @@ async function descargarPDF(planillaId){
     toast('No se pudo generar el PDF', true);
   }
 }
+async function descargarPDFMultiple(planillaIds){
+  toast('Generando PDF...');
+  try{
+    await new Promise(r=>setTimeout(r, 10));
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
+    let alguna = false;
+    for(let i=0;i<planillaIds.length;i++){
+      const p = getPlanilla(planillaIds[i]);
+      if(!p) continue;
+      if(alguna) pdf.addPage();
+      await drawPlanillaPdf(pdf, p);
+      alguna = true;
+    }
+    if(!alguna){ toast('No se encontraron las planillas', true); return; }
+    pdf.save('planillas_mangro_' + planillaIds.length + '.pdf');
+  }catch(err){
+    console.error(err);
+    toast('No se pudo generar el PDF', true);
+  }
+}
 
 /* ============================================================
    CONFIGURACION
@@ -2895,6 +3276,10 @@ function boot(){
   const navConfig = document.getElementById('navConfig');
   if(navConfig) navConfig.style.display = user.isAdmin ? '' : 'none';
   applyThemeToggleUI();
+  ['formFecha','planFechaInicio','planFechaFin'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) setupDatePicker(el);
+  });
 }
 function toggleSidebar(){
   const sidebar = document.getElementById('sidebar');

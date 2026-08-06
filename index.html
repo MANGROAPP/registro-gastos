@@ -24,9 +24,9 @@ try{
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --purple:#6C5DD3;
-    --purple-dark:#5843c9;
-    --purple-light:#EFEBFB;
+    --purple:#2F6FED;
+    --purple-dark:#2456C4;
+    --purple-light:#E8F0FE;
     --navy:#1B1B2F;
     --green:#1DBF73;
     --green-bg:#E7F9F1;
@@ -275,10 +275,20 @@ try{
   .filters input.date-input{
     width:100%;padding:11px 13px;border-radius:11px;border:1.5px solid var(--border);font-family:inherit;
     font-size:13.5px;background:#FBFBFE;color:var(--text);cursor:pointer;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5DD3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F6FED' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:right 12px center;background-size:17px;padding-right:38px;
   }
   .field input.date-input:focus,.filters input.date-input:focus{outline:none;border-color:var(--purple);background-color:#fff;}
+  /* El input real queda con el texto invisible (sigue guardando YYYY-MM-DD
+     para el resto del codigo); lo que se ve es el span de arriba, en
+     formato peruano DD/MM/AAAA. Ver setupDatePicker(). */
+  .date-input-wrap{position:relative;}
+  .date-input-wrap input.date-input{color:transparent;-webkit-text-fill-color:transparent;caret-color:transparent;}
+  .date-input-wrap input.date-input::placeholder{color:#B7B6CC;-webkit-text-fill-color:#B7B6CC;}
+  .date-input-display{
+    position:absolute;left:13px;top:0;bottom:0;display:flex;align-items:center;
+    font-size:13.5px;color:var(--text);pointer-events:none;
+  }
   .field small.hint{display:block;margin-top:5px;color:var(--text-mut);font-size:11px;text-transform:none;}
   .field.invalid input{border-color:var(--red);background:var(--red-bg);}
 
@@ -338,7 +348,7 @@ try{
 
   .login-screen{
     min-height:100vh;display:flex;align-items:center;justify-content:center;background:
-    linear-gradient(135deg,#EDEAFB,#F4F5FA 60%);
+    linear-gradient(135deg,#E7F0FE,#F4F5FA 60%);
   }
   .login-card{background:#fff;border-radius:24px;padding:40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(80,70,150,.12);}
   .login-card img{height:38px;margin:0 auto 26px;display:block;}
@@ -406,6 +416,7 @@ try{
     .filters input{
       font-size:16px;min-height:44px;
     }
+    .date-input-display{font-size:16px;}
     .filters{width:100%;}
     .filters select,.filters input{flex:1 1 160px;}
     .filters .btn{flex:0 0 auto;}
@@ -463,7 +474,7 @@ try{
      MODO OSCURO
      ============================================================ */
   html[data-theme="dark"]{
-    --purple-light:#2A2452;
+    --purple-light:#1C2E4E;
     --green-bg:#123A2B;
     --red-bg:#3A1E22;
     --orange-bg:#3A2E12;
@@ -514,9 +525,9 @@ try{
      ============================================================ */
   .login-screen{position:relative;overflow:hidden;}
   .login-blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;}
-  .login-blob-1{width:420px;height:420px;background:#C9BFFA;top:-160px;left:-120px;}
+  .login-blob-1{width:420px;height:420px;background:#BFDBFE;top:-160px;left:-120px;}
   .login-blob-2{width:360px;height:360px;background:#FFD9A0;bottom:-140px;right:-100px;opacity:.35;}
-  html[data-theme="dark"] .login-blob-1{background:#3A2E8A;opacity:.35;}
+  html[data-theme="dark"] .login-blob-1{background:#1E3A6B;opacity:.35;}
   html[data-theme="dark"] .login-blob-2{background:#5C3E10;opacity:.25;}
   .login-card{position:relative;z-index:1;}
   .login-logo{height:34px;margin:0 auto 22px;display:block;}
@@ -1656,6 +1667,33 @@ function setupDatePicker(input){
   if(!input || input._dpReady) return;
   input._dpReady = true;
   input.setAttribute('readonly','readonly');
+
+  // El input sigue guardando y devolviendo el valor real en ISO (YYYY-MM-DD)
+  // para el resto del codigo (nada mas cambia), pero en Peru la fecha se lee
+  // dia/mes/año, asi que se muestra un span encima con ese formato. Se
+  // sincroniza interceptando el propio accessor "value" del input, en vez de
+  // tocar cada lugar del codigo que hace formFecha.value = '...'.
+  const wrap = document.createElement('div');
+  wrap.className = 'date-input-wrap';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const display = document.createElement('span');
+  display.className = 'date-input-display';
+  display.setAttribute('aria-hidden', 'true');
+  wrap.appendChild(display);
+
+  const currentIso = input.value;
+  const nativeDesc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+  Object.defineProperty(input, 'value', {
+    get(){ return nativeDesc.get.call(input); },
+    set(iso){
+      nativeDesc.set.call(input, iso || '');
+      display.textContent = iso ? fmtFecha(iso) : '';
+    },
+    configurable: true
+  });
+  input.value = currentIso; // pinta el span si ya traia un valor antes de este setup
+
   input.addEventListener('click', ()=> openDatePickerFor(input));
   input.addEventListener('keydown', function(e){
     if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDatePickerFor(input); }
@@ -2245,8 +2283,8 @@ function exportExcel(){
   const rowsHtml = list.map((m,i)=>{
     const planilla = m.planillaId ? getPlanilla(m.planillaId) : null;
     const estado = planilla ? ('EN PLANILLA ' + planilla.correlativo) : 'PENDIENTE';
-    const bg = i % 2 === 0 ? '#FFFFFF' : '#F4F2FC';
-    const estadoColor = planilla ? '#6C5DD3' : '#C77700';
+    const bg = i % 2 === 0 ? '#FFFFFF' : '#EAF2FE';
+    const estadoColor = planilla ? '#2F6FED' : '#C77700';
     const cells = user.isAdmin
       ? [m.correlativo, fmtFecha(m.fecha), colabNombre[m.colaboradorId]||'', dniPorColab[m.colaboradorId]||'', m.motivo, m.partida, m.llegada, Number(m.importe).toFixed(2), (m.observaciones||''), m.periodo, estado]
       : [m.correlativo, fmtFecha(m.fecha), m.motivo, m.partida, m.llegada, Number(m.importe).toFixed(2), (m.observaciones||''), m.periodo, estado];
@@ -2256,21 +2294,21 @@ function exportExcel(){
       const align = ci===importeIdx ? 'right' : (ci===0 ? 'center' : 'left');
       const color = ci===estadoIdx ? ('color:'+estadoColor+';font-weight:bold;') : '';
       const fontWeight = (ci===importeIdx) ? 'font-weight:bold;' : '';
-      return `<td style="padding:7px 10px;border:1px solid #E4E1F5;text-align:${align};font-size:12px;${color}${fontWeight}">${c}</td>`;
+      return `<td style="padding:7px 10px;border:1px solid #DCE8FC;text-align:${align};font-size:12px;${color}${fontWeight}">${c}</td>`;
     }).join('') + '</tr>';
   }).join('');
 
   const totalRow = `<tr style="background:#1B1B2F;">
-    <td colspan="${cols.length-2}" style="padding:9px 10px;border:1px solid #E4E1F5;color:#fff;font-weight:bold;text-align:right;font-size:12.5px;">TOTAL</td>
-    <td style="padding:9px 10px;border:1px solid #E4E1F5;color:#fff;font-weight:bold;text-align:right;font-size:12.5px;">S/ ${total.toFixed(2)}</td>
-    <td style="padding:9px 10px;border:1px solid #E4E1F5;"></td>
+    <td colspan="${cols.length-2}" style="padding:9px 10px;border:1px solid #DCE8FC;color:#fff;font-weight:bold;text-align:right;font-size:12.5px;">TOTAL</td>
+    <td style="padding:9px 10px;border:1px solid #DCE8FC;color:#fff;font-weight:bold;text-align:right;font-size:12.5px;">S/ ${total.toFixed(2)}</td>
+    <td style="padding:9px 10px;border:1px solid #DCE8FC;"></td>
   </tr>`;
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:Calibri,Arial,sans-serif;">
     <table style="border-collapse:collapse;">
       <tr><td colspan="${cols.length}" style="padding:6px 10px;font-size:16px;font-weight:bold;color:#1B1B2F;">MANGRO SAC &middot; Movilidades ${user.isAdmin ? '(todo el personal)' : ''}</td></tr>
       <tr><td colspan="${cols.length}" style="padding:0 10px 10px;font-size:11px;color:#8A8AA3;">Exportado el ${fechaGenStr} &middot; ${list.length} registro(s)</td></tr>
-      <tr>${cols.map(c=>`<th style="background:#6C5DD3;color:#fff;padding:9px 10px;border:1px solid #5843C9;font-size:12px;text-align:left;">${c}</th>`).join('')}</tr>
+      <tr>${cols.map(c=>`<th style="background:#2F6FED;color:#fff;padding:9px 10px;border:1px solid #2456C4;font-size:12px;text-align:left;">${c}</th>`).join('')}</tr>
       ${rowsHtml}
       ${totalRow}
     </table>
@@ -3344,7 +3382,7 @@ function mostrarErrorInicio(err){
     + '<div style="font-size:32px;margin-bottom:10px;">&#9888;&#65039;</div>'
     + '<h2 style="margin:0 0 10px;font-size:17px;color:#1B1B2F;">No se pudo iniciar la aplicacion</h2>'
     + '<p style="margin:0 0 14px;font-size:13px;color:#8A8AA3;line-height:1.5;">Ocurrio un problema al cargar tus datos en este navegador. Si estas en el iPhone, intenta abrir el archivo directamente en Safari (no desde una vista previa de WhatsApp o Correo): toca el archivo, elige compartir y luego "Abrir en Safari", o guardalo primero en la app Archivos y abrelo desde ahi.</p>'
-    + '<button onclick="location.reload()" style="border:none;background:#6C5DD3;color:#fff;padding:10px 20px;border-radius:10px;font-family:inherit;font-weight:600;cursor:pointer;">Reintentar</button>'
+    + '<button onclick="location.reload()" style="border:none;background:#2F6FED;color:#fff;padding:10px 20px;border-radius:10px;font-family:inherit;font-weight:600;cursor:pointer;">Reintentar</button>'
     + '</div>';
   document.body.appendChild(overlay);
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mangro-gastos-v6';
+const CACHE_NAME = 'mangro-gastos-v7';
 const PRECACHE_URLS = [
   './',
   './index.html',

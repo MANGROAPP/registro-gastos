@@ -1138,6 +1138,78 @@ try{
     .dp-nav-anio{ width:32px; height:32px; }
   }
 
+
+  /* ==========================================================================
+     RONDA 26
+     ========================================================================== */
+
+  /* ---- Buscador dentro del select propio ---- */
+  .cs-search{
+    position:relative; display:flex; align-items:center;
+    padding:4px 4px 8px; border-bottom:1px solid var(--border); margin-bottom:4px;
+  }
+  .cs-search svg{
+    position:absolute; left:14px; width:15px; height:15px; color:var(--text-mut); pointer-events:none;
+  }
+  .cs-search input{
+    width:100%; box-sizing:border-box; padding:9px 12px 9px 36px;
+    border:1.5px solid var(--border); border-radius:10px;
+    font-family:inherit; font-size:13px; color:var(--text);
+    background-color:var(--card-2, #F6F6FB); text-transform:uppercase;
+  }
+  .cs-search input::placeholder{ text-transform:none; color:var(--text-mut); }
+  .cs-search input:focus{ outline:none; border-color:var(--purple); background-color:var(--card); }
+  html[data-theme="dark"] .cs-search input{ background-color:#15141F; }
+  .cs-list{ overflow-y:auto; }
+  /* Resaltado de teclado: se distingue del hover del mouse y del ya seleccionado. */
+  .cs-option.cs-activa{ background:var(--purple-light); box-shadow:inset 0 0 0 1.5px var(--purple); }
+  .cs-option.selected.cs-activa{ box-shadow:inset 0 0 0 2px var(--card); }
+
+  /* ---- Blindaje: .mono dibuja una pastilla y solo debe ir en un <span>.
+       Si por descuido vuelve a aparecer sobre un <td>, que no pinte la celda
+       entera como paso en Generar Planilla y en el historial de planillas. ---- */
+  td.mono{ background:none !important; padding:13px 12px !important; border-radius:0 !important; }
+  td.mono > *{ /* nada: la pastilla la pone el span interior */ }
+
+  /* ---- Mi cuenta ---- */
+  /* justify-content:flex-start es necesario: la regla anterior de esta misma
+     clase (ronda 24) ponia space-between para el diseño de una sola linea, y al
+     no redeclararlo aqui seguia empujando el bloque de texto contra el borde
+     derecho. Misma especificidad, propiedades distintas: no se pisan. */
+  .cuenta-correo{
+    width:100%; display:flex; align-items:center; justify-content:flex-start; gap:11px;
+    background:var(--card-2, #F6F6FB); border:1px solid var(--border); border-radius:12px;
+    padding:10px 13px;
+  }
+  .cuenta-avatar{
+    width:34px; height:34px; flex:none; border-radius:50%;
+    background:var(--purple-grad); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; letter-spacing:.02em;
+  }
+  .cuenta-datos{ min-width:0; flex:1; display:flex; flex-direction:column; gap:1px; align-items:flex-start; }
+  .cuenta-correo-lbl{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--text-mut); font-weight:700;
+  }
+  /* El correo va en su propia linea y a la izquierda: antes competia con la
+     etiqueta en la misma fila y en correos largos se veia apretado. */
+  .cuenta-correo-val{
+    font-size:12.5px; color:var(--text); font-weight:600; text-align:left;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  /* ---- Modal de primer ingreso ---- */
+  #primerIngresoOverlay .modal{ text-align:left; }
+  .pi-icon{
+    width:46px; height:46px; border-radius:14px; margin-bottom:14px;
+    background:var(--purple-light); color:var(--purple);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pi-icon svg{ width:22px; height:22px; }
+  #primerIngresoOverlay .field input{ width:100%; box-sizing:border-box; }
+  #primerIngresoOverlay .login-error{ margin-bottom:12px; }
+
 </style>
 </head>
 <body>
@@ -1480,7 +1552,7 @@ try{
             </div>
           </div>
           <table class="tbl-mov tbl-cards">
-            <thead><tr><th style="width:34px;"></th><th>Correlativo</th><th>Fecha</th><th>Motivo</th><th>Partida</th><th>Llegada</th><th>Importe</th></tr></thead>
+            <thead><tr><th style="width:34px;"></th><th class="col-num">N&deg; de Movilidad</th><th class="col-fecha">Fecha</th><th class="col-motivo">Motivo</th><th class="col-dist center">Partida</th><th class="col-dist center">Llegada</th><th class="col-imp right">Importe</th></tr></thead>
             <tbody id="candidatosBody"></tbody>
           </table>
           <div class="total-bar"><span>Total seleccionado:</span> <span class="amount" id="candidatosTotal">S/ 0.00</span></div>
@@ -1503,8 +1575,8 @@ try{
           <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
             <button class="btn btn-ghost btn-sm" id="btnRefrescarPlanHist" onclick="refrescarPlanillasHistorial()"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
           </div>
-          <table class="tbl-cards">
-            <thead><tr><th>N&deg; Planilla</th><th>Colaborador</th><th>Rango</th><th>Total</th><th>Generada</th><th></th></tr></thead>
+          <table class="tbl-mov tbl-cards">
+            <thead><tr><th class="col-num">N&deg; Planilla</th><th class="col-trab">Colaborador</th><th>Rango</th><th class="col-imp right">Total</th><th class="col-fecha">Generada</th><th></th></tr></thead>
             <tbody id="planillasHistBody"></tbody>
           </table>
           <div class="empty-state" id="planillasHistEmpty" style="display:none;">Aun no se han generado planillas.</div>
@@ -1561,7 +1633,7 @@ try{
       <div class="field" id="colabPasswordField">
         <label>Contraseña inicial</label>
         <input type="text" id="colabPassword" placeholder="Minimo 6 caracteres">
-        <small class="hint">Compartesela al colaborador; podra ingresar de inmediato con su correo y esta contraseña.</small>
+        <small class="hint">Es una contrase&ntilde;a <b>temporal</b>: compartesela al colaborador y, la primera vez que ingrese, la app le va a pedir que cree la suya. Desde ese momento la que le enviaste deja de servir y solo el conoce la nueva.</small>
       </div>
       <div class="field full" style="display:flex;align-items:center;gap:8px;">
         <input type="checkbox" id="colabIsAdmin" style="width:18px;height:18px;">
@@ -1605,8 +1677,11 @@ try{
     <div class="modal-row" style="align-items:flex-start;flex-direction:column;gap:10px;">
       <div class="mr-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Mi cuenta</span></div>
       <div class="cuenta-correo">
-        <span class="cuenta-correo-lbl">Correo de acceso</span>
-        <span class="cuenta-correo-val" id="cfgMiCorreo">-</span>
+        <div class="cuenta-avatar" id="cfgMiAvatar">--</div>
+        <div class="cuenta-datos">
+          <span class="cuenta-correo-lbl">Correo de acceso</span>
+          <span class="cuenta-correo-val" id="cfgMiCorreo">-</span>
+        </div>
       </div>
       <button class="btn btn-outline btn-sm" id="btnAbrirCambioPass" onclick="togglePassForm()" style="width:100%;justify-content:center;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;margin-right:6px;"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
@@ -1634,6 +1709,29 @@ try{
       <button class="btn btn-purple" onclick="saveConfig()">Guardar</button>
     </div>
     <div class="cfg-version">Registro de Gastos &middot; version <b id="cfgVersion">-</b></div>
+  </div>
+</div>
+
+<!-- ===================== PRIMER INGRESO: CREAR CONTRASENA =====================
+     Sin boton de cerrar y sin cierre por click fuera a proposito: la contrasena
+     temporal viajo por WhatsApp o correo y sigue viva hasta que se reemplaza.
+     La unica salida es crear la nueva o cerrar sesion. -->
+<div class="modal-overlay" id="primerIngresoOverlay">
+  <div class="modal" style="max-width:420px;">
+    <div class="pi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <h2>Crea tu contrase&ntilde;a</h2>
+    <p class="sub">Ingresaste con una contrase&ntilde;a temporal que te compartieron. Elige ahora una propia: desde este momento la anterior deja de funcionar y nadie mas la conoce.</p>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Nueva contrase&ntilde;a</label>
+      <input type="password" id="piPass1" autocomplete="new-password" placeholder="Minimo 8 caracteres">
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Repite la contrase&ntilde;a</label>
+      <input type="password" id="piPass2" autocomplete="new-password" placeholder="Escribela otra vez" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarPrimerIngreso();}">
+    </div>
+    <div class="login-error" id="piError" style="display:none;"></div>
+    <button class="btn btn-purple" id="btnPrimerIngreso" onclick="guardarPrimerIngreso()" style="width:100%;justify-content:center;">Guardar y continuar</button>
+    <button class="btn btn-ghost btn-sm" onclick="logout()" style="width:100%;justify-content:center;margin-top:8px;">Cerrar sesion</button>
   </div>
 </div>
 
@@ -2064,7 +2162,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.2.1';
+const APP_VERSION = '2.3.0';
 
 const safeStorage = (function(){
   let usable = false;
@@ -2569,6 +2667,79 @@ function csOptionRow(opt, select){
   const cls = 'cs-option' + (opt.selected ? ' selected' : '');
   return '<div class="' + cls + '" data-idx="' + idx + '" onclick="pickCustomSelectOption(' + idx + ')">' + opt.textContent + '</div>';
 }
+/* ---------------------------------------------------------------------
+   BUSCADOR DEL SELECT PROPIO
+   El <select> nativo dejaba saltar a una opcion escribiendo sus primeras
+   letras; al reemplazarlo por este panel esa comodidad se perdio, y con 40+
+   distritos buscar a ojo es lento. Esto la devuelve mejorada: en vez de saltar
+   solo por el inicio de la palabra, filtra por cualquier parte del nombre.
+   --------------------------------------------------------------------- */
+const CS_MIN_BUSCADOR = 8;   // con pocas opciones el buscador estorba mas que ayuda
+function csNormalizar(t){
+  return (t||'').toString().toUpperCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // SAN ISIDRO = SÁN ÍSIDRO
+    .replace(/\s+/g,' ').trim();
+}
+function csConstruirFilas(select, filtro){
+  const q = csNormalizar(filtro);
+  let rows = '', visibles = 0;
+  Array.prototype.forEach.call(select.children, function(child){
+    if(child.tagName === 'OPTGROUP'){
+      const hijos = Array.prototype.filter.call(child.children, function(opt){
+        return !q || csNormalizar(opt.textContent).indexOf(q) !== -1;
+      });
+      if(!hijos.length) return;
+      rows += '<div class="cs-group-label">' + child.label + '</div>';
+      hijos.forEach(function(opt){ rows += csOptionRow(opt, select); visibles++; });
+    } else if(child.tagName === 'OPTION'){
+      if(q && csNormalizar(child.textContent).indexOf(q) === -1) return;
+      rows += csOptionRow(child, select); visibles++;
+    }
+  });
+  if(!visibles){
+    rows = '<div class="cs-empty">' + (q ? 'Sin resultados para "' + filtro + '"' : 'Sin opciones') + '</div>';
+  }
+  return rows;
+}
+function csFiltrar(valor){
+  if(!_csSelect) return;
+  const lista = document.getElementById('csList');
+  if(!lista) return;
+  lista.innerHTML = csConstruirFilas(_csSelect, valor);
+  lista.scrollTop = 0;
+  /* Con un filtro activo se resalta la primera coincidencia, asi Enter elige lo
+     obvio sin obligar a mover el mouse. */
+  const primera = lista.querySelector('.cs-option');
+  if(valor && primera) primera.classList.add('cs-activa');
+}
+function csOpcionActiva(){
+  const lista = document.getElementById('csList');
+  if(!lista) return null;
+  return lista.querySelector('.cs-option.cs-activa') || lista.querySelector('.cs-option.selected');
+}
+function csMover(delta){
+  const lista = document.getElementById('csList');
+  if(!lista) return;
+  const opts = Array.prototype.slice.call(lista.querySelectorAll('.cs-option'));
+  if(!opts.length) return;
+  const actual = csOpcionActiva();
+  let i = actual ? opts.indexOf(actual) : -1;
+  i = Math.max(0, Math.min(opts.length-1, i + delta));
+  opts.forEach(function(o){ o.classList.remove('cs-activa'); });
+  opts[i].classList.add('cs-activa');
+  opts[i].scrollIntoView({ block:'nearest' });
+}
+function csTeclado(e){
+  if(e.key === 'ArrowDown'){ e.preventDefault(); csMover(1); return; }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); csMover(-1); return; }
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    const a = csOpcionActiva();
+    if(a) pickCustomSelectOption(parseInt(a.getAttribute('data-idx'), 10));
+    return;
+  }
+  if(e.key === 'Escape'){ e.preventDefault(); closeCustomSelectPanel(); }
+}
 function openCustomSelectPanel(select){
   closeCustomSelectPanel();
   closeDatePicker();
@@ -2580,16 +2751,15 @@ function openCustomSelectPanel(select){
     panel.className = 'custom-select-panel';
     document.body.appendChild(panel);
   }
-  let rows = '';
-  Array.prototype.forEach.call(select.children, function(child){
-    if(child.tagName === 'OPTGROUP'){
-      rows += '<div class="cs-group-label">' + child.label + '</div>';
-      Array.prototype.forEach.call(child.children, function(opt){ rows += csOptionRow(opt, select); });
-    } else if(child.tagName === 'OPTION'){
-      rows += csOptionRow(child, select);
-    }
-  });
-  panel.innerHTML = rows || '<div class="cs-empty">Sin opciones</div>';
+  const conBuscador = select.options.length >= CS_MIN_BUSCADOR;
+  panel.innerHTML =
+    (conBuscador
+      ? '<div class="cs-search">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.2-4.2"/></svg>' +
+          '<input type="text" id="csSearch" autocomplete="off" spellcheck="false" placeholder="Escribe para buscar..." oninput="csFiltrar(this.value)" onkeydown="csTeclado(event)">' +
+        '</div>'
+      : '') +
+    '<div class="cs-list" id="csList">' + csConstruirFilas(select, '') + '</div>';
 
   const trigger = select._csTrigger;
   const r = trigger.getBoundingClientRect();
@@ -2602,7 +2772,11 @@ function openCustomSelectPanel(select){
   const maxH = Math.max(140, Math.min(320, availableBelow));
   let top = r.bottom + 6;
   if(availableBelow < 140){ top = Math.max(8, r.top - maxH - 6); }
-  panel.style.maxHeight = maxH + 'px';
+  /* El alto maximo va en la LISTA, no en el panel: asi el buscador queda fijo
+     arriba y solo se desplazan las opciones. */
+  const lista = panel.querySelector('.cs-list');
+  if(lista) lista.style.maxHeight = Math.max(120, maxH - (conBuscador ? 52 : 0)) + 'px';
+  panel.style.maxHeight = 'none';
   panel.style.left = left + 'px';
   panel.style.top = top + 'px';
   panel.classList.add('open');
@@ -2611,6 +2785,10 @@ function openCustomSelectPanel(select){
   requestAnimationFrame(function(){
     const sel = panel.querySelector('.cs-option.selected');
     if(sel) sel.scrollIntoView({ block:'nearest' });
+    /* En celular NO se enfoca solo: el teclado taparia la lista de golpe.
+       Ahi el buscador queda a un toque de distancia. */
+    const buscador = document.getElementById('csSearch');
+    if(buscador && window.innerWidth > 900) buscador.focus();
   });
   setTimeout(function(){ document.addEventListener('click', csOutsideClick); }, 0);
 }
@@ -3486,7 +3664,10 @@ async function saveColaborador(){
     if(!email || !password){ if(btn) btn.disabled = false; toast('Ingresa el correo y una contraseña inicial para el nuevo colaborador', true); return; }
     if(password.length < 6){ if(btn) btn.disabled = false; toast('La contraseña debe tener al menos 6 caracteres', true); return; }
 
-    const { data: signUpData, error: signUpError } = await sbAdmin.auth.signUp({ email, password });
+    const { data: signUpData, error: signUpError } = await sbAdmin.auth.signUp({
+      email, password,
+      options: { data: { debe_cambiar_password: true } }
+    });
     if(signUpError){
       if(btn) btn.disabled = false;
       toast('No se pudo crear el acceso: ' + signUpError.message, true);
@@ -3591,13 +3772,13 @@ function buscarMovilidadesPendientes(){
     const checked = editing ? (m.planillaId===editing.id) : true;
     return `
     <tr data-id="${m.id}" data-importe="${m.importe}">
-      <td><input type="checkbox" class="candidato-chk" ${checked?'checked':''} onchange="recalcCandidatosTotal()"></td>
-      <td class="mono">${m.correlativo}</td>
-      <td>${fmtFecha(m.fecha)}</td>
-      <td>${m.motivo}</td>
-      <td><span class="badge purple">${m.partida}</span></td>
-      <td><span class="badge orange">${m.llegada}</span></td>
-      <td><b>${money(m.importe)}</b></td>
+      <td data-label="Incluir"><input type="checkbox" class="candidato-chk" ${checked?'checked':''} onchange="recalcCandidatosTotal()"></td>
+      <td class="col-num" data-label="N&deg; de Movilidad"><span class="mono">${m.correlativo}</span></td>
+      <td class="col-fecha" data-label="Fecha">${fmtFecha(m.fecha)}</td>
+      <td class="col-motivo" data-label="Motivo">${m.motivo}</td>
+      <td class="col-dist center" data-label="Partida"><span class="badge purple">${m.partida}</span></td>
+      <td class="col-dist center" data-label="Llegada"><span class="badge orange">${m.llegada}</span></td>
+      <td class="col-imp right" data-label="Importe"><b class="amount">${money(m.importe)}</b></td>
     </tr>`;
   }).join('');
   document.getElementById('selAllCandidatos').checked = list.every(m=> editing ? m.planillaId===editing.id : true);
@@ -3961,11 +4142,11 @@ function renderPlanillasHistorial(){
     const emision = new Date(p.fechaEmision);
     const fechaStr = String(emision.getDate()).padStart(2,'0')+'/'+String(emision.getMonth()+1).padStart(2,'0')+'/'+emision.getFullYear();
     return `<tr>
-      <td class="mono">${p.correlativo}</td>
-      <td>${user? nombreCompleto(user) : '—'}</td>
-      <td>${rango}</td>
-      <td><b>${money(total)}</b></td>
-      <td>${fechaStr}</td>
+      <td class="col-num" data-label="N&deg; Planilla"><span class="mono">${p.correlativo}</span></td>
+      <td class="col-trab" data-label="Colaborador">${user? nombreCompleto(user) : '—'}</td>
+      <td data-label="Rango">${rango}</td>
+      <td class="col-imp right" data-label="Total"><b class="amount">${money(total)}</b></td>
+      <td class="col-fecha" data-label="Generada">${fechaStr}</td>
       <td>
         <div class="row-actions">
           <button class="icon-action" title="Ver / Descargar" onclick="verPlanillaHistorial('${p.id}')">${ICO.ver}</button>
@@ -4253,6 +4434,48 @@ async function descargarPDFMultiple(planillaIds){
    sesion abierta. Se re-autentica en el cliente aislado (sbAdmin) para no
    tocar la sesion viva si la contrasena actual estuviera mal.
    ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------
+   PRIMER INGRESO CON CONTRASENA TEMPORAL
+   ------------------------------------------------------------------ */
+async function revisarPrimerIngreso(){
+  try{
+    const { data } = await sb.auth.getUser();
+    const meta = data && data.user ? (data.user.user_metadata || {}) : {};
+    if(meta.debe_cambiar_password === true){
+      document.getElementById('piPass1').value = '';
+      document.getElementById('piPass2').value = '';
+      document.getElementById('piError').style.display = 'none';
+      document.getElementById('primerIngresoOverlay').classList.add('open');
+      setTimeout(()=>{ const e=document.getElementById('piPass1'); if(e) e.focus(); }, 120);
+    }
+  }catch(e){ /* si no se puede leer, no se bloquea el acceso */ }
+}
+async function guardarPrimerIngreso(){
+  const p1 = document.getElementById('piPass1').value;
+  const p2 = document.getElementById('piPass2').value;
+  const err = document.getElementById('piError');
+  const mostrar = (m)=>{ err.textContent = m; err.style.display = m ? 'block' : 'none'; };
+  mostrar('');
+  if(!p1 || !p2){ mostrar('Escribe la contrasena en los dos campos.'); return; }
+  if(p1.length < 8){ mostrar('Debe tener al menos 8 caracteres.'); return; }
+  if(p1 !== p2){ mostrar('Las dos contrasenas no coinciden.'); return; }
+
+  const btn = document.getElementById('btnPrimerIngreso');
+  if(btn){ btn.disabled = true; btn.textContent = 'Guardando...'; }
+  /* La contrasena y la marca se actualizan en la misma llamada: si fallara una
+     de las dos, no queda un usuario con clave nueva al que se le siga pidiendo
+     cambiarla en cada ingreso. */
+  const { error } = await sb.auth.updateUser({ password: p1, data: { debe_cambiar_password: false } });
+  if(btn){ btn.disabled = false; btn.textContent = 'Guardar y continuar'; }
+  if(error){ mostrar('No se pudo guardar: ' + error.message); return; }
+
+  try{
+    if(safeStorage.getItem('mangro_rec_on') === '1'){ safeStorage.setItem('mangro_rec_pass', p1); }
+  }catch(e){}
+  document.getElementById('primerIngresoOverlay').classList.remove('open');
+  toast('Listo, tu contrasena quedo guardada');
+}
+
 async function pintarMiCorreo(){
   const el = document.getElementById('cfgMiCorreo');
   if(!el) return;
@@ -4260,6 +4483,9 @@ async function pintarMiCorreo(){
     const { data } = await sb.auth.getUser();
     el.textContent = (data && data.user && data.user.email) ? data.user.email : 'no disponible';
   }catch(e){ el.textContent = 'no disponible'; }
+  const av = document.getElementById('cfgMiAvatar');
+  const u = getCurrentUser();
+  if(av && u) av.textContent = initials(nombreCorto(u));
 }
 function togglePassForm(){
   const f = document.getElementById('cambioPassForm');
@@ -4374,6 +4600,7 @@ function boot(){
     const el = document.getElementById(id);
     if(el) setupDatePicker(el);
   });
+  revisarPrimerIngreso();
 }
 function toggleSideGroup(btn){
   const sidebar = document.getElementById('sidebar');

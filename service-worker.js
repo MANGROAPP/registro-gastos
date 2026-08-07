@@ -1,11 +1,14 @@
-/* MANGRO | Registro de Gastos — service worker
-   OJO: cada vez que se publique una version nueva hay que subir este numero,
-   si no los usuarios siguen viendo la version guardada en su dispositivo. */
-const CACHE = 'mangro-gastos-v11';
+/* MANGRO | Registro de Gastos - service worker
+   El nombre del cache ES la etiqueta de la version publicada. Si no se cambia,
+   los celulares que ya tienen la app instalada siguen sirviendo la copia vieja.
+   Debe coincidir con APP_VERSION dentro de index.html. */
+const CACHE = 'mangro-gastos-v2.1.0';
 const ARCHIVOS = [
   './', './index.html', './manifest.json',
-  './icons/icon-192.png', './icons/icon-512.png',
-  './icons/icon-180.png', './icons/icon-maskable-512.png'
+  './favicon-v2.ico',
+  './icons/icon-192-v2.png', './icons/icon-512-v2.png',
+  './icons/icon-maskable-512-v2.png',
+  './icons/apple-180-v2.png'
 ];
 
 self.addEventListener('install', e=>{
@@ -34,6 +37,18 @@ self.addEventListener('fetch', e=>{
         caches.open(CACHE).then(c=>c.put(req, copia));
         return r;
       }).catch(()=>caches.match(req).then(r=>r || caches.match('./index.html')))
+    );
+    return;
+  }
+  /* El manifest y los iconos tambien van con red primero: asi un cambio de
+     icono llega sin esperar a que caduque nada en el dispositivo. */
+  if(req.destination === 'manifest' || /manifest\.json$|\/icons\/|favicon/.test(url.pathname)){
+    e.respondWith(
+      fetch(req).then(r=>{
+        const copia = r.clone();
+        caches.open(CACHE).then(c=>c.put(req, copia));
+        return r;
+      }).catch(()=>caches.match(req))
     );
     return;
   }

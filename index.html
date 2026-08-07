@@ -15,19 +15,25 @@ try{
      paquete publicado (pwa_build/); al abrir el archivo suelto simplemente no cargan. -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2F6FED">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png">
-<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-<link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
+<link rel="icon" href="favicon-v2.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48-v2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32-v2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16-v2.png">
+<!-- iPhone / iPad: iOS recorta el icono con su propia mascara, por eso estos
+     archivos son cuadrados completos y SIN transparencia. -->
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-180-v2.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/apple-167-v2.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-152-v2.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/apple-120-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="MANGRO Gastos">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="application-name" content="MANGRO Gastos">
 <meta name="msapplication-TileColor" content="#2F6FED">
-<meta name="msapplication-TileImage" content="icons/icon-256.png">
+<meta name="msapplication-TileImage" content="icons/mstile-270-v2.png">
+<meta name="msapplication-square150x150logo" content="icons/mstile-270-v2.png">
+<meta name="msapplication-config" content="browserconfig.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -133,7 +139,7 @@ try{
   .sidebar .spacer{flex:1;}
 
   /* MAIN */
-  .main{flex:1;padding:26px 34px;max-width:1400px;}
+  .main{flex:1;padding:26px 34px;}
   .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:14px;}
   .topbar-left{display:flex;align-items:center;gap:22px;}
   .brand img{height:34px;display:block;}
@@ -430,7 +436,10 @@ try{
     /* background-color, NO background: la abreviada borraria la flecha del select
      y el icono de calendario al enfocar (mismo bug del mosaico de antes). */
   .filters select:focus,.filters input:focus{outline:none;border-color:var(--purple);background-color:#fff;}
-  html[data-theme="dark"] .filters select,html[data-theme="dark"] .filters input{background:#15141F;}
+  /* background-color, NO la abreviada: background: borraria la flecha del select
+     y el icono de calendario de los filtros en modo oscuro (misma especificidad,
+     esta regla va despues y ganaria). */
+  html[data-theme="dark"] .filters select,html[data-theme="dark"] .filters input{background-color:#15141F;}
   html[data-theme="dark"] .filters select:focus,html[data-theme="dark"] .filters input:focus{background-color:#1D1C2B;}
   .filters select{
     appearance:none;-webkit-appearance:none;-moz-appearance:none;
@@ -583,7 +592,7 @@ try{
   html[data-theme="dark"] .icon-action{background:var(--card);border-color:var(--border);}
   html[data-theme="dark"] .modal{background:var(--card);}
   html[data-theme="dark"] .sig-preview{background:#15141F;}
-  html[data-theme="dark"] .filters select,html[data-theme="dark"] .filters input{background:#15141F;color:var(--text);border-color:var(--border);}
+  html[data-theme="dark"] .filters select,html[data-theme="dark"] .filters input{background-color:#15141F;color:var(--text);border-color:var(--border);}
   html[data-theme="dark"] .sidebar-toggle{background:var(--card);border-color:var(--border);}
   html[data-theme="dark"] tbody tr:hover{background:#1D1C2B;}
   html[data-theme="dark"] .modal-overlay{background:rgba(0,0,0,.6);}
@@ -957,6 +966,64 @@ try{
     .tbl-cards .col-fecha, .tbl-cards .col-imp, .tbl-cards .col-estado{min-width:0;width:auto;}
     .badge-dist{max-width:none;white-space:normal;}
   }
+
+  /* ==========================================================================
+     RONDA 23 - SCROLL Y ANCHO DE LA PAGINA
+     El problema: .main tenia max-width:1400px y ademas es el elemento que
+     scrollea (overflow-y:auto). Cuando la pantalla era mas ancha que 1400px la
+     barra de scroll quedaba en medio de la pantalla y a su derecha se veia una
+     franja de fondo vacia: parecia que la pantalla estaba partida en dos.
+     Solucion: .main ocupa TODO el ancho disponible (la barra vuelve al borde de
+     la ventana) y el contenido se centra por dentro con un ancho maximo comodo.
+     ========================================================================== */
+  :root{ --contenido-max:1560px; }
+  .main{ max-width:none; width:100%; scrollbar-gutter:stable; overscroll-behavior:contain; }
+  .main > .section{ max-width:var(--contenido-max); margin-left:auto; margin-right:auto; }
+  /* La barra superior sigue siendo de ancho completo, pero su contenido se
+     alinea con el de las secciones usando el mismo centrado. */
+  .topbar{
+    padding-left:max(34px, calc((100% - var(--contenido-max))/2 + 34px));
+    padding-right:max(34px, calc((100% - var(--contenido-max))/2 + 34px));
+  }
+  @media (max-width:900px){
+    :root{ --contenido-max:none; }
+    .main{ scrollbar-gutter:auto; }
+    .main > .section{ max-width:100%; }
+    .topbar{ padding-left:16px; padding-right:16px; }
+  }
+
+  /* Barra de scroll discreta (antes era una banda gris pesada). */
+  .main{ scrollbar-width:thin; scrollbar-color:#C9C7DD transparent; }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{
+    background:rgba(96,92,130,.28); border-radius:99px;
+    border:3px solid transparent; background-clip:content-box;
+    transition:background-color .2s var(--ease);
+  }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(96,92,130,.48); background-clip:content-box; }
+  ::-webkit-scrollbar-corner{ background:transparent; }
+  html[data-theme="dark"] .main{ scrollbar-color:#3A3852 transparent; }
+  html[data-theme="dark"] ::-webkit-scrollbar-thumb{
+    background:rgba(200,196,230,.22); background-clip:content-box;
+  }
+  html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{
+    background:rgba(200,196,230,.38); background-clip:content-box;
+  }
+
+  /* Numero de version */
+  .login-version{
+    margin-top:14px; text-align:center; font-size:10.5px; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--text-mut); opacity:.75;
+  }
+  .login-version b{ font-weight:600; color:var(--text-mut); }
+  .cfg-version{
+    margin-top:16px; padding-top:13px; border-top:1px solid var(--border);
+    text-align:center; font-size:10.5px; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--text-mut); opacity:.8;
+  }
+  .cfg-version b{ font-weight:600; }
+
 </style>
 </head>
 <body>
@@ -1005,6 +1072,7 @@ try{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
       <span>Tus datos se guardan de forma segura en la nube de MANGRO y estan disponibles desde cualquier dispositivo.</span>
     </div>
+    <div class="login-version">Registro de Gastos &middot; version <b id="loginVersion">-</b></div>
   </div>
 </div>
 
@@ -1414,6 +1482,7 @@ try{
       <button class="btn btn-outline" onclick="closeConfigModal()">Cancelar</button>
       <button class="btn btn-purple" onclick="saveConfig()">Guardar</button>
     </div>
+    <div class="cfg-version">Registro de Gastos &middot; version <b id="cfgVersion">-</b></div>
   </div>
 </div>
 
@@ -1835,6 +1904,17 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    funcionando con un almacen en memoria (los datos no se guardan al
    cerrar, pero la app no se rompe ni queda en blanco).
    ============================================================ */
+/* ============================================================
+   VERSION DE LA APP  (MAYOR.MENOR.PARCHE)
+   PARCHE  -> solo se corrigieron errores.            2.1.0 -> 2.1.1
+   MENOR   -> se agrego algo nuevo compatible.        2.1.3 -> 2.2.0
+   MAYOR   -> rediseno o cambio grande de la app.     2.9.1 -> 3.0.0
+   Al subir este numero hay que subir tambien el nombre del cache en
+   service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
+   celulares siguen mostrando la version vieja.
+   ============================================================ */
+const APP_VERSION = '2.1.0';
+
 const safeStorage = (function(){
   let usable = false;
   const mem = {};
@@ -3999,8 +4079,15 @@ async function descargarPDFMultiple(planillaIds){
 /* ============================================================
    CONFIGURACION
    ============================================================ */
+function pintarVersion(){
+  document.querySelectorAll('#loginVersion,#cfgVersion').forEach(el=>{ el.textContent = APP_VERSION; });
+}
+try{ pintarVersion(); }catch(e){}
+document.addEventListener('DOMContentLoaded', ()=>{ try{ pintarVersion(); }catch(e){} });
+
 function openConfigModal(){
   closeMobileSidebar();   // en celular el menu quedaba encima del modal
+  pintarVersion();
   document.getElementById('configLimite').value = DB.limiteDiario;
   document.getElementById('configModalOverlay').classList.add('open');
 }

@@ -2,7 +2,7 @@
   "name": "MANGRO | Registro de Gastos",
   "short_name": "MANGRO Gastos",
   "description": "Registro de movilidad y generacion de planillas de gastos de MANGRO SAC.",
-  "id": "/registro-gastos/?app=2",
+  "id": "/registro-gastos/",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -21,7 +21,7 @@
     "productivity",
     "finance"
   ],
-  "version": "2.1.1",
+  "version": "2.2.1",
   "icons": [
     {
       "src": "icons/icon-16-v2.png",

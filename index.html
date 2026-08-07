@@ -1024,6 +1024,120 @@ try{
   }
   .cfg-version b{ font-weight:600; }
 
+
+  /* ==========================================================================
+     RONDA 24 - ENCABEZADO DE TABLA: VISIBLE Y REALMENTE FIJO
+     Dos problemas distintos que se veian como uno solo:
+     1) No se distinguia. El encabezado tenia el mismo fondo blanco que la tarjeta
+        y texto gris claro, asi que al scrollear las filas parecian pasar "por
+        encima" de el y confundia cual era el titulo y cual el dato.
+     2) Saltaba. Las tablas usan border-collapse:collapse, y con ese modo el
+        navegador pinta los bordes a nivel de tabla, no de celda: al pegarse el
+        <th> su borde inferior se queda atras y aparece/desaparece. Ademas
+        --topbar-h se medía una sola vez, y si la barra superior cambiaba de alto
+        quedaba una rendija por la que asomaban las filas.
+     ========================================================================== */
+  :root{
+    --thead-bg:#EDF0F7;
+    --thead-bg-2:#E4E9F4;
+    --thead-text:#4A4A63;
+    --thead-line:#D3D9E8;
+  }
+  html[data-theme="dark"]{
+    --thead-bg:#23222F;
+    --thead-bg-2:#2A2939;
+    --thead-text:#B9B6CC;
+    --thead-line:#34324A;
+  }
+
+  /* border-collapse:separate es imprescindible para que el borde viaje pegado
+     a la celda cuando el encabezado queda fijo. */
+  .tbl-cards{ border-collapse:separate; border-spacing:0; }
+
+  .tbl-cards thead th{
+    background:linear-gradient(180deg, var(--thead-bg) 0%, var(--thead-bg-2) 100%);
+    color:var(--thead-text);
+    font-size:11px; font-weight:700; letter-spacing:.055em;
+    padding:12px 12px;
+    border-bottom:1px solid var(--thead-line);
+    border-top:1px solid var(--thead-line);
+  }
+  .tbl-cards thead th:first-child{ border-left:1px solid var(--thead-line); border-radius:10px 0 0 10px; }
+  .tbl-cards thead th:last-child{ border-right:1px solid var(--thead-line); border-radius:0 10px 10px 0; }
+
+  /* Fijo debajo de la barra superior. El -1px es a proposito: superpone un pixel
+     con la barra para que nunca se abra la rendija por la que asomaba el
+     contenido. */
+  @media (min-width:901px){
+    .tbl-cards thead th{
+      position:sticky; top:calc(var(--topbar-h, 64px) - 1px); z-index:6;
+      transition:box-shadow .22s var(--ease);
+    }
+    /* La sombra aparece solo cuando de verdad hay algo pasando por debajo. */
+    body.hay-scroll .tbl-cards thead th{ box-shadow:0 10px 16px -12px rgba(23,25,60,.45); }
+    html[data-theme="dark"] body.hay-scroll .tbl-cards thead th{ box-shadow:0 10px 16px -12px rgba(0,0,0,.7); }
+  }
+  @media (max-width:900px){ .tbl-cards thead th{ position:static; } }
+
+  /* La flecha de ordenamiento tenia menos peso que el propio titulo y se perdia. */
+  .tbl-cards .th-sort{ transition:color .15s var(--ease), background-color .15s var(--ease); }
+  .tbl-cards .th-sort:hover{ color:var(--purple); background-color:rgba(47,111,237,.07); }
+  .tbl-cards .th-sort .sort-arrow{ opacity:.42; }
+  .tbl-cards .th-sort.sort-active{ color:var(--purple); }
+  .tbl-cards .th-sort.sort-active .sort-arrow{ opacity:1; }
+
+  /* Al pasar a separate, la primera fila del cuerpo necesita su propio aire.
+     Solo en escritorio: en celular las filas se dibujan como tarjetas y el
+     encabezado no existe, asi que ese aire extra sobra. */
+  @media (min-width:901px){ .tbl-cards tbody tr:first-child td{ padding-top:14px; } }
+
+  /* Las tablas del documento de planilla (la vista previa que replica el PDF) no
+     deben heredar nada de esto: son otro objeto visual. */
+  .planilla-doc table thead th{ position:static; background:none; box-shadow:none; }
+
+
+  /* Bloque "Mi cuenta" dentro de Configuracion */
+  /* El .modal-row usa align-items:flex-start, asi que los campos no se estiran
+     solos y quedaban a media anchura. */
+  #cambioPassForm .field{ width:100%; }
+  #cambioPassForm .field input{ width:100%; box-sizing:border-box; }
+  .cuenta-correo{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--card-2, #F6F6FB); border:1px solid var(--border); border-radius:11px;
+    padding:10px 13px;
+  }
+  .cuenta-correo-lbl{ font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-mut); font-weight:600; }
+  .cuenta-correo-val{ font-size:12.5px; color:var(--text); font-weight:600; word-break:break-all; text-align:right; }
+
+  /* Nota explicativa en Editar Colaborador */
+  .nota-acceso{
+    display:flex; gap:11px; align-items:flex-start;
+    background:var(--purple-light); border:1px solid rgba(47,111,237,.22);
+    border-radius:12px; padding:13px 14px;
+    font-size:12px; line-height:1.55; color:var(--text); text-transform:none;
+  }
+  .nota-acceso svg{ width:17px; height:17px; flex:none; margin-top:1px; color:var(--purple); }
+  .nota-acceso b{ font-weight:700; }
+  html[data-theme="dark"] .nota-acceso{ border-color:rgba(91,157,255,.28); }
+
+
+  /* ==========================================================================
+     RONDA 25 - CALENDARIO: navegacion de mes y año
+     Con cuatro botones en la cabecera hace falta apretar un poco el espaciado.
+     Los saltos de año existen porque el uso real incluye regularizar movilidades
+     atrasadas: llegar a un mes de hace un año a un click por mes es inviable.
+     ========================================================================== */
+  .dp-header{ gap:5px; }
+  .dp-title{ flex:1; text-align:center; white-space:nowrap; }
+  .dp-nav{ transition:background-color .15s var(--ease), color .15s var(--ease), transform .12s var(--ease); }
+  .dp-nav:active{ transform:scale(.92); }
+  .dp-nav-anio{ width:26px; height:26px; opacity:.82; }
+  .dp-nav-anio:hover{ opacity:1; }
+  @media (max-width:900px){
+    .dp-nav{ width:34px; height:34px; }
+    .dp-nav-anio{ width:32px; height:32px; }
+  }
+
 </style>
 </head>
 <body>
@@ -1434,6 +1548,16 @@ try{
         <label>Correo MANGRO (para iniciar sesion)</label>
         <input type="email" id="colabEmail" placeholder="nombre@mangro.com.pe">
       </div>
+      <div class="field full" id="colabAccesoNota" style="display:none;">
+        <div class="nota-acceso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div>
+            <b>El correo y la contrase&ntilde;a no se editan aqui.</b>
+            Viven en el sistema de acceso, aparte de esta ficha, y por seguridad ni siquiera un administrador puede leerlos desde el navegador.
+            Cada colaborador cambia su propia contrase&ntilde;a desde <b>Configuracion &rsaquo; Mi cuenta</b>, sin necesidad de correo de confirmacion.
+          </div>
+        </div>
+      </div>
       <div class="field" id="colabPasswordField">
         <label>Contraseña inicial</label>
         <input type="text" id="colabPassword" placeholder="Minimo 6 caracteres">
@@ -1477,6 +1601,33 @@ try{
     <div class="modal-row">
       <div class="mr-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span>Modo oscuro</span></div>
       <div class="switch" id="configDarkSwitch" onclick="toggleDarkMode()"><div class="knob"></div></div>
+    </div>
+    <div class="modal-row" style="align-items:flex-start;flex-direction:column;gap:10px;">
+      <div class="mr-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Mi cuenta</span></div>
+      <div class="cuenta-correo">
+        <span class="cuenta-correo-lbl">Correo de acceso</span>
+        <span class="cuenta-correo-val" id="cfgMiCorreo">-</span>
+      </div>
+      <button class="btn btn-outline btn-sm" id="btnAbrirCambioPass" onclick="togglePassForm()" style="width:100%;justify-content:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;margin-right:6px;"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        Cambiar mi contrase&ntilde;a
+      </button>
+      <div id="cambioPassForm" style="display:none;width:100%;">
+        <div class="field" style="margin-bottom:10px;">
+          <label>Contrase&ntilde;a actual</label>
+          <input type="password" id="passActual" autocomplete="current-password" placeholder="La que usas hoy">
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Nueva contrase&ntilde;a</label>
+          <input type="password" id="passNueva" autocomplete="new-password" placeholder="Minimo 8 caracteres">
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>Repite la nueva contrase&ntilde;a</label>
+          <input type="password" id="passNueva2" autocomplete="new-password" placeholder="Escribela otra vez">
+          <small class="hint">No se envia ningun correo de confirmacion: como ya iniciaste sesion, la app da por hecho que eres tu. El cambio es inmediato en todos tus dispositivos.</small>
+        </div>
+        <button class="btn btn-purple btn-sm" id="btnGuardarPass" onclick="cambiarMiPassword()" style="width:100%;justify-content:center;">Actualizar contrase&ntilde;a</button>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeConfigModal()">Cancelar</button>
@@ -1913,7 +2064,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.1.1';
+const APP_VERSION = '2.2.1';
 
 const safeStorage = (function(){
   let usable = false;
@@ -2290,9 +2441,11 @@ function renderDatePickerPanel(){
 
   panel.innerHTML = `
     <div class="dp-header">
-      <button type="button" class="dp-nav" onclick="dpChangeMonth(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;vertical-align:middle;"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button type="button" class="dp-nav dp-nav-anio" title="Año anterior" aria-label="Año anterior" onclick="dpChangeMonth(-12, event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;"><path d="M18 18l-6-6 6-6M11 18l-6-6 6-6"/></svg></button>
+      <button type="button" class="dp-nav" title="Mes anterior" aria-label="Mes anterior" onclick="dpChangeMonth(-1, event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;vertical-align:middle;"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="dp-title">${meses[m].charAt(0)+meses[m].slice(1).toLowerCase()} ${y}</div>
-      <button type="button" class="dp-nav" onclick="dpChangeMonth(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;vertical-align:middle;"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button type="button" class="dp-nav" title="Mes siguiente" aria-label="Mes siguiente" onclick="dpChangeMonth(1, event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;vertical-align:middle;"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button type="button" class="dp-nav dp-nav-anio" title="Año siguiente" aria-label="Año siguiente" onclick="dpChangeMonth(12, event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:middle;"><path d="M6 18l6-6-6-6M13 18l6-6-6-6"/></svg></button>
     </div>
     <div class="dp-weekdays"><span>LU</span><span>MA</span><span>MI</span><span>JU</span><span>VI</span><span>SA</span><span>DO</span></div>
     <div class="dp-grid">${cells}</div>
@@ -2301,7 +2454,8 @@ function renderDatePickerPanel(){
       <button type="button" class="dp-link" onclick="pickDate(todayLocalISO())">Hoy</button>
     </div>`;
 }
-function dpChangeMonth(delta){
+function dpChangeMonth(delta, ev){
+  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
   _dpViewDate = new Date(_dpViewDate.getFullYear(), _dpViewDate.getMonth()+delta, 1);
   renderDatePickerPanel();
 }
@@ -2320,6 +2474,15 @@ function clearDatePicker(){
 function dpOutsideClick(e){
   const panel = document.getElementById('customDatePickerPanel');
   if(!panel) return;
+  /* CAUSA RAIZ del bug "no se puede retroceder en el calendario":
+     al tocar una flecha, dpChangeMonth vuelve a dibujar el panel con innerHTML,
+     asi que el boton que se toco YA NO EXISTE cuando el click termina de subir
+     hasta document. panel.contains(e.target) daba falso, esto lo tomaba por un
+     click fuera y cerraba el calendario. El mes si cambiaba, pero el panel se
+     cerraba en el mismo gesto y al reabrirlo volvia al mes del campo: desde
+     afuera parecia que el boton de retroceder no servia.
+     Un nodo que ya no esta en el documento no puede ser un click "fuera". */
+  if(!e.target || !document.contains(e.target)) return;
   if(panel.contains(e.target) || (_dpInput && _dpInput.contains(e.target))) return;
   closeDatePicker();
 }
@@ -2460,6 +2623,7 @@ function pickCustomSelectOption(idx){
 function csOutsideClick(e){
   const panel = document.getElementById('customSelectPanel');
   if(!panel) return;
+  if(!e.target || !document.contains(e.target)) return;   // ver dpOutsideClick
   if(panel.contains(e.target)) return;
   if(_csSelect && _csSelect._csTrigger && _csSelect._csTrigger.contains(e.target)) return;
   closeCustomSelectPanel();
@@ -2693,6 +2857,7 @@ function notifOutsideClick(e){
   const panel = document.getElementById('notifPanel');
   const btn = document.getElementById('notifBellBtn');
   if(!panel) return;
+  if(!e.target || !document.contains(e.target)) return;   // ver dpOutsideClick
   if(panel.contains(e.target) || (btn && btn.contains(e.target))) return;
   closeNotifPanel();
 }
@@ -3202,6 +3367,7 @@ function openColabModal(id){
     // El correo y la contraseña se definen solo al crear el acceso; no se editan aqui.
     document.getElementById('colabEmailField').style.display = 'none';
     document.getElementById('colabPasswordField').style.display = 'none';
+    document.getElementById('colabAccesoNota').style.display = '';
     document.getElementById('colabEmail').value = '';
     document.getElementById('colabPassword').value = '';
   } else {
@@ -3215,6 +3381,7 @@ function openColabModal(id){
     document.getElementById('colabIsAdmin').checked = false;
     document.getElementById('colabEmailField').style.display = '';
     document.getElementById('colabPasswordField').style.display = '';
+    document.getElementById('colabAccesoNota').style.display = 'none';
     document.getElementById('colabEmail').value = '';
     document.getElementById('colabPassword').value = '';
   }
@@ -4079,6 +4246,69 @@ async function descargarPDFMultiple(planillaIds){
 /* ============================================================
    CONFIGURACION
    ============================================================ */
+/* ------------------------------------------------------------------
+   MI CUENTA: cambio de contrasena por autoservicio.
+   No hay correo de validacion de por medio a proposito: la prueba de
+   identidad es que la persona conoce su contrasena actual y ya tiene la
+   sesion abierta. Se re-autentica en el cliente aislado (sbAdmin) para no
+   tocar la sesion viva si la contrasena actual estuviera mal.
+   ------------------------------------------------------------------ */
+async function pintarMiCorreo(){
+  const el = document.getElementById('cfgMiCorreo');
+  if(!el) return;
+  try{
+    const { data } = await sb.auth.getUser();
+    el.textContent = (data && data.user && data.user.email) ? data.user.email : 'no disponible';
+  }catch(e){ el.textContent = 'no disponible'; }
+}
+function togglePassForm(){
+  const f = document.getElementById('cambioPassForm');
+  const abierto = f.style.display !== 'none';
+  f.style.display = abierto ? 'none' : 'block';
+  if(!abierto){ setTimeout(()=>{ const a=document.getElementById('passActual'); if(a) a.focus(); }, 60); }
+  else { ['passActual','passNueva','passNueva2'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; }); }
+}
+async function cambiarMiPassword(){
+  const actual = document.getElementById('passActual').value;
+  const nueva  = document.getElementById('passNueva').value;
+  const nueva2 = document.getElementById('passNueva2').value;
+  if(!actual || !nueva || !nueva2){ toast('Completa los tres campos', true); return; }
+  if(nueva.length < 8){ toast('La nueva contrasena debe tener al menos 8 caracteres', true); return; }
+  if(nueva !== nueva2){ toast('Las dos contrasenas nuevas no coinciden', true); return; }
+  if(nueva === actual){ toast('La nueva contrasena debe ser distinta de la actual', true); return; }
+
+  const btn = document.getElementById('btnGuardarPass');
+  if(btn){ btn.disabled = true; btn.textContent = 'Verificando...'; }
+
+  let correo = '';
+  try{ const { data } = await sb.auth.getUser(); correo = data && data.user ? data.user.email : ''; }catch(e){}
+  if(!correo){
+    if(btn){ btn.disabled=false; btn.textContent='Actualizar contrasena'; }
+    toast('No se pudo identificar tu sesion. Vuelve a ingresar.', true); return;
+  }
+
+  const { error: errActual } = await sbAdmin.auth.signInWithPassword({ email: correo, password: actual });
+  if(errActual){
+    if(btn){ btn.disabled=false; btn.textContent='Actualizar contrasena'; }
+    toast('La contrasena actual no es correcta', true); return;
+  }
+  try{ await sbAdmin.auth.signOut(); }catch(e){}
+
+  const { error } = await sb.auth.updateUser({ password: nueva });
+  if(btn){ btn.disabled=false; btn.textContent='Actualizar contrasena'; }
+  if(error){ toast('No se pudo actualizar: ' + error.message, true); return; }
+
+  /* Si el dispositivo tenia guardada la contrasena vieja, hay que refrescarla o
+     el proximo ingreso automatico fallaria. */
+  try{
+    if(safeStorage.getItem('mangro_rec_email')){ safeStorage.setItem('mangro_rec_pass', nueva); }
+  }catch(e){}
+
+  ['passActual','passNueva','passNueva2'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('cambioPassForm').style.display = 'none';
+  toast('Contrasena actualizada');
+}
+
 function pintarVersion(){
   document.querySelectorAll('#loginVersion,#cfgVersion').forEach(el=>{ el.textContent = APP_VERSION; });
 }
@@ -4088,6 +4318,9 @@ document.addEventListener('DOMContentLoaded', ()=>{ try{ pintarVersion(); }catch
 function openConfigModal(){
   closeMobileSidebar();   // en celular el menu quedaba encima del modal
   pintarVersion();
+  pintarMiCorreo();
+  const f = document.getElementById('cambioPassForm');
+  if(f) f.style.display = 'none';
   document.getElementById('configLimite').value = DB.limiteDiario;
   document.getElementById('configModalOverlay').classList.add('open');
 }
@@ -4183,14 +4416,25 @@ window.addEventListener('resize', closeSideFlyout);
 /* linea divisoria de la barra superior solo cuando hay contenido scrolleado debajo */
 function medirTopbar(){
   const t = document.querySelector('.topbar');
-  if(t) document.documentElement.style.setProperty('--topbar-h', t.offsetHeight + 'px');
+  if(t) document.documentElement.style.setProperty('--topbar-h', Math.round(t.getBoundingClientRect().height) + 'px');
 }
 window.addEventListener('resize', medirTopbar);
 document.addEventListener('DOMContentLoaded', medirTopbar);
 setTimeout(medirTopbar, 300);
+/* La barra superior cambia de alto sola: al envolverse en pantallas medianas, al
+   cargar la tipografia, al aparecer la miga de navegacion. Si --topbar-h se mide
+   una sola vez queda desfasada y entre la barra y el encabezado de la tabla se
+   abre una rendija por la que se ven pasar las filas: eso es lo que se percibia
+   como un "salto". Con ResizeObserver la medida se mantiene siempre exacta. */
+document.addEventListener('DOMContentLoaded', function(){
+  const t = document.querySelector('.topbar');
+  if(t && window.ResizeObserver){ new ResizeObserver(medirTopbar).observe(t); }
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(medirTopbar); }
+});
 
 function marcarScrollTopbar(desplazado){
   document.querySelectorAll('.topbar').forEach(t=>t.classList.toggle('scrolled', desplazado));
+  document.body.classList.toggle('hay-scroll', desplazado);   // activa la sombra del encabezado pegado
   if(desplazado) closeSideFlyout();
 }
 window.addEventListener('scroll', ()=>marcarScrollTopbar(window.scrollY > 4), {passive:true});

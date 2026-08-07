@@ -1,7 +1,7 @@
 /* MANGRO | Registro de Gastos — service worker
    OJO: cada vez que se publique una version nueva hay que subir este numero,
    si no los usuarios siguen viendo la version guardada en su dispositivo. */
-const CACHE = 'mangro-gastos-v9';
+const CACHE = 'mangro-gastos-v11';
 const ARCHIVOS = [
   './', './index.html', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png',

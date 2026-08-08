@@ -1210,6 +1210,24 @@ try{
   #primerIngresoOverlay .field input{ width:100%; box-sizing:border-box; }
   #primerIngresoOverlay .login-error{ margin-bottom:12px; }
 
+
+  /* ==========================================================================
+     RONDA 27 - ICONOS QUE NO SE DIBUJABAN EN iPHONE
+     Los SVG del objeto ICO (ver, editar, anular, activar, eliminar) no traian
+     width/height y NO habia ninguna regla CSS que los dimensionara: se veian
+     bien en Chrome solo porque ese navegador les asigna un tamano por defecto
+     al ser hijos flexibles. Safari en iPhone no hace lo mismo y los botones
+     salian como cuadrados vacios en Generar Planilla.
+     Ahora el tamano viene por triple via: atributo en el SVG, esta regla, y el
+     max-width de abajo como red de seguridad para cualquier icono futuro.
+     ========================================================================== */
+  .icon-action svg{ width:16px; height:16px; display:block; flex:none; }
+  .icon-action.danger svg{ width:15px; height:15px; }
+  .row-actions svg{ pointer-events:none; }   /* el click siempre es del boton */
+  /* Red de seguridad: ningun SVG dentro de un boton o celda puede crecer mas
+     que su contenedor aunque se olvide declararle el tamano. */
+  button svg, td svg{ max-width:100%; max-height:100%; }
+
 </style>
 </head>
 <body>
@@ -2162,7 +2180,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.3.1';
 
 const safeStorage = (function(){
   let usable = false;
@@ -3482,12 +3500,12 @@ function downloadFile(filename, content, type){
 /* Set de iconos de linea, mismo lenguaje visual que el resto de la interfaz
    (antes eran glifos unicode sueltos: lapiz, tacho, ojo, equis, flecha). */
 const ICO = {
-  editar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
-  eliminar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>',
-  ver:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
-  anular:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-  activar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
-  descargar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  editar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
+  eliminar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>',
+  ver:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+  anular:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  activar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  descargar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
 };
 
 function renderColaboradores(){

@@ -2,7 +2,7 @@
    El nombre del cache ES la etiqueta de la version publicada. Si no se cambia,
    los celulares que ya tienen la app instalada siguen sirviendo la copia vieja.
    Debe coincidir con APP_VERSION dentro de index.html. */
-const CACHE = 'mangro-gastos-v2.3.0';
+const CACHE = 'mangro-gastos-v2.3.1';
 const ARCHIVOS = [
   './', './index.html', './manifest.json',
   './favicon-v2.ico',

@@ -214,8 +214,11 @@ try{
   .custom-select-trigger:hover{border-color:var(--purple);}
   .custom-select-trigger.cs-open,.custom-select-trigger:focus{outline:none;border-color:var(--purple);background-color:#fff;}
   .custom-select-trigger.cs-disabled{opacity:.55;cursor:not-allowed;}
+  /* padding-right 36px, NO 13px: la regla base reserva ese espacio para la
+     flecha del desplegable y aqui se estaba pisando, asi que un nombre largo
+     como "GAMBOA CASAS CESAR ALFREDO" pasaba por debajo del icono. */
   .custom-select-wrap.filters-style .custom-select-trigger{
-    padding:10px 13px;border-radius:11px;font-size:13px;height:42px;box-sizing:border-box;background-color:#FBFBFE;
+    padding:10px 36px 10px 13px;border-radius:11px;font-size:13px;height:42px;box-sizing:border-box;background-color:#FBFBFE;
   }
   html[data-theme="dark"] .custom-select-trigger{background-color:#15141F;color:var(--text);border-color:var(--border);}
   html[data-theme="dark"] .custom-select-trigger.cs-open{background-color:#1D1C2B;}
@@ -1228,6 +1231,53 @@ try{
      que su contenedor aunque se olvide declararle el tamano. */
   button svg, td svg{ max-width:100%; max-height:100%; }
 
+
+  /* ==========================================================================
+     RONDA 28 - TECLADO, VERSION EN EL MENU Y FILTROS DE PLANILLA
+     ========================================================================== */
+
+  /* Foco visible: quien navega con Tab necesita ver donde esta parado. */
+  .custom-select-trigger:focus-visible, .date-input:focus-visible,
+  .btn:focus-visible, .icon-action:focus-visible, .nav-btn:focus-visible,
+  .pill-btn:focus-visible, .th-sort:focus-visible, .pager-btn:focus-visible{
+    outline:2px solid var(--purple); outline-offset:2px; border-radius:10px;
+  }
+  .cs-option:focus-visible{ outline:2px solid var(--purple); outline-offset:-2px; }
+
+  /* Version al pie del menu lateral */
+  .side-version{
+    margin-top:10px; padding:9px 12px 2px; text-align:center;
+    font-size:9.5px; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--text-mut); opacity:.65; white-space:nowrap; overflow:hidden;
+  }
+  .side-version b{ font-weight:700; }
+  .side-version .sv-mini{ display:none; }
+  .sidebar.collapsed .side-version .sv-full{ display:none; }
+  .sidebar.collapsed .side-version .sv-mini{ display:inline; }
+
+  /* Ayuda de atajos */
+  .atajos-grid{ display:grid; grid-template-columns:1fr; gap:2px; margin:4px 0 6px; }
+  .atajo{
+    display:flex; align-items:center; gap:12px; padding:9px 10px; border-radius:10px;
+    font-size:12.5px; color:var(--text);
+  }
+  .atajo:nth-child(odd){ background:var(--card-2,#F7F7FB); }
+  .atajo kbd{
+    font-family:inherit; font-size:11px; font-weight:700; letter-spacing:.02em;
+    background:var(--card); border:1px solid var(--border); border-bottom-width:2px;
+    border-radius:7px; padding:4px 9px; min-width:96px; text-align:center; flex:none;
+    color:var(--purple); white-space:nowrap;
+  }
+  html[data-theme="dark"] .atajo kbd{ background:#15141F; }
+  #atajosOverlay .modal-actions{ margin-top:16px; }
+
+  /* Filtros de Generar Planilla */
+  .plan-conteo{
+    font-size:11.5px; font-weight:700; color:var(--text-mut);
+    letter-spacing:.03em; text-transform:uppercase; margin-left:auto; align-self:center;
+  }
+  #planCandidatosCard .th-sort{ cursor:pointer; }
+
 </style>
 </head>
 <body>
@@ -1313,7 +1363,12 @@ try{
     </div>
     <div class="spacer"></div>
     <div class="sidebar-nav">
+      <button class="nav-btn side-item" id="btnAtajos" title="Atajos de teclado (Alt + H)" onclick="abrirAtajos()"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg></span><span class="side-label">Atajos de teclado</span></button>
       <button class="nav-btn side-item" title="Cerrar sesion" onclick="logout()"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span class="side-label">Cerrar sesion</span></button>
+      <div class="side-version" title="Version instalada en este dispositivo">
+        <span class="sv-full">Registro de Gastos &middot; v<b id="sideVersion">-</b></span>
+        <span class="sv-mini">v<b id="sideVersionMini">-</b></span>
+      </div>
     </div>
   </div>
 
@@ -1569,8 +1624,19 @@ try{
               </label>
             </div>
           </div>
+          <div class="filters" style="margin-bottom:14px;">
+            <input type="text" id="planBuscar" placeholder="BUSCAR POR MOTIVO, DISTRITO O N&deg; DE MOVILIDAD" oninput="buscarMovilidadesPendientes()" style="min-width:300px;flex:1;">
+            <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosPlan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path d="M18 6L6 18M6 6l12 12"/></svg>Limpiar filtros</button>
+            <span class="plan-conteo" id="planConteo"></span>
+          </div>
           <table class="tbl-mov tbl-cards">
-            <thead><tr><th style="width:34px;"></th><th class="col-num">N&deg; de Movilidad</th><th class="col-fecha">Fecha</th><th class="col-motivo">Motivo</th><th class="col-dist center">Partida</th><th class="col-dist center">Llegada</th><th class="col-imp right">Importe</th></tr></thead>
+            <thead><tr><th style="width:34px;"></th>
+              <th class="th-sort col-num" data-plansort="correlativo" onclick="setPlanSort('correlativo')">N&deg; de Movilidad<span class="sort-arrow">&#8645;</span></th>
+              <th class="th-sort col-fecha" data-plansort="fecha" onclick="setPlanSort('fecha')">Fecha<span class="sort-arrow">&#8645;</span></th>
+              <th class="th-sort col-motivo" data-plansort="motivo" onclick="setPlanSort('motivo')">Motivo<span class="sort-arrow">&#8645;</span></th>
+              <th class="th-sort col-dist center" data-plansort="partida" onclick="setPlanSort('partida')">Partida<span class="sort-arrow">&#8645;</span></th>
+              <th class="th-sort col-dist center" data-plansort="llegada" onclick="setPlanSort('llegada')">Llegada<span class="sort-arrow">&#8645;</span></th>
+              <th class="th-sort col-imp right" data-plansort="importe" onclick="setPlanSort('importe')">Importe<span class="sort-arrow">&#8645;</span></th></tr></thead>
             <tbody id="candidatosBody"></tbody>
           </table>
           <div class="total-bar"><span>Total seleccionado:</span> <span class="amount" id="candidatosTotal">S/ 0.00</span></div>
@@ -1750,6 +1816,16 @@ try{
     <div class="login-error" id="piError" style="display:none;"></div>
     <button class="btn btn-purple" id="btnPrimerIngreso" onclick="guardarPrimerIngreso()" style="width:100%;justify-content:center;">Guardar y continuar</button>
     <button class="btn btn-ghost btn-sm" onclick="logout()" style="width:100%;justify-content:center;margin-top:8px;">Cerrar sesion</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="atajosOverlay">
+  <div class="modal" style="max-width:520px;">
+    <button class="close-x" onclick="cerrarAtajos()">&times;</button>
+    <h2>Atajos de teclado</h2>
+    <p class="sub">Para moverte por la app sin soltar el teclado. Dentro de los desplegables, las flechas recorren la lista, Enter elige y escribir una letra busca.</p>
+    <div class="atajos-grid"><div class="atajo"><kbd>Alt + I</kbd><span>Ir a Inicio</span></div><div class="atajo"><kbd>Alt + N</kbd><span>Nueva Movilidad</span></div><div class="atajo"><kbd>Alt + M</kbd><span>Movilidades</span></div><div class="atajo"><kbd>Alt + G</kbd><span>Generar Planilla</span></div><div class="atajo"><kbd>Alt + C</kbd><span>Colaboradores (solo administrador)</span></div><div class="atajo"><kbd>Alt + K</kbd><span>Ir al buscador de la pantalla actual</span></div><div class="atajo"><kbd>Alt + L</kbd><span>Limpiar los filtros</span></div><div class="atajo"><kbd>Alt + &larr; / &rarr;</kbd><span>Pagina anterior / siguiente del historial</span></div><div class="atajo"><kbd>Ctrl + Enter</kbd><span>Guardar el formulario abierto</span></div><div class="atajo"><kbd>Alt + D</kbd><span>Modo oscuro</span></div><div class="atajo"><kbd>Alt + B</kbd><span>Contraer o expandir el menu</span></div><div class="atajo"><kbd>Alt + H</kbd><span>Abrir esta ayuda</span></div><div class="atajo"><kbd>Esc</kbd><span>Cerrar ventana o lista</span></div></div>
+    <div class="modal-actions"><button class="btn btn-purple" onclick="cerrarAtajos()">Entendido</button></div>
   </div>
 </div>
 
@@ -2180,7 +2256,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.3.1';
+const APP_VERSION = '2.4.0';
 
 const safeStorage = (function(){
   let usable = false;
@@ -2648,6 +2724,27 @@ function setupCustomSelect(select){
     toggleCustomSelectPanel(select);
   });
 
+  /* Teclado: el boton se comporta como un <select> nativo. Flechas o Enter
+     abren la lista; escribir una letra abre y filtra directamente. */
+  trigger.addEventListener('keydown', function(e){
+    if(select.disabled) return;
+    const abierto = _csSelect === select && document.getElementById('customSelectPanel')
+                    && document.getElementById('customSelectPanel').classList.contains('open');
+    if(e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' '){
+      if(!abierto){ e.preventDefault(); openCustomSelectPanel(select); }
+      return;
+    }
+    if(e.key === 'Escape' && abierto){ e.preventDefault(); closeCustomSelectPanel(); trigger.focus(); return; }
+    if(!abierto && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey){
+      e.preventDefault();
+      openCustomSelectPanel(select);
+      setTimeout(function(){
+        const b = document.getElementById('csSearch');
+        if(b){ b.value = e.key; csFiltrar(e.key); b.focus(); }
+      }, 0);
+    }
+  });
+
   const descValue = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
   Object.defineProperty(select, 'value', {
     get(){ return descValue.get.call(select); },
@@ -2756,7 +2853,13 @@ function csTeclado(e){
     if(a) pickCustomSelectOption(parseInt(a.getAttribute('data-idx'), 10));
     return;
   }
-  if(e.key === 'Escape'){ e.preventDefault(); closeCustomSelectPanel(); }
+  if(e.key === 'Escape'){
+    e.preventDefault();
+    const t = _csSelect && _csSelect._csTrigger;
+    closeCustomSelectPanel();
+    if(t) t.focus();
+  }
+  if(e.key === 'Tab'){ closeCustomSelectPanel(); }   // Tab sale del campo, no queda el panel colgando
 }
 function openCustomSelectPanel(select){
   closeCustomSelectPanel();
@@ -2812,9 +2915,14 @@ function openCustomSelectPanel(select){
 }
 function pickCustomSelectOption(idx){
   if(!_csSelect) return;
+  const trigger = _csSelect._csTrigger;
   _csSelect.selectedIndex = idx;
   _csSelect.dispatchEvent(new Event('change', {bubbles:true}));
   closeCustomSelectPanel();
+  /* Devolver el foco al boton: si no, tras elegir una opcion el foco se pierde
+     y el siguiente Tab arranca desde el principio de la pagina en vez de pasar
+     al campo de al lado. Es lo que rompia el flujo Partida -> Tab -> Llegada. */
+  if(trigger) trigger.focus();
 }
 function csOutsideClick(e){
   const panel = document.getElementById('customSelectPanel');
@@ -3287,13 +3395,32 @@ function populateTrabajadorFilter(){
   sel.value = cur;
   refreshCustomSelect(sel);
 }
+/* El periodo se DERIVA de la fecha, no se lee de la columna guardada.
+   Motivos: los registros antiguos podian tener periodo vacio (y aparecia una
+   opcion "null" que no filtraba nada), y el orden alfabetico de "AGO-2026",
+   "JUL-2026", "JUN-2026" no es cronologico, asi que la lista salia desordenada
+   y al elegir un mes se veian resultados que no correspondian. Derivandolo de
+   la fecha el filtro no puede desincronizarse de lo que muestra la tabla. */
+const MESES_LARGO = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO',
+                     'AGOSTO','SETIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+function periodoDeFecha(fecha){
+  if(!fecha) return '';
+  return String(fecha).slice(0,7);          // 2026-08, ordenable como texto
+}
+function periodoEtiqueta(clave){
+  if(!clave) return '';
+  const [y,m] = clave.split('-');
+  return (MESES_LARGO[parseInt(m,10)-1] || clave) + ' ' + y;
+}
 function populatePeriodoFilter(){
   const sel = document.getElementById('filterPeriodo');
   setupCustomSelect(sel);
   const cur = sel.value;
-  const periodos = [...new Set(historialScopedList().map(m=>m.periodo))].sort().reverse();
-  sel.innerHTML = '<option value="">TODOS LOS PERIODOS</option>' + periodos.map(p=>`<option value="${p}">${p}</option>`).join('');
-  sel.value = cur;
+  const periodos = [...new Set(historialScopedList().map(m=>periodoDeFecha(m.fecha)).filter(Boolean))]
+                     .sort().reverse();     // 2026-08, 2026-07, 2026-06...
+  sel.innerHTML = '<option value="">TODOS LOS PERIODOS</option>'
+    + periodos.map(p=>`<option value="${p}">${periodoEtiqueta(p)}</option>`).join('');
+  sel.value = periodos.indexOf(cur) !== -1 ? cur : '';
   refreshCustomSelect(sel);
 }
 let historialSort = { field:'fecha', dir:'desc' };
@@ -3327,7 +3454,7 @@ function historialFilteredSortedList(){
   const trabajadorId = document.getElementById('filterTrabajador') ? document.getElementById('filterTrabajador').value : '';
   const q = up(document.getElementById('filterMotivo').value);
   let list = historialScopedList();
-  if(periodo) list = list.filter(m=>m.periodo===periodo);
+  if(periodo) list = list.filter(m=>periodoDeFecha(m.fecha)===periodo);
   if(trabajadorId) list = list.filter(m=>m.colaboradorId===trabajadorId);
   if(q) list = list.filter(m=> m.motivo.includes(q) || m.partida.includes(q) || m.llegada.includes(q) || m.correlativo.includes(q));
 
@@ -3753,9 +3880,29 @@ async function refrescarPlanNueva(){
   toast('Movilidades pendientes actualizadas');
 }
 let planCandidatosSortDir = 'asc';
-function togglePlanCandidatosSort(){
-  planCandidatosSortDir = planCandidatosSortDir === 'asc' ? 'desc' : 'asc';
+/* Mismo comportamiento que el historial: se ordena haciendo click en el
+   encabezado, y el segundo click invierte el sentido. */
+let planSort = { field:'fecha', dir:'asc' };
+function setPlanSort(field){
+  if(planSort.field === field){ planSort.dir = planSort.dir === 'asc' ? 'desc' : 'asc'; }
+  else { planSort = { field, dir: (field==='fecha'||field==='importe') ? 'desc' : 'asc' }; }
+  planCandidatosSortDir = planSort.field==='fecha' ? planSort.dir : planCandidatosSortDir;
   buscarMovilidadesPendientes();
+}
+function togglePlanCandidatosSort(){
+  planSort = { field:'fecha', dir: planSort.field==='fecha' && planSort.dir==='asc' ? 'desc' : 'asc' };
+  planCandidatosSortDir = planSort.dir;
+  buscarMovilidadesPendientes();
+}
+function limpiarFiltrosPlan(){
+  const b = document.getElementById('planBuscar');
+  if(b) b.value = '';
+  document.getElementById('planFechaInicio').value = '';
+  document.getElementById('planFechaFin').value = '';
+  planSort = { field:'fecha', dir:'asc' };
+  planCandidatosSortDir = 'asc';
+  buscarMovilidadesPendientes();
+  toast('Filtros limpiados');
 }
 function buscarMovilidadesPendientes(){
   const colabId = document.getElementById('planColab').value;
@@ -3770,7 +3917,25 @@ function buscarMovilidadesPendientes(){
   let list = DB.movilidades.filter(m=> m.colaboradorId===colabId && (!m.planillaId || (editing && m.planillaId===editing.id)));
   if(fi) list = list.filter(m=>m.fecha>=fi);
   if(ff) list = list.filter(m=>m.fecha<=ff);
-  list.sort((a,b)=> planCandidatosSortDir==='asc' ? a.fecha.localeCompare(b.fecha) : b.fecha.localeCompare(a.fecha));
+  const qPlan = up((document.getElementById('planBuscar')||{value:''}).value).trim();
+  if(qPlan) list = list.filter(m=> (m.motivo||'').includes(qPlan) || (m.partida||'').includes(qPlan)
+                                || (m.llegada||'').includes(qPlan) || (m.correlativo||'').includes(qPlan));
+
+  const multP = planSort.dir === 'asc' ? 1 : -1;
+  list.sort((a,b)=>{
+    let va, vb;
+    if(planSort.field === 'importe'){ va = Number(a.importe)||0; vb = Number(b.importe)||0; }
+    else { va = a[planSort.field]||''; vb = b[planSort.field]||''; }
+    if(va < vb) return -1*multP;
+    if(va > vb) return 1*multP;
+    return 0;
+  });
+  document.querySelectorAll('[data-plansort]').forEach(th=>{
+    const activo = th.dataset.plansort === planSort.field;
+    th.classList.toggle('sort-active', activo);
+    const fl = th.querySelector('.sort-arrow');
+    if(fl) fl.innerHTML = activo ? (planSort.dir==='asc' ? '&#8593;' : '&#8595;') : '&#8645;';
+  });
   const sortBtn = document.getElementById('btnSortPlanCandidatos');
   if(sortBtn) sortBtn.innerHTML = planCandidatosSortDir==='asc' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Fecha' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>Fecha';
 
@@ -3778,7 +3943,20 @@ function buscarMovilidadesPendientes(){
     ? ('Editando planilla ' + editing.correlativo + ': movilidades incluidas y pendientes')
     : 'Movilidades pendientes de incluir';
 
+  const conteo = document.getElementById('planConteo');
+  if(conteo) conteo.textContent = list.length === 1 ? '1 movilidad' : list.length + ' movilidades';
+
   if(list.length===0){
+    /* Si la lista quedo vacia por el buscador, la tarjeta se queda visible para
+       que el filtro siga a la vista y se pueda corregir sin volver atras. */
+    if(qPlan){
+      document.getElementById('planCandidatosCard').style.display = 'block';
+      document.getElementById('planCandidatosEmpty').style.display = 'none';
+      document.getElementById('candidatosBody').innerHTML =
+        '<tr><td colspan="7" style="text-align:center;padding:26px 10px;color:var(--text-mut);font-size:12.5px;">Ninguna movilidad coincide con "' + qPlan + '".</td></tr>';
+      document.getElementById('candidatosTotal').textContent = money(0);
+      return;
+    }
     document.getElementById('planCandidatosCard').style.display = 'none';
     document.getElementById('planCandidatosEmpty').style.display = 'block';
     return;
@@ -4553,8 +4731,84 @@ async function cambiarMiPassword(){
   toast('Contrasena actualizada');
 }
 
+/* ============================================================
+   ATAJOS DE TECLADO
+   Se usa e.code (KeyN, KeyM...) y no e.key: con Alt, macOS y algunos teclados
+   producen caracteres raros ("˜", "µ"), pero e.code siempre dice que tecla se
+   apreto fisicamente. Los atajos se ignoran mientras se escribe en un campo,
+   salvo Ctrl+Enter y Escape, que ahi justamente son utiles.
+   ============================================================ */
+function abrirAtajos(){ closeMobileSidebar(); document.getElementById('atajosOverlay').classList.add('open'); }
+function cerrarAtajos(){ document.getElementById('atajosOverlay').classList.remove('open'); }
+
+function escribiendo(el){
+  if(!el) return false;
+  const t = (el.tagName||'').toUpperCase();
+  return t==='INPUT' || t==='TEXTAREA' || el.isContentEditable;
+}
+function irSeccionAtajo(sec){
+  if(sec==='colaboradores'){
+    const u = getCurrentUser();
+    if(!u || !u.isAdmin){ toast('Solo los administradores ven Colaboradores', true); return; }
+  }
+  showSection(sec);
+}
+function enfocarBuscador(){
+  const activa = document.querySelector('.section.active');
+  if(!activa) return;
+  const campo = activa.querySelector('.filters input[type="text"], .filters input:not([type])');
+  if(campo){ campo.focus(); campo.select(); return; }
+  const otro = activa.querySelector('input[type="text"]:not([readonly]):not([disabled])');
+  if(otro){ otro.focus(); otro.select(); }
+}
+function guardarConTeclado(){
+  const activa = document.querySelector('.section.active');
+  if(!activa) return false;
+  const abierto = document.querySelector('.modal-overlay.open .btn-purple');
+  if(abierto){ abierto.click(); return true; }
+  const id = activa.id;
+  if(id==='section-nueva'){ saveMovilidad(); return true; }
+  if(id==='section-planillas'){
+    const b = document.getElementById('btnGenerarPlanilla');
+    if(b && b.offsetParent){ b.click(); return true; }
+  }
+  return false;
+}
+document.addEventListener('keydown', function(e){
+  // Escape cierra lo que este abierto, en orden de lo mas superficial a lo mas profundo
+  if(e.key === 'Escape'){
+    const at = document.getElementById('atajosOverlay');
+    if(at && at.classList.contains('open')){ cerrarAtajos(); return; }
+  }
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    if(guardarConTeclado()) e.preventDefault();
+    return;
+  }
+  if(!e.altKey || e.ctrlKey || e.metaKey) return;
+  if(escribiendo(document.activeElement) && e.code !== 'KeyH') return;
+
+  const mapa = {
+    KeyI:()=>irSeccionAtajo('dashboard'), KeyN:()=>irSeccionAtajo('nueva'),
+    KeyM:()=>irSeccionAtajo('historial'), KeyG:()=>irSeccionAtajo('planillas'),
+    KeyC:()=>irSeccionAtajo('colaboradores'),
+    KeyK:enfocarBuscador,
+    KeyD:()=>toggleDarkMode(),
+    KeyB:()=>toggleSidebar(),
+    KeyH:()=>{ const at=document.getElementById('atajosOverlay');
+               at.classList.contains('open') ? cerrarAtajos() : abrirAtajos(); },
+    KeyL:()=>{ const s=document.querySelector('.section.active');
+               if(s && s.id==='section-historial') limpiarFiltrosHistorial(); },
+    ArrowLeft:()=>{ const s=document.querySelector('.section.active');
+                    if(s && s.id==='section-historial') irAPaginaHistorial(historialPagina-1); },
+    ArrowRight:()=>{ const s=document.querySelector('.section.active');
+                     if(s && s.id==='section-historial') irAPaginaHistorial(historialPagina+1); }
+  };
+  const fn = mapa[e.code];
+  if(fn){ e.preventDefault(); fn(); }
+});
+
 function pintarVersion(){
-  document.querySelectorAll('#loginVersion,#cfgVersion').forEach(el=>{ el.textContent = APP_VERSION; });
+  document.querySelectorAll('#loginVersion,#cfgVersion,#sideVersion,#sideVersionMini').forEach(el=>{ el.textContent = APP_VERSION; });
 }
 try{ pintarVersion(); }catch(e){}
 document.addEventListener('DOMContentLoaded', ()=>{ try{ pintarVersion(); }catch(e){} });

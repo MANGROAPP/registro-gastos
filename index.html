@@ -312,6 +312,8 @@ try{
   .badge.red{background:var(--red-bg);color:var(--red);}
   .badge.purple{background:var(--purple-light);color:var(--purple);}
   .badge.orange{background:var(--orange-bg);color:var(--orange);}
+  .badge.gray{background:var(--border);color:var(--text-mut);}
+  .modulo-badge{font-size:10px;padding:3px 9px;margin:1px;}
   .row-actions{display:flex;gap:6px;}
   .icon-action{
     width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text-mut);
@@ -755,6 +757,28 @@ try{
   .quick-action-card .qa-label{font-weight:700;font-size:13px;}
   .quick-action-card .qa-sub{font-size:11.5px;color:var(--text-mut);margin-top:1px;}
 
+  /* Accesos de otros modulos: mas chicos y solo icono + etiqueta, para que
+     quepan varios sin competir con las 3 acciones principales de arriba.
+     Cada modulo nuevo que se agregue a futuro suma una ficha mas aqui, sin
+     tener que rediseniar nada (el flex-wrap las va acomodando solo). */
+  .module-shortcuts-label{font-size:11.5px;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:.04em;margin:-10px 0 10px;}
+  .module-shortcuts-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 28px;}
+  .module-shortcut-tile{
+    display:flex;flex-direction:column;align-items:center;gap:6px;width:78px;padding:12px 6px 10px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;
+    transition:transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  }
+  .module-shortcut-tile:hover{transform:translateY(-2px);box-shadow:var(--sh-2);border-color:var(--purple);}
+  .module-shortcut-tile:active{transform:scale(.97);transition-duration:.08s;}
+  .module-shortcut-tile .mst-ico{
+    width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:var(--purple-grad);color:#fff;
+  }
+  .module-shortcut-tile .mst-ico svg{width:14px;height:14px;}
+  .module-shortcut-tile .mst-label{font-size:10.5px;font-weight:700;text-align:center;line-height:1.2;}
+  .module-shortcut-tile.mst-soon{opacity:.5;}
+  .module-shortcut-tile.mst-soon .mst-ico{background:var(--text-mut);}
+
   .module-block{margin-bottom:36px;}
   .module-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;}
   .module-head-left{display:flex;align-items:center;gap:10px;}
@@ -798,6 +822,7 @@ try{
   html[data-theme="dark"] .badge.green{background:rgba(61,220,151,.15);color:#5FE6A6;}
   html[data-theme="dark"] .badge.red{background:rgba(255,110,124,.15);color:#FF9AA4;}
   html[data-theme="dark"] .badge.orange{background:rgba(255,180,84,.15);color:#FFC773;}
+  html[data-theme="dark"] .badge.gray{background:rgba(255,255,255,.08);color:var(--text-mut);}
   html[data-theme="dark"] .mono{background:rgba(91,157,255,.14);}
   .mono{background:var(--purple-light);padding:3px 8px;border-radius:7px;font-size:12px;}
 
@@ -1356,7 +1381,7 @@ try{
         <button class="nav-btn side-item side-subitem" data-section="planillas" title="Generar Planilla" onclick="showSection('planillas')"><span class="side-label">Generar Planilla</span></button>
       </div>
 
-      <button class="nav-btn side-item" disabled title="Rendiciones (proximamente)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><span class="side-label">Rendiciones</span></button>
+      <button class="nav-btn side-item" id="navGastosSoon" disabled title="Rendiciones (proximamente)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><span class="side-label">Rendiciones</span></button>
       <button class="nav-btn side-item" data-section="colaboradores" title="Colaboradores" onclick="showSection('colaboradores')"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20"/><circle cx="9.5" cy="8" r="3.5"/><path d="M20 20v-1.5a3.2 3.2 0 0 0-2.2-3.03"/><path d="M14.7 4.6a3.5 3.5 0 0 1 0 6.8"/></svg></span><span class="side-label">Colaboradores</span></button>
     </div>
     <div class="sidebar-divider"></div>
@@ -1416,7 +1441,7 @@ try{
         <div id="dashboardNovedadesBody"></div>
       </div>
 
-      <div class="quick-actions">
+      <div class="quick-actions" id="quickActionsMovilidad">
         <button class="quick-action-card" onclick="showSection('nueva')">
           <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span>
           <span><span class="qa-label">+ Nueva Movilidad</span><span class="qa-sub" style="display:block;">Registrar un traslado</span></span>
@@ -1431,7 +1456,21 @@ try{
         </button>
       </div>
 
-      <div class="module-block">
+      <!-- Accesos de otros modulos: chicos y solo icono + etiqueta (a
+           diferencia de las 3 tarjetas grandes de arriba, que son las
+           acciones del dia a dia de Movilidad). Cuando Gastos este
+           conectado, esta ficha pasa de "Proximamente" a un acceso real;
+           cualquier modulo que se agregue despues suma su propia ficha aqui
+           mismo, sin rediseniar nada. -->
+      <div class="module-shortcuts-label" id="otrosModulosLabel">Otros modulos</div>
+      <div class="module-shortcuts-row">
+        <button class="module-shortcut-tile mst-soon" id="mstGastos" onclick="toast('El modulo Gastos todavia esta en desarrollo.', true)" title="Gastos (proximamente): Rendiciones, Reembolsos y Caja Chica">
+          <span class="mst-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span>
+          <span class="mst-label">Gastos</span>
+        </button>
+      </div>
+
+      <div class="module-block" id="dashboardBlockMovilidad">
         <div class="module-head"><div class="module-head-left"><span class="module-dot"></span><h2>Movilidad</h2></div></div>
 
       <div class="stats-row">
@@ -1476,7 +1515,7 @@ try{
       <!-- Resumen de Planillas: quien tiene reintegro pendiente y cuanto ya se pago.
            Mismo patron de bloque que Movilidad, para que el Inicio se sienta
            como un solo sistema y no como pantallas pegadas. -->
-      <div class="module-block">
+      <div class="module-block" id="dashboardBlockPlanillas">
         <div class="module-head"><div class="module-head-left"><span class="module-dot"></span><h2>Planillas</h2></div></div>
 
         <div class="stats-row">
@@ -1511,7 +1550,7 @@ try{
       <!-- Modulo Gastos (Rendiciones/Reembolsos/Caja Chica): aun no conectado a la
            base de datos real. Cuando lo este, su resumen entra aqui como un bloque
            mas, sin tener que rediseniar el Inicio de nuevo. -->
-      <div class="module-block module-block-soon">
+      <div class="module-block module-block-soon" id="dashboardBlockGastos">
         <div class="module-head">
           <div class="module-head-left"><span class="module-dot"></span><h2>Gastos</h2></div>
           <span class="module-soon-badge">Proximamente</span>
@@ -1623,7 +1662,7 @@ try{
           <button class="btn btn-primary" id="btnAgregarColaborador" onclick="openColabModal()">+ Agregar Colaborador</button>
         </div>
         <table class="tbl-cards">
-          <thead><tr><th>Apellidos y Nombres</th><th>DNI</th><th>Firma</th><th>Estado</th><th></th></tr></thead>
+          <thead><tr><th>Apellidos y Nombres</th><th>DNI</th><th>Firma</th><th>Módulos</th><th>Estado</th><th></th></tr></thead>
           <tbody id="colabBody"></tbody>
         </table>
       </div>
@@ -1814,6 +1853,11 @@ try{
       <div class="field full" style="display:flex;align-items:center;gap:8px;">
         <input type="checkbox" id="colabIsAdmin" style="width:18px;height:18px;">
         <label for="colabIsAdmin" style="margin:0;">Es administrador (puede ver y gestionar a todo el personal)</label>
+      </div>
+      <div class="field full" id="colabModulosField">
+        <label>M&oacute;dulos con acceso</label>
+        <div id="colabModulosBox" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;"></div>
+        <small class="hint">Define qu&eacute; partes de la app puede ver y usar este colaborador. Se puede cambiar despu&eacute;s en cualquier momento editando su ficha.</small>
       </div>
       <div class="field">
         <label>Firma (imagen escaneada)</label>
@@ -2353,7 +2397,56 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '2.8.1';
+/* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
+   (control de acceso por modulo). Cada modulo nuevo que se agregue a la
+   app suma una entrada aqui, y automaticamente aparece como checkbox en
+   la ficha de Colaborador y como columna en la lista de Colaboradores —
+   no hay que tocar nada mas en el HTML del modal para eso. La llave
+   (key) es la que se guarda en `colaboradores.modulos_acceso` y la que
+   revisa Supabase (RLS) del lado del servidor, asi que debe coincidir
+   exactamente con la que usan las políticas en supabase_modulos_acceso.sql. */
+const MODULOS_DISPONIBLES = [
+  { key:'movilidad', label:'Movilidad', desc:'Nueva Movilidad, Movilidades e Historial, Generar Planilla.' },
+  { key:'gastos', label:'Gastos', desc:'Proveedores, Comprobantes, Caja Chica y Liquidaciones (en desarrollo).' }
+];
+function usuarioTieneModulo(modulo){
+  const user = getCurrentUser();
+  return !!(user && Array.isArray(user.modulos) && user.modulos.includes(modulo));
+}
+/* Aplica el control de acceso por modulo a todo lo que pueda llevar a
+   Movilidad o a Gastos: el grupo del sidebar, los accesos rapidos de
+   Inicio, la ficha de "Otros modulos" y los bloques de resumen del
+   dashboard. IMPORTANTE: esto es la capa de conveniencia en pantalla
+   (para no mostrar botones que de todas formas van a fallar) — el
+   control de verdad, el que no se puede saltar abriendo la consola del
+   navegador, vive en Supabase via Row Level Security (ver
+   supabase_modulos_acceso.sql). Aunque este JS tenga un error o alguien
+   lo desactive, la base de datos igual rechaza la lectura/escritura. */
+function aplicarVisibilidadPorModulos(){
+  const tieneMovilidad = usuarioTieneModulo('movilidad');
+  const tieneGastos = usuarioTieneModulo('gastos');
+
+  const gBtn = document.getElementById('groupMovilidadBtn');
+  if(gBtn) gBtn.style.display = tieneMovilidad ? '' : 'none';
+  const qa = document.getElementById('quickActionsMovilidad');
+  if(qa) qa.style.display = tieneMovilidad ? '' : 'none';
+  const bMov = document.getElementById('dashboardBlockMovilidad');
+  if(bMov) bMov.style.display = tieneMovilidad ? '' : 'none';
+  const bPlan = document.getElementById('dashboardBlockPlanillas');
+  if(bPlan) bPlan.style.display = tieneMovilidad ? '' : 'none';
+
+  const navGastosSoon = document.getElementById('navGastosSoon');
+  if(navGastosSoon) navGastosSoon.style.display = tieneGastos ? '' : 'none';
+  const mstGastos = document.getElementById('mstGastos');
+  if(mstGastos) mstGastos.style.display = tieneGastos ? '' : 'none';
+  const bGastos = document.getElementById('dashboardBlockGastos');
+  if(bGastos) bGastos.style.display = tieneGastos ? '' : 'none';
+  // "Otros modulos" hoy solo trae la ficha de Gastos; si no aplica, se
+  // oculta tambien el rotulo para no dejar un titulo suelto sin nada debajo.
+  const otrosLabel = document.getElementById('otrosModulosLabel');
+  if(otrosLabel) otrosLabel.style.display = tieneGastos ? '' : 'none';
+}
 
 const safeStorage = (function(){
   let usable = false;
@@ -2441,7 +2534,11 @@ function rowToColaborador(r){
     dni: r.dni,
     firma: r.firma,
     activo: r.activo,
-    isAdmin: !!r.is_admin
+    isAdmin: !!r.is_admin,
+    // Si el proyecto de Supabase todavia no tiene la columna nueva
+    // (supabase_modulos_acceso.sql aun no corrido), se asume Movilidad
+    // para no dejar a nadie sin acceso a lo que ya usa hoy.
+    modulos: Array.isArray(r.modulos_acceso) && r.modulos_acceso.length ? r.modulos_acceso : ['movilidad']
   };
 }
 function rowToMovilidad(r){
@@ -3186,6 +3283,14 @@ const CRUMBS = {
 const SECCIONES_MOVILIDAD = ['nueva','historial','planillas'];
 
 function showSection(name){
+  // Control de acceso por modulo: si el colaborador no tiene Movilidad
+  // habilitada, no dejamos que ninguna de sus pantallas quede visible,
+  // ni siquiera navegando directo (flyout, atajos de teclado, etc.).
+  // Esto es solo la capa de UI; la capa real esta en Supabase (RLS).
+  if(SECCIONES_MOVILIDAD.indexOf(name)!==-1 && !usuarioTieneModulo('movilidad')){
+    toast('No tienes acceso al modulo de Movilidad', true);
+    name = 'dashboard';
+  }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('section-'+name).classList.add('active');
   document.querySelectorAll('.nav-btn[data-section]').forEach(b=>b.classList.toggle('active', b.dataset.section===name));
@@ -3224,6 +3329,7 @@ function showSection(name){
 function renderDashboard(){
   const user = getCurrentUser();
   if(!user) return;
+  aplicarVisibilidadPorModulos();
   document.getElementById('welcomeName').textContent = nombreCorto(user);
   const mine = DB.movilidades.filter(m=>m.colaboradorId===user.id);
   document.getElementById('statTotal').textContent = mine.length;
@@ -3954,6 +4060,7 @@ function renderColaboradores(){
       <td data-label="Colaborador"><b>${nombreCompleto(c)}</b>${c.isAdmin ? ' <span class="badge purple">ADMIN</span>' : ''}</td>
       <td data-label="DNI" class="center">${c.dni}</td>
       <td data-label="Firma" class="center"><span class="badge ${c.firma?'green':'orange'}">${c.firma?'REGISTRADA':'PENDIENTE'}</span></td>
+      <td data-label="Módulos" class="center">${MODULOS_DISPONIBLES.map(m=>`<span class="badge modulo-badge ${(c.modulos||[]).includes(m.key)?'green':'gray'}" title="${(c.modulos||[]).includes(m.key)?m.label+': habilitado':m.label+': sin acceso'}">${m.label}</span>`).join(' ')}</td>
       <td data-label="Estado" class="center"><span class="badge ${c.activo?'green':'red'}">${c.activo?'ACTIVO':'INACTIVO'}</span></td>
       <td data-label="Acciones" class="center">
         ${soyAdmin ? `<div class="row-actions">
@@ -3972,6 +4079,23 @@ async function toggleColab(id){
   await refreshColaboradores();
   renderColaboradores();
   toast(nuevoEstado ? 'Colaborador activado' : 'Colaborador desactivado');
+}
+/* Dibuja los checkboxes de modulos dentro de la ficha de Colaborador.
+   `seleccionados` es el arreglo de keys ya habilitadas (o el default para
+   un colaborador nuevo). Volver a llamar esta funcion redibuja desde cero,
+   asi que sirve tanto para abrir en modo edicion como en modo nuevo. */
+function renderColabModulosCheckboxes(seleccionados){
+  const sel = seleccionados || [];
+  const box = document.getElementById('colabModulosBox');
+  if(!box) return;
+  box.innerHTML = MODULOS_DISPONIBLES.map(m=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="checkbox" class="colab-modulo-chk" value="${m.key}" id="colabMod_${m.key}" ${sel.includes(m.key)?'checked':''} style="width:18px;height:18px;margin-top:1px;">
+      <label for="colabMod_${m.key}" style="margin:0;"><b>${m.label}</b><br><span style="font-weight:400;color:var(--text-mut);font-size:12px;">${m.desc}</span></label>
+    </div>`).join('');
+}
+function leerColabModulosSeleccionados(){
+  return Array.from(document.querySelectorAll('.colab-modulo-chk:checked')).map(el=>el.value);
 }
 function openColabModal(id){
   document.getElementById('colabModalOverlay').classList.add('open');
@@ -3995,6 +4119,7 @@ function openColabModal(id){
     document.getElementById('colabDni').value = c.dni;
     if(c.firma) document.getElementById('firmaPreviewBox').innerHTML = '<img src="'+c.firma+'">';
     document.getElementById('colabIsAdmin').checked = !!c.isAdmin;
+    renderColabModulosCheckboxes(Array.isArray(c.modulos) && c.modulos.length ? c.modulos : ['movilidad']);
     // El correo y la contraseña se definen solo al crear el acceso; no se editan aqui.
     document.getElementById('colabEmailField').style.display = 'none';
     document.getElementById('colabPasswordField').style.display = 'none';
@@ -4010,6 +4135,10 @@ function openColabModal(id){
     document.getElementById('colabSegundoNombre').value = '';
     document.getElementById('colabDni').value = '';
     document.getElementById('colabIsAdmin').checked = false;
+    // Por defecto, un colaborador nuevo entra con Movilidad habilitado (es
+    // el modulo que ya esta en uso diario) y Gastos apagado: quien lo cree
+    // decide activarlo cuando corresponda, no queda prendido por accidente.
+    renderColabModulosCheckboxes(['movilidad']);
     document.getElementById('colabEmailField').style.display = '';
     document.getElementById('colabPasswordField').style.display = '';
     document.getElementById('colabAccesoNota').style.display = 'none';
@@ -4094,7 +4223,9 @@ async function saveColaborador(){
   const dni = document.getElementById('colabDni').value.trim();
   const isAdmin = document.getElementById('colabIsAdmin').checked;
   const editId = document.getElementById('colabEditId').value;
+  const modulosSeleccionados = leerColabModulosSeleccionados();
   if(!apellidoPaterno || !primerNombre || !dni){ toast('Completa al menos apellido paterno, primer nombre y DNI', true); return; }
+  if(!modulosSeleccionados.length){ toast('Marca al menos un modulo, o el colaborador no vera nada al ingresar', true); return; }
 
   const btn = document.getElementById('btnGuardarColab');
   if(btn) btn.disabled = true;
@@ -4104,7 +4235,7 @@ async function saveColaborador(){
     const patch = {
       apellido_paterno: apellidoPaterno, apellido_materno: apellidoMaterno,
       primer_nombre: primerNombre, segundo_nombre: segundoNombre, dni,
-      is_admin: isAdmin
+      is_admin: isAdmin, modulos_acceso: modulosSeleccionados
     };
     if(pendingFirma) patch.firma = pendingFirma;
     const { error } = await sb.from('colaboradores').update(patch).eq('id', editId);
@@ -4136,7 +4267,7 @@ async function saveColaborador(){
     const { error: insertError } = await sb.from('colaboradores').insert({
       id: newId, apellido_paterno: apellidoPaterno, apellido_materno: apellidoMaterno,
       primer_nombre: primerNombre, segundo_nombre: segundoNombre, dni,
-      firma: pendingFirma || null, is_admin: isAdmin
+      firma: pendingFirma || null, is_admin: isAdmin, modulos_acceso: modulosSeleccionados
     });
     if(btn) btn.disabled = false;
     if(insertError){ toast('El acceso se creo pero no se pudo guardar el perfil: ' + insertError.message, true); return; }
@@ -5098,6 +5229,472 @@ async function descargarPDFMultiple(planillaIds){
 }
 
 /* ============================================================
+   DOCUMENTOS DE GASTOS: ACTA DE ENTREGA DE FONDO Y LIQUIDACION
+   Mismo estilo y misma tecnica de dibujo (jsPDF con coordenadas en pt) que
+   drawPlanillaPdf, para que un colaborador que ya conoce el PDF de planillas
+   reconozca el mismo documento de la empresa en Gastos. Estas funciones
+   reciben objetos simples (no dependen todavia de `cache`/Supabase real):
+   se conectan cuando el modulo Gastos quede cableado a la base de datos.
+   ============================================================ */
+
+/* ---- Monto en letras (soles), para el acta de entrega ---- */
+function numeroALetrasGrupo(n, apocope){
+  const UNI     = ['','UNO','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE'];
+  const UNI_APO = ['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE'];
+  const ESP     = {10:'DIEZ',11:'ONCE',12:'DOCE',13:'TRECE',14:'CATORCE',15:'QUINCE',16:'DIECISEIS',17:'DIECISIETE',18:'DIECIOCHO',19:'DIECINUEVE',
+    20:'VEINTE',21:'VEINTIUNO',22:'VEINTIDOS',23:'VEINTITRES',24:'VEINTICUATRO',25:'VEINTICINCO',26:'VEINTISEIS',27:'VEINTISIETE',28:'VEINTIOCHO',29:'VEINTINUEVE'};
+  const ESP_APO = Object.assign({}, ESP, {21:'VEINTIUN'});
+  const DEC     = ['','','','TREINTA','CUARENTA','CINCUENTA','SESENTA','SETENTA','OCHENTA','NOVENTA'];
+  const CEN     = ['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS','SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
+  if(n===0) return '';
+  if(n===100) return 'CIEN';
+  const c = Math.floor(n/100), r = n%100;
+  let out = '';
+  if(c>0) out += CEN[c] + (r>0 ? ' ' : '');
+  if(r>0){
+    if(r<10) out += (apocope?UNI_APO:UNI)[r];
+    else if(r<30) out += (apocope?ESP_APO:ESP)[r];
+    else{
+      const d = Math.floor(r/10), u = r%10;
+      out += DEC[d] + (u>0 ? (' Y ' + (apocope?UNI_APO:UNI)[u]) : '');
+    }
+  }
+  return out;
+}
+function montoEnLetrasSoles(monto){
+  monto = Math.round(Math.abs(Number(monto)||0)*100)/100;
+  const entero = Math.floor(monto);
+  const centavos = Math.round((monto-entero)*100);
+  const centTxt = String(centavos).padStart(2,'0') + '/100 SOLES';
+  if(entero===0) return 'CERO CON ' + centTxt;
+  let resto = entero;
+  const millones = Math.floor(resto/1000000); resto %= 1000000;
+  const miles    = Math.floor(resto/1000);    resto %= 1000;
+  const unidades = resto;
+  const partes = [];
+  if(millones>0) partes.push(millones===1 ? 'UN MILLON' : numeroALetrasGrupo(millones,false) + ' MILLONES');
+  if(miles>0)    partes.push(miles===1 ? 'MIL' : numeroALetrasGrupo(miles,false) + ' MIL');
+  if(unidades>0) partes.push(numeroALetrasGrupo(unidades, true));
+  return partes.join(' ') + ' CON ' + centTxt;
+}
+
+/* ---- Helpers de dibujo compartidos por ambos documentos (mismo look de drawPlanillaPdf) ---- */
+function crearLienzoDocumento(pdf, tituloDocumento){
+  const PAGE_W = pdf.internal.pageSize.getWidth();
+  const PAGE_H = pdf.internal.pageSize.getHeight();
+  const M = 32;
+  const CW = PAGE_W - 2*M;
+  let y = M, pageTop = M;
+  function vCenter(top,h,fontSize){ return top + h/2 + fontSize*0.32; }
+  function closeBorder(bottomY){ pdf.setLineWidth(1.4); pdf.rect(M, pageTop, CW, bottomY-pageTop); }
+  function ensureSpace(neededH){
+    if(y + neededH > PAGE_H - M){ closeBorder(y); pdf.addPage(); y = M; pageTop = M; return true; }
+    return false;
+  }
+  function metaLine(label, value, x, ly){
+    pdf.setFont('courier','bold'); pdf.text(label, x, ly);
+    const lw = pdf.getTextWidth(label);
+    pdf.setFont('courier','normal'); pdf.text(': ' + (value||''), x+lw+5, ly);
+  }
+  return { PAGE_W, PAGE_H, M, CW, get y(){return y;}, set y(v){y=v;}, vCenter, closeBorder, ensureSpace, metaLine };
+}
+async function dibujarEncabezadoDocumento(pdf, doc, correlativo, titulo){
+  const { M, CW } = doc;
+  const logoMeta = await loadImageMeta(LOGO_SRC);
+  let logoH = 30, logoW = 30;
+  pdf.setFont('courier','normal');
+  if(logoMeta){ logoH = 30; logoW = logoH*(logoMeta.w/logoMeta.h); pdf.addImage(logoMeta.src, imgFormatFromDataURL(logoMeta.src), M, doc.y, logoW, logoH); }
+  pdf.setFont('courier','bold'); pdf.setFontSize(10.5);
+  const numText = 'N° ' + correlativo;
+  const numPad = 9, numH = 21;
+  const numW = pdf.getTextWidth(numText) + numPad*2;
+  const numX = M + CW - numW;
+  pdf.setLineWidth(1);
+  pdf.rect(numX, doc.y, numW, numH);
+  pdf.text(numText, numX+numW/2, doc.vCenter(doc.y,numH,10.5), {align:'center'});
+  doc.y += Math.max(logoH, numH) + 12;
+  pdf.setLineWidth(1.3);
+  pdf.line(M, doc.y, M+CW, doc.y);
+  doc.y += 18;
+  pdf.setFont('courier','bold'); pdf.setFontSize(12);
+  pdf.text(titulo, M+CW/2, doc.y, {align:'center'});
+  const tW = pdf.getTextWidth(titulo);
+  pdf.setLineWidth(0.8);
+  pdf.line(M+CW/2-tW/2, doc.y+3, M+CW/2+tW/2, doc.y+3);
+  doc.y += 24;
+}
+function dibujarBloqueFirma(pdf, doc, firmaSrc, firmaMeta, etiqueta, subEtiqueta){
+  doc.ensureSpace(120);
+  doc.y += 8;
+  if(firmaMeta){
+    const sigH = 56, sigW = sigH*(firmaMeta.w/firmaMeta.h);
+    pdf.addImage(firmaMeta.src, imgFormatFromDataURL(firmaMeta.src), doc.M+doc.CW/2-sigW/2, doc.y, sigW, sigH);
+    doc.y += sigH + 6;
+  } else { doc.y += 40; }
+  pdf.setLineWidth(0.8);
+  const sigLineW = 220;
+  pdf.line(doc.M+doc.CW/2-sigLineW/2, doc.y, doc.M+doc.CW/2+sigLineW/2, doc.y);
+  doc.y += 13;
+  pdf.setFont('courier','bold'); pdf.setFontSize(9.5);
+  pdf.text(etiqueta, doc.M+doc.CW/2, doc.y, {align:'center'});
+  // subEtiqueta acepta una linea (string) o varias (array); asi el bloque de
+  // "aprobado por" puede mostrar nombre + cargo en una linea y la fecha en otra.
+  const subLineas = Array.isArray(subEtiqueta) ? subEtiqueta.filter(Boolean) : (subEtiqueta ? [subEtiqueta] : []);
+  subLineas.forEach(linea=>{
+    doc.y += 12;
+    pdf.setFont('courier','normal'); pdf.setFontSize(8.5);
+    pdf.text(linea, doc.M+doc.CW/2, doc.y, {align:'center'});
+  });
+  doc.y += 18;
+}
+
+/* ============================================================
+   ACTA DE ENTREGA DE FONDO (CAJA CHICA o ENTREGA A RENDIR)
+   Es el sustento firmado de que el colaborador recibio el dinero: nace al
+   crear un fondo nuevo (tabla `fondos`) y lleva el MISMO correlativo del
+   fondo (CAJ-2026-0001 / ENT-2026-0001) — no se inventa una serie aparte.
+   fondo: { correlativo, tipo:'CAJA_CHICA'|'ENTREGA', monto, fecha, medio,
+            banco, referencia, observaciones }
+   colaborador: { ..., dni, firma }
+   entregadoPor: { nombre, cargo }
+   ============================================================ */
+async function drawActaEntregaFondoPdf(pdf, fondo, colaborador, entregadoPor){
+  const doc = crearLienzoDocumento(pdf);
+  const esCaja = fondo.tipo === 'CAJA_CHICA';
+  const titulo = esCaja ? 'ACTA DE ENTREGA DE FONDO FIJO - CAJA CHICA' : 'ACTA DE ENTREGA A RENDIR CUENTA';
+  await dibujarEncabezadoDocumento(pdf, doc, fondo.correlativo, titulo);
+
+  const f = new Date(fondo.fecha + 'T00:00:00');
+  const fechaStr = String(f.getDate()).padStart(2,'0')+'/'+String(f.getMonth()+1).padStart(2,'0')+'/'+f.getFullYear();
+  const nombreStr = nombreCompleto(colaborador);
+  const montoStr = Number(fondo.monto||0).toFixed(2);
+  const letrasStr = montoEnLetrasSoles(fondo.monto);
+
+  pdf.setFontSize(9.2);
+  doc.y += 8;
+  doc.metaLine('RAZON SOCIAL', EMPRESA.razonSocial, doc.M+10, doc.y);
+  doc.metaLine('FECHA DE ENTREGA', fechaStr, doc.M+doc.CW*0.60, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('RUC', EMPRESA.ruc, doc.M+10, doc.y);
+  doc.metaLine('MEDIO', fondo.medio || 'EFECTIVO', doc.M+doc.CW*0.60, doc.y);
+  doc.y += 15.5 + 12;
+
+  pdf.setLineWidth(1);
+  pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
+  doc.y += 20;
+  doc.metaLine('APELLIDOS Y NOMBRES', nombreStr, doc.M+10, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('DNI', colaborador.dni||'', doc.M+10, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('MONTO ENTREGADO', 'S/ ' + montoStr, doc.M+10, doc.y);
+  doc.y += 15.5 + 16;
+
+  // ---- parrafo de declaracion (cuerpo del acta) ----
+  pdf.setFont('courier','normal'); pdf.setFontSize(9.4);
+  const glosa = esCaja
+    ? `Por medio del presente documento, yo, ${nombreStr}, identificado(a) con DNI N° ${colaborador.dni||''}, colaborador(a) de ${EMPRESA.razonSocial}, declaro haber recibido de la empresa la suma de S/ ${montoStr} (${letrasStr}), por concepto de FONDO FIJO DE CAJA CHICA. Me comprometo a administrar dicho fondo de forma rotativa para cubrir gastos menores autorizados por la empresa, a sustentar cada gasto con el comprobante de pago correspondiente (factura, boleta, recibo por honorarios, etc.) emitido a nombre de ${EMPRESA.razonSocial}, y a reponer el fondo unicamente por el monto exacto de lo gastado y sustentado, manteniendo en todo momento, entre el efectivo disponible y los comprobantes pendientes de reposicion, el integro de la suma aqui recibida.`
+    : `Por medio del presente documento, yo, ${nombreStr}, identificado(a) con DNI N° ${colaborador.dni||''}, colaborador(a) de ${EMPRESA.razonSocial}, declaro haber recibido de la empresa la suma de S/ ${montoStr} (${letrasStr}), por concepto de ENTREGA A RENDIR CUENTA. Me comprometo a sustentar el integro de dicho monto con los comprobantes de pago correspondientes emitidos a nombre de ${EMPRESA.razonSocial}, o a devolver a la empresa el saldo no utilizado, mediante la liquidacion respectiva, dentro del plazo que la empresa establezca.`;
+  // Texto justificado (ambos margenes parejos, como en un procesador de
+  // texto) en vez de alineado solo a la izquierda: jsPDF soporta align:
+  // 'justify' dibujando el parrafo completo de una vez con maxWidth, por lo
+  // que el interlineado se fija aparte con setLineHeightFactor para que
+  // coincida con el resto del documento (13.5pt a este tamano de letra).
+  const glosaLines = pdf.splitTextToSize(glosa, doc.CW - 20);
+  const glosaLineH = 13.5;
+  doc.ensureSpace(glosaLines.length*glosaLineH + 10);
+  pdf.setLineHeightFactor(glosaLineH/9.4);
+  pdf.text(glosa, doc.M+10, doc.y, { maxWidth: doc.CW-20, align:'justify' });
+  pdf.setLineHeightFactor(1.15);
+  doc.y += glosaLines.length*glosaLineH + 6;
+
+  // ---- firmas: colaborador (quien recibe) y quien entrega, lado a lado ----
+  doc.ensureSpace(140);
+  doc.y += 22;
+  const mitad = doc.CW/2;
+  const colaFirmaMeta = colaborador.firma ? await loadImageMeta(colaborador.firma) : null;
+  const yInicioFirmas = doc.y;
+  // Colaborador (izquierda)
+  if(colaFirmaMeta){
+    const sigH = 50, sigW = sigH*(colaFirmaMeta.w/colaFirmaMeta.h);
+    pdf.addImage(colaFirmaMeta.src, imgFormatFromDataURL(colaFirmaMeta.src), doc.M+mitad/2-sigW/2, doc.y, sigW, sigH);
+  }
+  let yL = yInicioFirmas + 58;
+  pdf.setLineWidth(0.8);
+  pdf.line(doc.M+30, yL, doc.M+mitad-30, yL);
+  yL += 13;
+  pdf.setFont('courier','bold'); pdf.setFontSize(9);
+  pdf.text('RECIBI CONFORME', doc.M+mitad/2, yL, {align:'center'});
+  yL += 12;
+  pdf.setFont('courier','normal'); pdf.setFontSize(8.2);
+  pdf.text(nombreStr + ' - DNI ' + (colaborador.dni||''), doc.M+mitad/2, yL, {align:'center'});
+  // Entregado por (derecha)
+  let yR = yInicioFirmas + 58;
+  pdf.setLineWidth(0.8);
+  pdf.line(doc.M+mitad+30, yR, doc.M+doc.CW-30, yR);
+  yR += 13;
+  pdf.setFont('courier','bold'); pdf.setFontSize(9);
+  pdf.text('ENTREGADO POR', doc.M+mitad+mitad/2, yR, {align:'center'});
+  yR += 12;
+  pdf.setFont('courier','normal'); pdf.setFontSize(8.2);
+  pdf.text((entregadoPor && entregadoPor.nombre) || '', doc.M+mitad+mitad/2, yR, {align:'center'});
+  if(entregadoPor && entregadoPor.cargo){
+    yR += 11;
+    pdf.text(entregadoPor.cargo, doc.M+mitad+mitad/2, yR, {align:'center'});
+  }
+  doc.y = Math.max(yL, yR) + 20;
+
+  doc.closeBorder(doc.y);
+}
+async function descargarActaEntregaFondoPDF(fondo, colaborador, entregadoPor){
+  toast('Generando PDF...');
+  try{
+    await new Promise(r=>setTimeout(r,10));
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit:'pt', format:'a4', orientation:'portrait' });
+    await drawActaEntregaFondoPdf(pdf, fondo, colaborador, entregadoPor);
+    pdf.save('acta_entrega_' + fondo.correlativo + '.pdf');
+  }catch(err){ console.error(err); toast('No se pudo generar el PDF', true); }
+}
+
+/* ============================================================
+   LIQUIDACION (RENDICION / REEMBOLSO / REPOSICION)
+   Mismo estilo que la planilla de movilidad: encabezado con logo y
+   correlativo, datos del colaborador, tabla de comprobantes (solo los
+   campos que hacen falta para sustentar, no la fila tecnica completa) y
+   totales. Se adjunta al pago igual que hoy se adjunta el PDF de planilla.
+   liquidacion: { correlativo, tipo:'RENDICION'|'REEMBOLSO'|'REPOSICION',
+                  fecha, periodoDesde, periodoHasta, totalSustentado,
+                  totalDevuelto, saldo, estado, aprobadaPor, aprobadaAt,
+                  reintegroAt, reintegroMedio, reintegroOperacion }
+   comprobantes: [{ fecha, tipoDocumento, serie, numero, proveedorRazonSocial,
+                    proveedorRuc, concepto, moneda, total }]
+                 — SIEMPRE documentos reales de sustento (factura, boleta,
+                 recibo por honorarios, ticket, etc.), nunca una "devolucion":
+                 devolver dinero no es un gasto que se sustente con un
+                 comprobante, es la contraparte de haber recibido un
+                 anticipo, y por eso vive aparte, en `liquidacion.totalDevuelto`
+                 (ver mas abajo por que eso solo aplica a RENDICION).
+   aprobadoPor: colaborador (con firma) del administrador que aprobo, o null
+                si todavia no se aprueba. El titulo del documento SI cambia
+                segun tipo (ver tituloLiquidacion): RENDICION -> "Liquidacion
+                de Rendicion de Cuentas", REEMBOLSO -> "Liquidacion de
+                Reembolso", REPOSICION -> "Liquidacion de Reposicion de Caja
+                Chica".
+
+   Por que "totalDevuelto" (y el propio saldo a favor/en contra) SOLO tiene
+   sentido en RENDICION, y nunca en REPOSICION ni en REEMBOLSO:
+   - RENDICION = hubo un ANTICIPO entregado antes (fondo tipo ENTREGA, "toma
+     estos S/500 y rinde cuentas"). Si el colaborador gasta menos de lo que
+     se le adelanto, tiene que DEVOLVER la diferencia — de ahi que exista
+     "Total devuelto" y que el saldo final pueda quedar a favor de la
+     empresa (si aun debe devolver mas) o del colaborador (si gasto mas de
+     lo adelantado).
+   - REPOSICION (caja chica) = el fondo YA esta en poder del colaborador
+     desde antes, de forma rotativa: la empresa nunca entrega nada nuevo al
+     momento de liquidar, solo repone exactamente lo ya sustentado. No hay
+     anticipo puntual que pueda "sobrar", asi que no existe devolucion ni
+     saldo: solo "Monto a reponer".
+   - REEMBOLSO = el colaborador gasto de SU PROPIO bolsillo, sin que la
+     empresa le haya entregado nada por adelantado. La empresa simplemente
+     le paga lo sustentado — tampoco hay nada que devolver, porque nunca
+     recibio dinero de mas. Por eso REEMBOLSO usa la misma etiqueta directa
+     que REPOSICION ("Monto a reembolsar"), NO el saldo a favor de RENDICION.
+   ============================================================ */
+function tituloLiquidacion(tipo){
+  return tipo==='RENDICION' ? 'LIQUIDACION DE RENDICION DE CUENTAS'
+       : tipo==='REEMBOLSO' ? 'LIQUIDACION DE REEMBOLSO'
+       : 'LIQUIDACION DE REPOSICION DE CAJA CHICA';
+}
+function docComprobanteTexto(c){
+  const partes = [c.tipoDocumento||''];
+  if(c.serie || c.numero) partes.push((c.serie||'')+(c.numero?('-'+c.numero):''));
+  return partes.join(' ');
+}
+async function drawLiquidacionPdf(pdf, liquidacion, colaborador, comprobantes, aprobadoPor){
+  const doc = crearLienzoDocumento(pdf);
+  const titulo = tituloLiquidacion(liquidacion.tipo);
+  await dibujarEncabezadoDocumento(pdf, doc, liquidacion.correlativo, titulo);
+
+  const f = new Date(liquidacion.fecha + 'T00:00:00');
+  const fechaStr = String(f.getDate()).padStart(2,'0')+'/'+String(f.getMonth()+1).padStart(2,'0')+'/'+f.getFullYear();
+  const nombreStr = nombreCompleto(colaborador);
+  const periodo = (liquidacion.periodoDesde && liquidacion.periodoHasta)
+    ? (fmtFecha(liquidacion.periodoDesde) + ' al ' + fmtFecha(liquidacion.periodoHasta)) : '-';
+
+  pdf.setFontSize(9.2);
+  doc.y += 8;
+  doc.metaLine('RAZON SOCIAL', EMPRESA.razonSocial, doc.M+10, doc.y);
+  doc.metaLine('FECHA DE EMISION', fechaStr, doc.M+doc.CW*0.60, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('RUC', EMPRESA.ruc, doc.M+10, doc.y);
+  doc.metaLine('ESTADO', liquidacion.estado||'', doc.M+doc.CW*0.60, doc.y);
+  doc.y += 15.5;
+  if(liquidacion.tipo === 'REPOSICION'){
+    doc.metaLine('PERIODO DE CAJA CHICA', periodo, doc.M+10, doc.y);
+    doc.y += 15.5;
+  }
+  doc.y += 6;
+
+  pdf.setLineWidth(1);
+  pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
+  doc.y += 20;
+  doc.metaLine('APELLIDOS Y NOMBRES', nombreStr, doc.M+10, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('DNI', colaborador.dni||'', doc.M+10, doc.y);
+  doc.y += 15.5 + 12;
+
+  // ---- tabla de comprobantes: solo lo necesario para sustentar ----
+  const colPct = [10,17,25,26,7,15];
+  const colW = colPct.map(pc=>doc.CW*pc/100);
+  const colX = [doc.M];
+  for(let i=0;i<colW.length-1;i++) colX.push(colX[i]+colW[i]);
+  const headerFontSize = 7.6, bodyFontSize = 8;
+
+  function drawTableHeader(){
+    doc.ensureSpace(30);
+    const hy0 = doc.y, h1 = 22;
+    pdf.setFont('courier','bold'); pdf.setFontSize(headerFontSize);
+    const titulos = ['FECHA','DOCUMENTO','PROVEEDOR','CONCEPTO','MON.','IMPORTE'];
+    titulos.forEach((t,i)=> pdf.text(t, colX[i]+colW[i]/2, doc.vCenter(hy0,h1,headerFontSize), {align:'center'}));
+    pdf.setLineWidth(1);
+    pdf.line(doc.M, hy0, doc.M+doc.CW, hy0);
+    pdf.line(doc.M, hy0+h1, doc.M+doc.CW, hy0+h1);
+    [...colX, doc.M+doc.CW].forEach(vx=> pdf.line(vx, hy0, vx, hy0+h1));
+    doc.y = hy0 + h1;
+  }
+  drawTableHeader();
+
+  pdf.setFont('courier','normal'); pdf.setFontSize(bodyFontSize);
+  const cellPadX = 3, lineH = 9.2;
+  let totalMostrado = 0;
+  (comprobantes||[]).forEach(c=>{
+    const docTxt = docComprobanteTexto(c);
+    const provTxt = up((c.proveedorRazonSocial||'') + (c.proveedorRuc ? (' ('+c.proveedorRuc+')') : ''));
+    const docLines = pdf.splitTextToSize(docTxt, colW[1]-cellPadX*2);
+    const concLines = pdf.splitTextToSize(up(c.concepto||''), colW[3]-cellPadX*2);
+    const provLines = pdf.splitTextToSize(provTxt, colW[2]-cellPadX*2);
+    const nLines = Math.max(1, docLines.length, concLines.length, provLines.length);
+    const rowH = Math.max(14, nLines*lineH + 5);
+    if(doc.ensureSpace(rowH)) drawTableHeader();
+
+    const ry0 = doc.y;
+    pdf.setLineWidth(0.8);
+    [...colX, doc.M+doc.CW].forEach(vx=> pdf.line(vx, ry0, vx, ry0+rowH));
+    pdf.line(doc.M, ry0+rowH, doc.M+doc.CW, ry0+rowH);
+
+    const midY = doc.vCenter(ry0, rowH, bodyFontSize);
+    pdf.text(fmtFecha(c.fecha), colX[0]+colW[0]/2, midY, {align:'center'});
+    let dy = ry0 + (rowH-docLines.length*lineH)/2 + lineH*0.72;
+    docLines.forEach(line=>{ pdf.text(line, colX[1]+colW[1]/2, dy, {align:'center'}); dy += lineH; });
+    let py = ry0 + (rowH-provLines.length*lineH)/2 + lineH*0.72;
+    provLines.forEach(line=>{ pdf.text(line, colX[2]+cellPadX, py); py += lineH; });
+    let cy = ry0 + (rowH-concLines.length*lineH)/2 + lineH*0.72;
+    concLines.forEach(line=>{ pdf.text(line, colX[3]+cellPadX, cy); cy += lineH; });
+    pdf.text(c.moneda||'PEN', colX[4]+colW[4]/2, midY, {align:'center'});
+    pdf.text(Number(c.total||0).toFixed(2), colX[5]+colW[5]-cellPadX, midY, {align:'right'});
+    totalMostrado += Number(c.total||0);
+    doc.y += rowH;
+  });
+
+  // ---- totales: caja de resumen aparte y bien separada de la tabla, en vez
+  // de lineas sueltas pegadas a la ultima fila (eso era lo que se veia como
+  // "duplicado" y apretado) ----
+  const sustentado = liquidacion.totalSustentado != null ? liquidacion.totalSustentado : totalMostrado;
+  const totalDevueltoVal = liquidacion.totalDevuelto || 0;
+  let labelFinal, valorFinal, mostrarDevuelto;
+  if(liquidacion.tipo === 'REPOSICION'){
+    // Caja chica: el fondo ya esta en poder del colaborador desde antes, de
+    // forma rotativa. No hay anticipo puntual que pueda "sobrar", asi que
+    // no existe devolucion ni saldo a favor de nadie: solo se repone
+    // exactamente lo ya sustentado.
+    labelFinal = 'MONTO A REPONER';
+    valorFinal = sustentado;
+    mostrarDevuelto = false;
+  } else if(liquidacion.tipo === 'REEMBOLSO'){
+    // El colaborador gasto de su propio bolsillo: la empresa no le
+    // entrego nada por adelantado, asi que tampoco hay nada que pueda
+    // devolver. Se le reembolsa directo lo sustentado, sin comparar
+    // contra ningun anticipo (a diferencia de Rendicion).
+    labelFinal = 'MONTO A REEMBOLSAR';
+    valorFinal = sustentado;
+    mostrarDevuelto = false;
+  } else {
+    // Rendicion de cuentas: aqui SI hubo un anticipo entregado antes
+    // (fondo tipo ENTREGA). Si gasto menos de lo adelantado, devuelve la
+    // diferencia (Total devuelto), y el saldo final puede quedar a favor
+    // de la empresa (si aun debe devolver mas) o del colaborador (si
+    // gasto mas de lo que se le adelanto).
+    const saldo = liquidacion.saldo != null ? liquidacion.saldo : (sustentado - totalDevueltoVal);
+    labelFinal = saldo >= 0 ? 'SALDO A FAVOR DEL COLABORADOR' : 'SALDO A FAVOR DE LA EMPRESA';
+    valorFinal = Math.abs(saldo);
+    mostrarDevuelto = true;
+  }
+  const filasTotal = [['TOTAL SUSTENTADO', sustentado]];
+  if(mostrarDevuelto && totalDevueltoVal) filasTotal.push(['TOTAL DEVUELTO', totalDevueltoVal]);
+
+  const totW = doc.CW*0.62;
+  const totX = doc.M + doc.CW - totW;
+  const padIn = 12;
+  const filaH = 17;
+  const boxH = filasTotal.length*filaH + 40;
+  doc.ensureSpace(boxH + 34);
+  doc.y += 16;
+  pdf.setLineWidth(1);
+  pdf.rect(totX, doc.y, totW, boxH);
+  let ty = doc.y + 15;
+  pdf.setFont('courier','normal'); pdf.setFontSize(9);
+  filasTotal.forEach(([label,val])=>{
+    pdf.text(label, totX+padIn, ty);
+    pdf.text(Number(val||0).toFixed(2), totX+totW-padIn, ty, {align:'right'});
+    ty += filaH;
+  });
+  pdf.setLineWidth(0.7);
+  pdf.line(totX+padIn, ty-5, totX+totW-padIn, ty-5);
+  ty += 14;
+  pdf.setFont('courier','bold'); pdf.setFontSize(10.5);
+  pdf.text(labelFinal, totX+padIn, ty);
+  pdf.text('S/ ' + Number(valorFinal||0).toFixed(2), totX+totW-padIn, ty, {align:'right'});
+  doc.y += boxH + 16;
+
+  pdf.setFont('courier','normal'); pdf.setFontSize(8);
+  pdf.text('Comprobantes adjuntos: ' + (comprobantes||[]).length, doc.M, doc.y);
+  doc.y += 20;
+
+  // ---- firmas: la del colaborador jala la MISMA firma ya cargada en la
+  // ficha del colaborador (la misma que usa la planilla de movilidad -
+  // colaborador.firma). La de "revisado y aprobado" se mantiene aqui a
+  // proposito, a diferencia de la planilla de movilidad: la movilidad sigue
+  // una tarifa fija ya autorizada de antemano por politica, mientras que
+  // una liquidacion libera un monto variable (reposicion, reembolso o
+  // rendicion), asi que conviene dejar constancia de doble control de quien
+  // autorizo el pago. Usa la firma real del administrador que aprobo
+  // (aprobadoPor), tambien tomada de su ficha de colaborador. ----
+  const firmaMeta = colaborador.firma ? await loadImageMeta(colaborador.firma) : null;
+  dibujarBloqueFirma(pdf, doc, colaborador.firma, firmaMeta, 'FIRMA DEL COLABORADOR', 'Declaro que los gastos aqui detallados son veraces');
+  if(liquidacion.aprobadaPor || liquidacion.estado==='APROBADA' || liquidacion.estado==='REINTEGRADA' || liquidacion.estado==='CERRADA'){
+    const nombreAdmin = aprobadoPor ? nombreCompleto(aprobadoPor) : null;
+    const subLineas = [
+      nombreAdmin ? (nombreAdmin + (aprobadoPor.isAdmin ? ' - Administrador' : '')) : null,
+      liquidacion.aprobadaAt ? ('Aprobado el ' + fmtFecha(String(liquidacion.aprobadaAt).slice(0,10))) : null
+    ];
+    const adminFirmaMeta = (aprobadoPor && aprobadoPor.firma) ? await loadImageMeta(aprobadoPor.firma) : null;
+    dibujarBloqueFirma(pdf, doc, aprobadoPor && aprobadoPor.firma, adminFirmaMeta, 'REVISADO Y APROBADO POR', subLineas);
+  }
+
+  doc.closeBorder(doc.y);
+}
+async function descargarLiquidacionPDF(liquidacion, colaborador, comprobantes, aprobadoPor){
+  toast('Generando PDF...');
+  try{
+    await new Promise(r=>setTimeout(r,10));
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit:'pt', format:'a4', orientation:'portrait' });
+    await drawLiquidacionPdf(pdf, liquidacion, colaborador, comprobantes, aprobadoPor);
+    pdf.save('liquidacion_' + liquidacion.correlativo + '.pdf');
+  }catch(err){ console.error(err); toast('No se pudo generar el PDF', true); }
+}
+
+/* ============================================================
    CONFIGURACION
    ============================================================ */
 /* ------------------------------------------------------------------
@@ -5345,6 +5942,7 @@ function boot(){
   if(userChip) userChip.onclick = user.isAdmin ? function(){ showSection('colaboradores'); } : null;
   const navConfig = document.getElementById('navConfig');
   if(navConfig) navConfig.style.display = user.isAdmin ? '' : 'none';
+  aplicarVisibilidadPorModulos();
   applyThemeToggleUI();
   ['formFecha','planFechaInicio','planFechaFin'].forEach(id=>{
     const el = document.getElementById(id);

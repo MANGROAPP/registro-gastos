@@ -2,7 +2,7 @@
    El nombre del cache ES la etiqueta de la version publicada. Si no se cambia,
    los celulares que ya tienen la app instalada siguen sirviendo la copia vieja.
    Debe coincidir con APP_VERSION dentro de index.html. */
-const CACHE = 'mangro-gastos-v2.5.0';
+const CACHE = 'mangro-gastos-v2.6.0';
 const ARCHIVOS = [
   './', './index.html', './manifest.json',
   './favicon-v2.ico',
@@ -57,4 +57,38 @@ self.addEventListener('fetch', e=>{
     caches.open(CACHE).then(c=>c.put(req, copia));
     return resp;
   }).catch(()=>r)));
+});
+
+/* ============================================================
+   PUSH: avisos que llegan aunque la app este cerrada.
+   El envio real lo dispara una funcion en la nube (Supabase Edge Function,
+   ver GUIA_PUSH_NOTIFICACIONES.md) cuando se crea una fila nueva en la tabla
+   notificaciones. Esto de aqui solo dibuja la notificacion del sistema
+   operativo cuando ese envio llega al navegador.
+   ============================================================ */
+self.addEventListener('push', e=>{
+  let datos = { titulo:'MANGRO', cuerpo:'Tienes una novedad nueva.', url:'./' };
+  try{ if(e.data) datos = Object.assign(datos, e.data.json()); }catch(err){ /* payload no era JSON: se usan los valores por defecto */ }
+  e.waitUntil(
+    self.registration.showNotification(datos.titulo, {
+      body: datos.cuerpo,
+      icon: './icons/icon-192-v2.png',
+      badge: './icons/icon-192-v2.png',
+      data: { url: datos.url || './' },
+      tag: datos.tag || 'mangro-notif'
+    })
+  );
+});
+
+/* Al tocar la notificacion: si ya hay una pestaña abierta, la enfoca en vez de
+   abrir una nueva (asi no se acumulan pestañas de la misma app). */
+self.addEventListener('notificationclick', e=>{
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || './';
+  e.waitUntil(
+    self.clients.matchAll({ type:'window', includeUncontrolled:true }).then(clientsArr=>{
+      for(const c of clientsArr){ if('focus' in c) return c.focus(); }
+      if(self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
 });

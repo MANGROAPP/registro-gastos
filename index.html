@@ -1656,11 +1656,28 @@ try{
 
       <div id="planHistorialView" style="display:none;">
         <div class="card">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+          <div class="filters" style="margin-bottom:16px;">
+            <select id="filterPlanTrabajador" onchange="renderPlanillasHistorial()"></select>
+            <select id="filterPlanEstado" onchange="renderPlanillasHistorial()">
+              <option value="">TODOS LOS ESTADOS</option>
+              <option value="PENDIENTE_REINTEGRO">PENDIENTE DE REINTEGRO</option>
+              <option value="REINTEGRADA">REINTEGRADA</option>
+            </select>
+            <select id="filterPlanPeriodo" onchange="renderPlanillasHistorial()"><option value="">TODOS LOS PERIODOS</option></select>
+            <input type="text" id="filterPlanBuscar" placeholder="BUSCAR POR N&deg; DE PLANILLA O COLABORADOR" oninput="renderPlanillasHistorial()">
+            <button class="btn btn-outline btn-sm" onclick="limpiarFiltrosPlanHist()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px;margin-right:5px;"><path d="M18 6L6 18M6 6l12 12"/></svg>Limpiar filtros</button>
+            <div class="spacer" style="flex:1;"></div>
+            <span class="plan-conteo" id="planHistConteo"></span>
             <button class="btn btn-ghost btn-sm" id="btnRefrescarPlanHist" onclick="refrescarPlanillasHistorial()"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
           </div>
           <table class="tbl-mov tbl-cards">
-            <thead><tr><th class="col-num">N&deg; Planilla</th><th class="col-trab">Colaborador</th><th>Rango</th><th class="col-imp right">Total</th><th class="col-fecha">Generada</th><th></th></tr></thead>
+            <thead><tr>
+              <th class="th-sort col-num" data-plhsort="correlativo" onclick="setPlanHistSort('correlativo')">N&deg; Planilla<span class="sort-arrow">&#8645;</span></th>
+              <th id="thPlanHistTrabajador" class="th-sort col-trab" data-plhsort="trabajador" onclick="setPlanHistSort('trabajador')">Colaborador<span class="sort-arrow">&#8645;</span></th>
+              <th>Rango</th>
+              <th class="th-sort col-imp right" data-plhsort="total" onclick="setPlanHistSort('total')">Total<span class="sort-arrow">&#8645;</span></th>
+              <th class="th-sort col-fecha" data-plhsort="fecha" onclick="setPlanHistSort('fecha')">Generada<span class="sort-arrow">&#8645;</span></th>
+              <th class="col-estado center">Estado</th><th></th></tr></thead>
             <tbody id="planillasHistBody"></tbody>
           </table>
           <div class="empty-state" id="planillasHistEmpty" style="display:none;">Aun no se han generado planillas.</div>
@@ -1670,6 +1687,34 @@ try{
     </div>
 
   </div>
+
+<!-- ===================== MODAL REGISTRAR REINTEGRO (PLANILLA) ===================== -->
+<div class="modal-overlay" id="reintegroPlanModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarReintegroPlanilla()">&times;</button>
+    <h2>Registrar reintegro</h2>
+    <p class="sub" id="reintegroPlanSub">Confirma que ya se le pago al colaborador el total de esta planilla.</p>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Medio de pago</label>
+        <select id="reintegroPlanMedio">
+          <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+          <option value="EFECTIVO">EFECTIVO</option>
+          <option value="DEPOSITO">DEPOSITO</option>
+          <option value="CHEQUE">CHEQUE</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>N&deg; de operacion (opcional)</label>
+        <input type="text" id="reintegroPlanOperacion" placeholder="EJ: 88213340">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarReintegroPlanilla()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarReintegroPlan" onclick="confirmarReintegroPlanilla()">Confirmar reintegro</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- ===================== MODAL COLABORADOR ===================== -->
@@ -2256,7 +2301,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.5.0';
 
 const safeStorage = (function(){
   let usable = false;
@@ -2369,7 +2414,16 @@ function rowToPlanilla(r, movilidades){
     correlativo: r.correlativo,
     colaboradorId: r.colaborador_id,
     fechaEmision: r.fecha_emision,
-    movilidadIds: movilidades.filter(m=>m.planillaId===r.id).map(m=>m.id)
+    movilidadIds: movilidades.filter(m=>m.planillaId===r.id).map(m=>m.id),
+    // Estado del reintegro: PENDIENTE_REINTEGRO al generarse, REINTEGRADA cuando
+    // un administrador registra que ya se le pago al colaborador. Si la base de
+    // datos todavia no tiene estas columnas (no se corrio supabase_planillas_estado.sql),
+    // r.estado llega undefined y se asume pendiente para no romper la pantalla.
+    estado: r.estado || 'PENDIENTE_REINTEGRO',
+    reintegroAt: r.reintegro_at || null,
+    reintegroPor: r.reintegro_por || null,
+    reintegroMedio: r.reintegro_medio || null,
+    reintegroOperacion: r.reintegro_operacion || null
   };
 }
 
@@ -3498,7 +3552,9 @@ function renderHistorial(){
   body.innerHTML = pagina.map((m,i)=>{
     const planilla = m.planillaId ? getPlanilla(m.planillaId) : null;
     const estadoCell = planilla
-      ? `<span class="badge purple" title="Incluida en planilla ${planilla.correlativo}">EN PLANILLA</span>`
+      ? ( planilla.estado === 'REINTEGRADA'
+          ? `<span class="badge green" title="Planilla ${planilla.correlativo} &middot; ya se te reintegro">REINTEGRADA</span>`
+          : `<span class="badge orange" title="Planilla ${planilla.correlativo} &middot; en espera de que se registre el pago">PENDIENTE DE REINTEGRO</span>` )
       : `<div class="row-actions">
           <button class="icon-action" title="Editar" onclick="editMovilidad('${m.id}')">${ICO.editar}</button>
           <button class="icon-action danger" title="Eliminar" onclick="deleteMovilidad('${m.id}')">${ICO.eliminar}</button>
@@ -3633,7 +3689,13 @@ const ICO = {
   anular:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
   activar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   descargar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  billete:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>',
+  revertir:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.64-6.36"/><path d="M3 3v5h5"/></svg>',
 };
+/* Defensa: todo SVG dentro de un boton de accion tiene su propio tamano.
+   Sin esto, un icono sin width/height declarado se dibuja gigante o no se
+   ve en algunos navegadores -- ya paso una vez con los iconos de Generar
+   Planilla en iPhone (ronda 27). */
 
 function renderColaboradores(){
   const me = getCurrentUser();
@@ -4161,6 +4223,7 @@ function splitIdsUnaHojaPorPlanilla(ids){
 function editarPlanilla(id){
   const p = getPlanilla(id);
   if(!p) return;
+  if(p.estado === 'REINTEGRADA'){ toast('Esta planilla ya fue reintegrada. Revierte el estado antes de editarla.', true); return; }
   editingPlanillaId = id;
   showPlanTab('nueva');
   document.getElementById('planColab').value = p.colaboradorId;
@@ -4326,28 +4389,144 @@ async function refrescarPlanillasHistorial(){
   renderPlanillasHistorial();
   toast('Planillas actualizadas');
 }
-function renderPlanillasHistorial(){
-  const body = document.getElementById('planillasHistBody');
-  const list = [...DB.planillas].sort((a,b)=> (b.fechaEmision||'').localeCompare(a.fechaEmision||''));
-  document.getElementById('planillasHistEmpty').style.display = list.length? 'none':'block';
-  body.innerHTML = list.map(p=>{
-    const user = DB.colaboradores.find(c=>c.id===p.colaboradorId);
+/* El colaborador de la planilla se resuelve una sola vez por fila para no
+   repetir el find() en el filtro, el orden y el render. */
+function planillasHistorialEnriquecidas(){
+  const user = getCurrentUser();
+  const base = user && user.isAdmin ? DB.planillas.slice() : DB.planillas.filter(p=>p.colaboradorId===(user&&user.id));
+  return base.map(p=>{
+    const colab = DB.colaboradores.find(c=>c.id===p.colaboradorId);
     const items = DB.movilidades.filter(m=>p.movilidadIds.includes(m.id));
     const total = items.reduce((s,m)=>s+Number(m.importe||0),0);
+    return { p, colab, items, total };
+  });
+}
+function populatePlanHistFilters(){
+  const user = getCurrentUser();
+  const sel = document.getElementById('filterPlanTrabajador');
+  const th = document.getElementById('thPlanHistTrabajador');
+  if(sel && user){
+    setupCustomSelect(sel);
+    if(!user.isAdmin){
+      setFieldVisible(sel, false);
+      if(th) th.style.display = 'none';
+    } else {
+      setFieldVisible(sel, true);
+      if(th) th.style.display = '';
+      const cur = sel.value;
+      const opciones = DB.colaboradores.slice().sort((a,b)=>nombreCompleto(a).localeCompare(nombreCompleto(b)));
+      sel.innerHTML = '<option value="">TODOS LOS TRABAJADORES</option>' + opciones.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+      sel.value = cur;
+      refreshCustomSelect(sel);
+    }
+  }
+  const selP = document.getElementById('filterPlanPeriodo');
+  if(selP){
+    setupCustomSelect(selP);
+    const cur = selP.value;
+    const periodos = [...new Set(planillasHistorialEnriquecidas().map(x=>periodoDeFecha(x.p.fechaEmision)).filter(Boolean))].sort().reverse();
+    selP.innerHTML = '<option value="">TODOS LOS PERIODOS</option>' + periodos.map(pe=>`<option value="${pe}">${periodoEtiqueta(pe)}</option>`).join('');
+    selP.value = periodos.indexOf(cur)!==-1 ? cur : '';
+    refreshCustomSelect(selP);
+  }
+  const selE = document.getElementById('filterPlanEstado');
+  if(selE) setupCustomSelect(selE);
+}
+let planHistSort = { field:'fecha', dir:'desc' };
+function setPlanHistSort(field){
+  if(planHistSort.field === field){
+    planHistSort.dir = planHistSort.dir==='asc' ? 'desc' : 'asc';
+  } else {
+    planHistSort = { field, dir: (field==='fecha'||field==='total') ? 'desc' : 'asc' };
+  }
+  renderPlanillasHistorial();
+}
+function limpiarFiltrosPlanHist(){
+  const t = document.getElementById('filterPlanTrabajador'); if(t) t.value = '';
+  const e = document.getElementById('filterPlanEstado'); if(e) e.value = '';
+  const pe = document.getElementById('filterPlanPeriodo'); if(pe) pe.value = '';
+  const b = document.getElementById('filterPlanBuscar'); if(b) b.value = '';
+  planHistSort = { field:'fecha', dir:'desc' };
+  renderPlanillasHistorial();
+  toast('Filtros limpiados');
+}
+function planHistFilteredSorted(){
+  const trabajadorId = document.getElementById('filterPlanTrabajador') ? document.getElementById('filterPlanTrabajador').value : '';
+  const estado = document.getElementById('filterPlanEstado') ? document.getElementById('filterPlanEstado').value : '';
+  const periodo = document.getElementById('filterPlanPeriodo') ? document.getElementById('filterPlanPeriodo').value : '';
+  const q = up(document.getElementById('filterPlanBuscar') ? document.getElementById('filterPlanBuscar').value : '');
+  let list = planillasHistorialEnriquecidas();
+  if(trabajadorId) list = list.filter(x=>x.p.colaboradorId===trabajadorId);
+  if(estado) list = list.filter(x=>x.p.estado===estado);
+  if(periodo) list = list.filter(x=>periodoDeFecha(x.p.fechaEmision)===periodo);
+  if(q) list = list.filter(x=> x.p.correlativo.includes(q) || (x.colab && up(nombreCompleto(x.colab)).includes(q)));
+  const dir = planHistSort.dir==='asc' ? 1 : -1;
+  list = list.slice().sort((a,b)=>{
+    let va, vb;
+    switch(planHistSort.field){
+      case 'trabajador': va=a.colab?nombreCompleto(a.colab):''; vb=b.colab?nombreCompleto(b.colab):''; break;
+      case 'total':       va=a.total; vb=b.total; break;
+      case 'fecha':       va=a.p.fechaEmision||''; vb=b.p.fechaEmision||''; break;
+      default:            va=a.p.correlativo; vb=b.p.correlativo;
+    }
+    if(typeof va==='number') return (va-vb)*dir;
+    return String(va).localeCompare(String(vb))*dir;
+  });
+  return list;
+}
+function renderPlanillasHistorial(){
+  populatePlanHistFilters();
+  const body = document.getElementById('planillasHistBody');
+  const list = planHistFilteredSorted();
+
+  document.querySelectorAll('[data-plhsort]').forEach(th=>{
+    const active = th.dataset.plhsort === planHistSort.field;
+    th.classList.toggle('sort-active', active);
+    const arrow = th.querySelector('.sort-arrow');
+    if(arrow) arrow.innerHTML = active ? (planHistSort.dir==='asc' ? '&#8593;' : '&#8595;') : '&#8645;';
+  });
+
+  document.getElementById('planillasHistEmpty').style.display = list.length? 'none':'block';
+  const conteo = document.getElementById('planHistConteo');
+  if(conteo) conteo.textContent = list.length + (list.length===1 ? ' planilla' : ' planillas');
+  const user = getCurrentUser();
+  body.innerHTML = list.map(({p, colab, items, total})=>{
     const rango = rangoLabel(items);
     const emision = new Date(p.fechaEmision);
     const fechaStr = String(emision.getDate()).padStart(2,'0')+'/'+String(emision.getMonth()+1).padStart(2,'0')+'/'+emision.getFullYear();
+    const pagada = p.estado === 'REINTEGRADA';
+    const estadoCell = pagada
+      ? `<span class="badge green" title="${p.reintegroMedio||''} ${p.reintegroOperacion?('&middot; OP. '+p.reintegroOperacion):''}">REINTEGRADA</span>`
+      : `<span class="badge orange">PENDIENTE</span>`;
+    // Anular y editar mueven/borran movilidades de la planilla: una vez pagada
+    // eso dejaria un pago registrado que ya no cuadra, asi que se bloquean en
+    // pantalla (la base de datos los bloquea igual, esto solo evita el viaje
+    // de ida y vuelta con un error confuso).
+    const accionesAdmin = !user || !user.isAdmin ? '' : (
+      pagada
+        ? `<button class="icon-action" title="Revertir a pendiente (por si fue un error)" onclick="revertirReintegroPlanilla('${p.id}')">${ICO.revertir}</button>`
+        : `<button class="icon-action" title="Registrar reintegro" onclick="abrirReintegroPlanilla('${p.id}')">${ICO.billete}</button>`
+    );
+    const btnEditar = pagada
+      ? `<button class="icon-action" disabled title="Ya reintegrada: revierte el estado antes de editarla" style="opacity:.35;cursor:not-allowed;">${ICO.editar}</button>`
+      : `<button class="icon-action" title="Editar movilidades incluidas" onclick="editarPlanilla('${p.id}')">${ICO.editar}</button>`;
+    const btnAnular = pagada
+      ? `<button class="icon-action danger" disabled title="Ya reintegrada: revierte el estado antes de anularla" style="opacity:.35;cursor:not-allowed;">${ICO.anular}</button>`
+      : `<button class="icon-action danger" title="Anular" onclick="anularPlanilla('${p.id}')">${ICO.anular}</button>`;
+    const trabajadorCell = (!user || user.isAdmin) ? `<td class="col-trab" data-label="Colaborador">${colab? nombreCompleto(colab) : '—'}</td>` : '';
     return `<tr>
       <td class="col-num" data-label="N&deg; Planilla"><span class="mono">${p.correlativo}</span></td>
-      <td class="col-trab" data-label="Colaborador">${user? nombreCompleto(user) : '—'}</td>
+      ${trabajadorCell}
       <td data-label="Rango">${rango}</td>
       <td class="col-imp right" data-label="Total"><b class="amount">${money(total)}</b></td>
       <td class="col-fecha" data-label="Generada">${fechaStr}</td>
+      <td class="col-estado center" data-label="Estado">${estadoCell}</td>
       <td>
         <div class="row-actions">
           <button class="icon-action" title="Ver / Descargar" onclick="verPlanillaHistorial('${p.id}')">${ICO.ver}</button>
-          <button class="icon-action" title="Editar movilidades incluidas" onclick="editarPlanilla('${p.id}')">${ICO.editar}</button>
-          <button class="icon-action danger" title="Anular" onclick="anularPlanilla('${p.id}')">${ICO.anular}</button>
+          ${btnEditar}
+          ${accionesAdmin}
+          ${btnAnular}
         </div>
       </td>
     </tr>`;
@@ -4359,6 +4538,8 @@ function verPlanillaHistorial(id){
   mostrarPreviewPlanilla(p, 'planHistPreviewCard');
 }
 async function anularPlanilla(id){
+  const p = getPlanilla(id);
+  if(p && p.estado === 'REINTEGRADA'){ toast('Esta planilla ya fue reintegrada. Revierte el estado antes de anularla.', true); return; }
   if(!confirm('¿Anular esta planilla? Las movilidades incluidas quedaran disponibles nuevamente para generar una nueva planilla.')) return;
   const { error: errMov } = await sb.from('movilidades').update({ planilla_id: null }).eq('planilla_id', id);
   if(errMov){ toast('No se pudo anular la planilla', true); return; }
@@ -4369,6 +4550,56 @@ async function anularPlanilla(id){
   toast('Planilla anulada');
   renderPlanillasHistorial();
   document.getElementById('planHistPreviewCard').style.display = 'none';
+}
+
+/* ---------------------------------------------------------------------
+   Registrar / revertir el reintegro de una planilla. Solo un administrador
+   llega a ver estos botones (accionesAdmin arriba), pero ademas la base de
+   datos lo exige por su cuenta (trigger planilla_guardia): si alguien
+   llamara a estas funciones sin ser administrador, Supabase rechaza el
+   cambio igual.
+   --------------------------------------------------------------------- */
+let reintegroPlanTargetId = null;
+function abrirReintegroPlanilla(id){
+  const p = getPlanilla(id);
+  if(!p) return;
+  reintegroPlanTargetId = id;
+  const colab = DB.colaboradores.find(c=>c.id===p.colaboradorId);
+  document.getElementById('reintegroPlanSub').textContent =
+    'Confirma que ya se le pago a ' + (colab?nombreCompleto(colab):'este colaborador') + ' el total de la planilla ' + p.correlativo + '.';
+  document.getElementById('reintegroPlanMedio').value = 'TRANSFERENCIA';
+  document.getElementById('reintegroPlanOperacion').value = '';
+  document.getElementById('reintegroPlanModalOverlay').classList.add('open');
+}
+function cerrarReintegroPlanilla(){
+  reintegroPlanTargetId = null;
+  document.getElementById('reintegroPlanModalOverlay').classList.remove('open');
+}
+async function confirmarReintegroPlanilla(){
+  if(!reintegroPlanTargetId) return;
+  const btn = document.getElementById('btnConfirmarReintegroPlan');
+  btn.disabled = true;
+  const medio = document.getElementById('reintegroPlanMedio').value;
+  const operacion = document.getElementById('reintegroPlanOperacion').value.trim().toUpperCase() || null;
+  const { error } = await sb.from('planillas').update({
+    estado: 'REINTEGRADA', reintegro_medio: medio, reintegro_operacion: operacion
+  }).eq('id', reintegroPlanTargetId);
+  btn.disabled = false;
+  if(error){ toast('No se pudo registrar el reintegro', true); return; }
+  cerrarReintegroPlanilla();
+  await refreshPlanillas();
+  renderPlanillasHistorial();
+  toast('Reintegro registrado');
+}
+async function revertirReintegroPlanilla(id){
+  const p = getPlanilla(id);
+  if(!p) return;
+  if(!confirm('¿Revertir el reintegro de la planilla ' + p.correlativo + '? Volvera a quedar pendiente de pago.')) return;
+  const { error } = await sb.from('planillas').update({ estado: 'PENDIENTE_REINTEGRO' }).eq('id', id);
+  if(error){ toast('No se pudo revertir el reintegro', true); return; }
+  await refreshPlanillas();
+  renderPlanillasHistorial();
+  toast('Reintegro revertido: la planilla volvio a pendiente');
 }
 /* ============================================================
    GENERACION DE PDF (texto vectorial real, no una imagen capturada)

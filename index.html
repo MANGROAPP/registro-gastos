@@ -1374,14 +1374,19 @@ try{
 
       <!-- Modulo "Planillas de Movilidad": agrupa todo lo relacionado a movilidad
            en un desplegable, para que la barra soporte mas modulos a futuro. -->
-      <button class="nav-btn side-item side-group-btn" id="groupMovilidadBtn" title="Planillas de Movilidad" onclick="toggleSideGroup(this)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span><span class="side-label">Planillas de Movilidad</span><svg class="side-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="nav-btn side-item side-group-btn" id="groupMovilidadBtn" data-group="movilidad" title="Planillas de Movilidad" onclick="toggleSideGroup(this)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span><span class="side-label">Planillas de Movilidad</span><svg class="side-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
       <div class="side-submenu" id="groupMovilidad">
         <button class="nav-btn side-item side-subitem" data-section="nueva" title="Nueva Movilidad" onclick="showSection('nueva')"><span class="side-label">Nueva Movilidad</span></button>
         <button class="nav-btn side-item side-subitem" data-section="historial" title="Movilidades" onclick="showSection('historial')"><span class="side-label">Movilidades</span></button>
         <button class="nav-btn side-item side-subitem" data-section="planillas" title="Generar Planilla" onclick="showSection('planillas')"><span class="side-label">Generar Planilla</span></button>
       </div>
 
-      <button class="nav-btn side-item" id="navGastosSoon" disabled title="Rendiciones (proximamente)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><span class="side-label">Rendiciones</span></button>
+      <button class="nav-btn side-item side-group-btn" id="groupGastosBtn" data-group="gastos" title="Gastos" onclick="toggleSideGroup(this)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><span class="side-label">Gastos</span><svg class="side-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="side-submenu" id="groupGastos">
+        <button class="nav-btn side-item side-subitem" data-section="nuevoComprobante" title="Nuevo Comprobante" onclick="showSection('nuevoComprobante')"><span class="side-label">Nuevo Comprobante</span></button>
+        <button class="nav-btn side-item side-subitem" data-section="cajaChica" title="Caja Chica" onclick="showSection('cajaChica')"><span class="side-label">Caja Chica</span></button>
+        <button class="nav-btn side-item side-subitem" data-section="liquidaciones" title="Liquidaciones" onclick="showSection('liquidaciones')"><span class="side-label">Liquidaciones</span></button>
+      </div>
       <button class="nav-btn side-item" data-section="colaboradores" title="Colaboradores" onclick="showSection('colaboradores')"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20"/><circle cx="9.5" cy="8" r="3.5"/><path d="M20 20v-1.5a3.2 3.2 0 0 0-2.2-3.03"/><path d="M14.7 4.6a3.5 3.5 0 0 1 0 6.8"/></svg></span><span class="side-label">Colaboradores</span></button>
     </div>
     <div class="sidebar-divider"></div>
@@ -1464,7 +1469,7 @@ try{
            mismo, sin rediseniar nada. -->
       <div class="module-shortcuts-label" id="otrosModulosLabel">Otros modulos</div>
       <div class="module-shortcuts-row">
-        <button class="module-shortcut-tile mst-soon" id="mstGastos" onclick="toast('El modulo Gastos todavia esta en desarrollo.', true)" title="Gastos (proximamente): Rendiciones, Reembolsos y Caja Chica">
+        <button class="module-shortcut-tile" id="mstGastos" onclick="showSection('cajaChica')" title="Gastos: Caja Chica (Rendicion y Reembolso, proximamente)">
           <span class="mst-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span>
           <span class="mst-label">Gastos</span>
         </button>
@@ -1547,18 +1552,34 @@ try{
         </div>
       </div>
 
-      <!-- Modulo Gastos (Rendiciones/Reembolsos/Caja Chica): aun no conectado a la
-           base de datos real. Cuando lo este, su resumen entra aqui como un bloque
-           mas, sin tener que rediseniar el Inicio de nuevo. -->
-      <div class="module-block module-block-soon" id="dashboardBlockGastos">
+      <!-- Modulo Gastos: por ahora solo esta conectada la Caja Chica (lo
+           primero que se pidio implementar). Rendicion y Reembolso se suman
+           despues, y este bloque cambia solo, sin rediseniar el Inicio. -->
+      <div class="module-block" id="dashboardBlockGastos">
         <div class="module-head">
           <div class="module-head-left"><span class="module-dot"></span><h2>Gastos</h2></div>
-          <span class="module-soon-badge">Proximamente</span>
         </div>
-        <div class="card">
+        <div class="stats-row" id="dashboardGastosConCaja" style="display:none;">
+          <div class="stat-card acc-purple">
+            <div class="stat-icon purple">S/</div>
+            <div class="stat-label">Tope de Caja Chica</div>
+            <div class="stat-value" id="statCajaTope">S/ 0.00</div>
+          </div>
+          <div class="stat-card acc-orange">
+            <div class="stat-icon orange">S/</div>
+            <div class="stat-label">Gastado sin reponer</div>
+            <div class="stat-value" id="statCajaGastado">S/ 0.00</div>
+          </div>
+          <div class="stat-card acc-green">
+            <div class="stat-icon green">S/</div>
+            <div class="stat-label">Disponible hoy</div>
+            <div class="stat-value" id="statCajaDisponible">S/ 0.00</div>
+          </div>
+        </div>
+        <div class="card" id="dashboardGastosSinCaja">
           <div class="empty-state">
             <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></div>
-            Este modulo esta en desarrollo (Rendiciones, Reembolsos y Caja Chica). Cuando este listo, su resumen aparecera aqui mismo, junto al de Movilidad y Planillas.
+            <span id="dashboardGastosSinCajaTexto">Todavia no tienes una caja chica asignada.</span>
           </div>
         </div>
       </div>
@@ -1772,7 +1793,246 @@ try{
       </div>
     </div>
 
+    <!-- ================= GASTOS: NUEVO COMPROBANTE ================= -->
+    <div class="section" id="section-nuevoComprobante">
+      <h1 class="page-title">Nuevo Comprobante</h1>
+      <p class="page-sub">Registra una factura, boleta u otro sustento contra tu Caja Chica.</p>
+
+      <div class="card" style="margin-top:18px;max-width:760px;">
+        <div class="form-grid">
+          <div class="field" id="cmpColabField">
+            <label>Colaborador</label>
+            <select id="cmpColaborador" onchange="actualizarCajaChicaDestino()"></select>
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <div class="saldo-info" id="cmpCajaInfo">Selecciona un colaborador para ver su Caja Chica.</div>
+            <div class="form-error" id="cmpFormError" style="display:none;"></div>
+          </div>
+          <div class="field">
+            <label>Fecha</label>
+            <input type="text" class="date-input" id="cmpFecha" readonly placeholder="Selecciona una fecha">
+          </div>
+          <div class="field">
+            <label>Tipo de documento</label>
+            <select id="cmpTipoDocumento">
+              <option value="FACTURA">FACTURA</option>
+              <option value="BOLETA">BOLETA</option>
+              <option value="RECIBO POR HONORARIOS">RECIBO POR HONORARIOS</option>
+              <option value="PASAJE AEREO">PASAJE AEREO</option>
+              <option value="TICKET">TICKET</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Serie</label>
+            <input type="text" id="cmpSerie" placeholder="EJ: F001">
+          </div>
+          <div class="field">
+            <label>Numero</label>
+            <input type="text" id="cmpNumero" placeholder="EJ: 00001234">
+          </div>
+          <div class="field">
+            <label>RUC del proveedor</label>
+            <input type="text" id="cmpProveedorRuc" placeholder="11 digitos" maxlength="11" oninput="buscarProveedorPorRuc()">
+          </div>
+          <div class="field">
+            <label>Razon social</label>
+            <input type="text" id="cmpProveedorRazon" placeholder="RAZON SOCIAL DEL PROVEEDOR">
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label>Concepto</label>
+            <input type="text" id="cmpConcepto" placeholder="EJ: UTILES DE OFICINA">
+          </div>
+          <div class="field">
+            <label>Moneda</label>
+            <select id="cmpMoneda"><option value="PEN">SOLES (PEN)</option><option value="USD">DOLARES (USD)</option></select>
+          </div>
+          <div class="field">
+            <label>Total</label>
+            <input type="number" id="cmpTotal" step="0.01" min="0" placeholder="0.00">
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label>Adjunto (foto o PDF del comprobante, opcional)</label>
+            <input type="file" id="cmpAdjunto" accept="image/*,application/pdf">
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content:flex-start;">
+          <button class="btn btn-purple" id="btnGuardarComprobante" onclick="saveComprobante()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;"><path d="M20 6L9 17l-5-5"/></svg>Guardar Comprobante</button>
+          <button class="btn btn-outline" onclick="showSection('cajaChica')">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= GASTOS: CAJA CHICA ================= -->
+    <div class="section" id="section-cajaChica">
+      <h1 class="page-title">Caja Chica</h1>
+      <p class="page-sub">Fondo rotativo: se gasta contra el, y al reponerse vuelve a su tope.</p>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="filters" id="cajaChicaFiltros" style="margin-bottom:16px;display:none;">
+          <select id="cajaChicaColaborador" onchange="renderCajaChica()"></select>
+          <div class="spacer" style="flex:1;"></div>
+          <button class="btn btn-outline btn-sm" onclick="abrirAsignarCajaChica()">+ Asignar Caja Chica</button>
+        </div>
+
+        <div id="cajaChicaSinFondo" class="empty-state" style="display:none;">
+          <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></div>
+          <span id="cajaChicaSinFondoTexto">Este colaborador todavia no tiene una Caja Chica asignada.</span>
+        </div>
+
+        <div id="cajaChicaConFondo" style="display:none;">
+          <div class="stats-row">
+            <div class="stat-card acc-purple">
+              <div class="stat-icon purple">S/</div>
+              <div class="stat-label">Tope de la Caja Chica</div>
+              <div class="stat-value" id="ccTope">S/ 0.00</div>
+            </div>
+            <div class="stat-card acc-orange">
+              <div class="stat-icon orange">S/</div>
+              <div class="stat-label">Gastado sin reponer</div>
+              <div class="stat-value" id="ccGastado">S/ 0.00</div>
+            </div>
+            <div class="stat-card acc-green">
+              <div class="stat-icon green">S/</div>
+              <div class="stat-label">Disponible hoy</div>
+              <div class="stat-value" id="ccDisponible">S/ 0.00</div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px;">
+            <h3 style="margin:0;font-size:14px;">Comprobantes pendientes de reponer</h3>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-outline btn-sm" onclick="showSection('nuevoComprobante')">+ Nuevo Comprobante</button>
+              <button class="btn btn-primary btn-sm" id="btnArmarReposicion" onclick="armarLiquidacionReposicion()">Armar liquidacion de reposicion</button>
+            </div>
+          </div>
+          <table class="tbl-cards">
+            <thead><tr><th>N&deg;</th><th>Fecha</th><th>Tipo</th><th>Proveedor</th><th>Concepto</th><th class="right">Total</th></tr></thead>
+            <tbody id="ccPendientesBody"></tbody>
+          </table>
+          <div class="empty-state" id="ccPendientesEmpty" style="display:none;">No hay comprobantes pendientes de reponer.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= GASTOS: LIQUIDACIONES ================= -->
+    <div class="section" id="section-liquidaciones">
+      <h1 class="page-title">Liquidaciones</h1>
+      <p class="page-sub">Ciclo de reposicion de Caja Chica: armar, enviar, aprobar y registrar el reintegro.</p>
+
+      <div class="pill-nav" style="display:inline-flex;margin:14px 0 20px;">
+        <button id="liqTabArmar" class="active" onclick="showLiqTab('armar')">Por armar</button>
+        <button id="liqTabAprobar" onclick="showLiqTab('aprobar')">Por aprobar</button>
+        <button id="liqTabHistorial" onclick="showLiqTab('historial')">Historial</button>
+      </div>
+
+      <div class="card">
+        <table class="tbl-cards">
+          <thead><tr><th>N&deg; Liquidacion</th><th>Colaborador</th><th>Tipo</th><th>Fecha</th><th class="right">Total Sustentado</th><th class="center">Estado</th><th></th></tr></thead>
+          <tbody id="liqBody"></tbody>
+        </table>
+        <div class="empty-state" id="liqEmpty" style="display:none;">No hay liquidaciones en esta vista.</div>
+      </div>
+    </div>
+
   </div>
+
+<!-- ===================== MODAL ASIGNAR CAJA CHICA ===================== -->
+<div class="modal-overlay" id="asignarCajaModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarAsignarCajaChica()">&times;</button>
+    <h2>Asignar Caja Chica</h2>
+    <p class="sub">Se crea el fondo y se descarga el Acta de Entrega para que la firme el colaborador.</p>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Colaborador</label>
+        <select id="asignarCajaColaborador"></select>
+      </div>
+      <div class="field">
+        <label>Tope de la Caja Chica (S/)</label>
+        <input type="number" id="asignarCajaMonto" step="0.10" min="0" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Medio de entrega</label>
+        <select id="asignarCajaMedio">
+          <option value="EFECTIVO">EFECTIVO</option>
+          <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+          <option value="DEPOSITO">DEPOSITO</option>
+          <option value="CHEQUE">CHEQUE</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarAsignarCajaChica()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarAsignarCaja" onclick="confirmarAsignarCajaChica()">Crear Caja Chica</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL OBSERVAR LIQUIDACION ===================== -->
+<div class="modal-overlay" id="observarLiqModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarObservarLiquidacion()">&times;</button>
+    <h2>Observar liquidacion</h2>
+    <p class="sub" id="observarLiqSub">Explica que hay que corregir. El colaborador la vera y podra volver a enviarla.</p>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Motivo</label>
+        <textarea id="observarLiqMotivo" rows="3" placeholder="EJ: FALTA EL COMPROBANTE DE..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarObservarLiquidacion()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarObservarLiq" onclick="confirmarObservarLiquidacion()">Observar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL REINTEGRAR LIQUIDACION (REPOSICION) ===================== -->
+<div class="modal-overlay" id="reintegroLiqModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarReintegroLiquidacion()">&times;</button>
+    <h2>Registrar reposicion</h2>
+    <p class="sub" id="reintegroLiqSub">Confirma que ya se repuso el efectivo de esta Caja Chica.</p>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Medio de pago</label>
+        <select id="reintegroLiqMedio">
+          <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+          <option value="EFECTIVO">EFECTIVO</option>
+          <option value="DEPOSITO">DEPOSITO</option>
+          <option value="CHEQUE">CHEQUE</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>N&deg; de operacion (opcional)</label>
+        <input type="text" id="reintegroLiqOperacion" placeholder="EJ: 88213340">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarReintegroLiquidacion()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarReintegroLiq" onclick="confirmarReintegroLiquidacion()">Confirmar reposicion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL REABRIR LIQUIDACION ===================== -->
+<div class="modal-overlay" id="reabrirLiqModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarReabrirLiquidacion()">&times;</button>
+    <h2>Reabrir liquidacion</h2>
+    <p class="sub">Esta liquidacion esta cerrada. Escribe el motivo para reabrirla.</p>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Motivo</label>
+        <textarea id="reabrirLiqMotivo" rows="3" placeholder="EJ: SE ENCONTRO UN ERROR EN..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarReabrirLiquidacion()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarReabrirLiq" onclick="confirmarReabrirLiquidacion()">Reabrir</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== MODAL REGISTRAR REINTEGRO (PLANILLA) ===================== -->
 <div class="modal-overlay" id="reintegroPlanModalOverlay">
@@ -1874,8 +2134,11 @@ try{
 </div>
 
 <!-- ===================== MODAL CONFIGURACION ===================== -->
+<!-- Un solo flyout, se rellena segun el grupo que se abrio (ver SIDE_GROUPS
+     y toggleSideFlyout): asi cada modulo nuevo suma su propio grupo sin
+     tener que agregar un flyout de HTML por modulo. -->
 <div class="side-flyout" id="sideFlyout">
-  <div class="side-flyout-title">Planillas de Movilidad</div>
+  <div class="side-flyout-title" id="sideFlyoutTitle">Planillas de Movilidad</div>
   <button class="side-flyout-item" data-fly="nueva" onclick="goFromFlyout('nueva')">Nueva Movilidad</button>
   <button class="side-flyout-item" data-fly="historial" onclick="goFromFlyout('historial')">Movilidades</button>
   <button class="side-flyout-item" data-fly="planillas" onclick="goFromFlyout('planillas')">Generar Planilla</button>
@@ -2397,7 +2660,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.8.1';
+const APP_VERSION = '2.9.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -2408,7 +2671,7 @@ const APP_VERSION = '2.8.1';
    exactamente con la que usan las políticas en supabase_modulos_acceso.sql. */
 const MODULOS_DISPONIBLES = [
   { key:'movilidad', label:'Movilidad', desc:'Nueva Movilidad, Movilidades e Historial, Generar Planilla.' },
-  { key:'gastos', label:'Gastos', desc:'Proveedores, Comprobantes, Caja Chica y Liquidaciones (en desarrollo).' }
+  { key:'gastos', label:'Gastos', desc:'Nuevo Comprobante, Caja Chica y Liquidaciones (Rendicion y Reembolso, proximamente).' }
 ];
 function usuarioTieneModulo(modulo){
   const user = getCurrentUser();
@@ -2436,8 +2699,8 @@ function aplicarVisibilidadPorModulos(){
   const bPlan = document.getElementById('dashboardBlockPlanillas');
   if(bPlan) bPlan.style.display = tieneMovilidad ? '' : 'none';
 
-  const navGastosSoon = document.getElementById('navGastosSoon');
-  if(navGastosSoon) navGastosSoon.style.display = tieneGastos ? '' : 'none';
+  const gastosBtn = document.getElementById('groupGastosBtn');
+  if(gastosBtn) gastosBtn.style.display = tieneGastos ? '' : 'none';
   const mstGastos = document.getElementById('mstGastos');
   if(mstGastos) mstGastos.style.display = tieneGastos ? '' : 'none';
   const bGastos = document.getElementById('dashboardBlockGastos');
@@ -2521,7 +2784,15 @@ const cache = {
   planillas: [],
   notificaciones: [],
   limiteDiario: 45.20,
-  currentUser: null
+  currentUser: null,
+  // Modulo Gastos (Caja Chica primero). Todas tolerantes a 42P01
+  // (tabla/vista todavia no existe: supabase_rendiciones_*.sql sin correr).
+  proveedores: [],
+  fondos: [],
+  comprobantes: [],
+  liquidaciones: [],
+  fondosSaldo: [],       // espejo de la vista v_fondos_saldo (ya calculada en SQL)
+  saldosColaborador: []  // espejo de la vista v_saldos_colaborador
 };
 
 function rowToColaborador(r){
@@ -2590,6 +2861,92 @@ function rowToNotificacion(r){
   };
 }
 
+/* ============================================================
+   MODULO GASTOS -- Caja Chica (primera pantalla implementada)
+   ============================================================ */
+function rowToProveedor(r){
+  return { id:r.id, ruc:r.ruc, razonSocial:r.razon_social, direccion:r.direccion, activo: r.activo!==false };
+}
+function rowToFondo(r){
+  return {
+    id: r.id, correlativo: r.correlativo, tipo: r.tipo, colaboradorId: r.colaborador_id,
+    monto: Number(r.monto), fecha: r.fecha, medio: r.medio, banco: r.banco,
+    referencia: r.referencia, observaciones: r.observaciones, estado: r.estado,
+    createdAt: r.created_at
+  };
+}
+function rowToComprobante(r){
+  return {
+    id: r.id, correlativo: r.correlativo, colaboradorId: r.colaborador_id, fondoId: r.fondo_id,
+    liquidacionId: r.liquidacion_id, tipoDocumento: r.tipo_documento, serie: r.serie, numero: r.numero,
+    fecha: r.fecha, proveedorId: r.proveedor_id, proveedorRuc: r.proveedor_ruc,
+    proveedorRazonSocial: r.proveedor_razon_social, clienteId: r.cliente_id, concepto: r.concepto,
+    moneda: r.moneda, total: Number(r.total), signo: Number(r.signo),
+    adjuntoUrl: r.adjunto_url, createdAt: r.created_at
+  };
+}
+function rowToLiquidacion(r){
+  return {
+    id: r.id, correlativo: r.correlativo, tipo: r.tipo, colaboradorId: r.colaborador_id, fondoId: r.fondo_id,
+    fecha: r.fecha, periodoDesde: r.periodo_desde, periodoHasta: r.periodo_hasta,
+    totalSustentado: Number(r.total_sustentado), totalDevuelto: Number(r.total_devuelto),
+    saldo: Number(r.saldo), estado: r.estado, observacion: r.observacion,
+    enviadaAt: r.enviada_at, enviadaPor: r.enviada_por,
+    aprobadaAt: r.aprobada_at, aprobadaPor: r.aprobada_por,
+    reintegroAt: r.reintegro_at, reintegroPor: r.reintegro_por, reintegroMonto: r.reintegro_monto,
+    reintegroMedio: r.reintegro_medio, reintegroOperacion: r.reintegro_operacion,
+    cerradaAt: r.cerrada_at, cerradaPor: r.cerrada_por, createdAt: r.created_at
+  };
+}
+// Todas estas tablas/vistas dependen de que el colaborador haya corrido los
+// 3 scripts supabase_rendiciones_*.sql en Supabase. Si todavia no lo hizo,
+// la consulta falla con 42P01 (tabla/vista inexistente) y se deja el cache
+// vacio en silencio, para no romper el resto de la app mientras se pone al
+// dia -- mismo criterio que refreshNotificaciones().
+async function refreshProveedores(){
+  const { data, error } = await sb.from('proveedores').select('*').order('razon_social');
+  if(error){ if(error.code !== '42P01') console.error('refreshProveedores', error); cache.proveedores = []; return; }
+  cache.proveedores = (data||[]).map(rowToProveedor);
+}
+async function refreshFondos(){
+  const { data, error } = await sb.from('fondos').select('*');
+  if(error){ if(error.code !== '42P01') console.error('refreshFondos', error); cache.fondos = []; return; }
+  cache.fondos = (data||[]).map(rowToFondo);
+}
+async function refreshComprobantes(){
+  const { data, error } = await sb.from('comprobantes').select('*').order('fecha', { ascending:false });
+  if(error){ if(error.code !== '42P01') console.error('refreshComprobantes', error); cache.comprobantes = []; return; }
+  cache.comprobantes = (data||[]).map(rowToComprobante);
+}
+async function refreshLiquidaciones(){
+  const { data, error } = await sb.from('liquidaciones').select('*').order('created_at', { ascending:false });
+  if(error){ if(error.code !== '42P01') console.error('refreshLiquidaciones', error); cache.liquidaciones = []; return; }
+  cache.liquidaciones = (data||[]).map(rowToLiquidacion);
+}
+// Los saldos de fondos y colaboradores se calculan en SQL (v_fondos_saldo /
+// v_saldos_colaborador, ver supabase_rendiciones_2_reglas.sql) y no en JS:
+// asi la unica fuente de verdad del "cuanto disponible" es la base de
+// datos, la misma para la app y para cualquier reporte futuro. Ademas
+// respetan RLS (security_invoker), asi que un colaborador solo ve lo suyo.
+async function refreshFondosSaldo(){
+  const { data, error } = await sb.from('v_fondos_saldo').select('*');
+  if(error){ if(error.code !== '42P01') console.error('refreshFondosSaldo', error); cache.fondosSaldo = []; return; }
+  cache.fondosSaldo = data || [];
+}
+async function refreshSaldosColaborador(){
+  const { data, error } = await sb.from('v_saldos_colaborador').select('*');
+  if(error){ if(error.code !== '42P01') console.error('refreshSaldosColaborador', error); cache.saldosColaborador = []; return; }
+  cache.saldosColaborador = data || [];
+}
+async function refreshGastos(){
+  await refreshProveedores();
+  await refreshFondos();
+  await refreshComprobantes();
+  await refreshLiquidaciones();
+  await refreshFondosSaldo();
+  await refreshSaldosColaborador();
+}
+
 async function refreshColaboradores(){
   const { data, error } = await sb.from('colaboradores').select('*').order('apellido_paterno');
   if(error){ console.error('refreshColaboradores', error); toast('No se pudo cargar la lista de colaboradores', true); return; }
@@ -2635,6 +2992,7 @@ async function refreshAll(){
   await refreshPlanillas();
   await refreshConfig();
   await refreshNotificaciones();
+  await refreshGastos();
 }
 
 const DB = {
@@ -2642,7 +3000,13 @@ const DB = {
   get movilidades(){ return cache.movilidades; },
   get planillas(){ return cache.planillas; },
   get notificaciones(){ return cache.notificaciones; },
-  get limiteDiario(){ return cache.limiteDiario; }
+  get limiteDiario(){ return cache.limiteDiario; },
+  get proveedores(){ return cache.proveedores; },
+  get fondos(){ return cache.fondos; },
+  get comprobantes(){ return cache.comprobantes; },
+  get liquidaciones(){ return cache.liquidaciones; },
+  get fondosSaldo(){ return cache.fondosSaldo; },
+  get saldosColaborador(){ return cache.saldosColaborador; }
 };
 
 // Correlativo de movilidad calculado a partir del maximo existente en la base de datos
@@ -2690,6 +3054,18 @@ async function nextPlanillaNumero(anio){
     }
   });
   return prefix + String(maxSeq+1).padStart(4,'0');
+}
+
+// Correlativo de Gastos (CMP-2026-00001, LIQ-2026-0001, ENT-2026-0001):
+// siempre por RPC del lado del servidor (next_correlativo, ver
+// supabase_rendiciones_2_reglas.sql), atomico para toda la empresa. No hay
+// respaldo local a proposito -- si la funcion no existe todavia (script 2
+// no corrido), es mejor que falle claro a que la app invente un numero que
+// despues choque.
+async function nextCorrelativoGastos(serie, ancho){
+  const { data, error } = await sb.rpc('next_correlativo', { p_serie: serie, p_ancho: ancho || 4 });
+  if(error){ console.error('nextCorrelativoGastos RPC', error); throw error; }
+  return data;
 }
 
 /* ============================================================
@@ -3279,16 +3655,24 @@ const CRUMBS = {
   historial:{parent:'Planillas de Movilidad', current:'Movilidades'},
   planillas:{parent:'Planillas de Movilidad', current:'Generar Planilla'},
   colaboradores:{current:'Colaboradores'},
+  nuevoComprobante:{parent:'Gastos', current:'Nuevo Comprobante'},
+  cajaChica:{parent:'Gastos', current:'Caja Chica'},
+  liquidaciones:{parent:'Gastos', current:'Liquidaciones'},
 };
 const SECCIONES_MOVILIDAD = ['nueva','historial','planillas'];
+const SECCIONES_GASTOS = ['nuevoComprobante','cajaChica','liquidaciones'];
 
 function showSection(name){
-  // Control de acceso por modulo: si el colaborador no tiene Movilidad
-  // habilitada, no dejamos que ninguna de sus pantallas quede visible,
-  // ni siquiera navegando directo (flyout, atajos de teclado, etc.).
-  // Esto es solo la capa de UI; la capa real esta en Supabase (RLS).
+  // Control de acceso por modulo: si el colaborador no tiene Movilidad o
+  // Gastos habilitado, no dejamos que ninguna de sus pantallas quede
+  // visible, ni siquiera navegando directo (flyout, atajos de teclado,
+  // etc). Esto es solo la capa de UI; la capa real esta en Supabase (RLS).
   if(SECCIONES_MOVILIDAD.indexOf(name)!==-1 && !usuarioTieneModulo('movilidad')){
     toast('No tienes acceso al modulo de Movilidad', true);
+    name = 'dashboard';
+  }
+  if(SECCIONES_GASTOS.indexOf(name)!==-1 && !usuarioTieneModulo('gastos')){
+    toast('No tienes acceso al modulo de Gastos', true);
     name = 'dashboard';
   }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -3304,22 +3688,28 @@ function showSection(name){
   if(elPar){ elPar.textContent = crumb.parent || ''; elPar.style.display = crumb.parent ? 'inline' : 'none'; }
   if(elSep) elSep.style.display = crumb.parent ? 'inline-block' : 'none';
 
-  // el modulo "Planillas de Movilidad" se abre y se resalta solo cuando la
-  // seccion visible es una de sus hijas; con otra seccion se contrae.
-  const gBtn = document.getElementById('groupMovilidadBtn');
-  const gSub = document.getElementById('groupMovilidad');
-  if(gBtn && gSub){
-    const esDelGrupo = SECCIONES_MOVILIDAD.indexOf(name) !== -1;
+  // cada grupo del sidebar (Planillas de Movilidad, Gastos, ...) se abre y
+  // se resalta solo cuando la seccion visible es una de sus hijas; con
+  // otra seccion se contrae. Ver SIDE_GROUPS.
+  Object.keys(SIDE_GROUPS).forEach(key=>{
+    const cfg = SIDE_GROUPS[key];
+    const gBtn = document.querySelector('.side-group-btn[data-group="'+key+'"]');
+    const gSub = document.getElementById(cfg.submenu);
+    if(!gBtn || !gSub) return;
+    const esDelGrupo = cfg.items.some(it=>it.sec===name);
     gBtn.classList.toggle('group-active', esDelGrupo);
     gSub.classList.toggle('open', esDelGrupo);
     gBtn.classList.toggle('expanded', esDelGrupo);
-  }
+  });
   closeSideFlyout();
   if(name==='dashboard') renderDashboard();
   if(name==='historial') renderHistorial();
   if(name==='colaboradores') renderColaboradores();
   if(name==='planillas'){ populatePlanColab(); showPlanTab('nueva'); }
   if(name==='nueva' && !document.getElementById('editId').value) resetForm();
+  if(name==='nuevoComprobante') renderNuevoComprobante();
+  if(name==='cajaChica') renderCajaChica();
+  if(name==='liquidaciones') renderLiquidaciones();
   closeMobileSidebar();
 }
 
@@ -3330,6 +3720,7 @@ function renderDashboard(){
   const user = getCurrentUser();
   if(!user) return;
   aplicarVisibilidadPorModulos();
+  actualizarResumenCajaChicaDashboard();
   document.getElementById('welcomeName').textContent = nombreCorto(user);
   const mine = DB.movilidades.filter(m=>m.colaboradorId===user.id);
   document.getElementById('statTotal').textContent = mine.length;
@@ -4043,6 +4434,7 @@ const ICO = {
   descargar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
   billete:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>',
   revertir:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.64-6.36"/><path d="M3 3v5h5"/></svg>',
+  pdf:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
 };
 /* Defensa: todo SVG dentro de un boton de accion tiene su propio tamano.
    Sin esto, un icono sin width/height declarado se dibuja gigante o no se
@@ -5695,6 +6087,510 @@ async function descargarLiquidacionPDF(liquidacion, colaborador, comprobantes, a
 }
 
 /* ============================================================
+   MODULO GASTOS -- CAJA CHICA (primera pantalla implementada del modulo,
+   por decision explicita: "Empieza por Caja Chica primero"). Rendicion y
+   Reembolso quedan para una siguiente ronda, sobre la misma base de datos
+   y las mismas pantallas (Nuevo Comprobante ya deja el terreno listo: solo
+   falta sumar los otros dos "destinos" del gasto).
+   ============================================================ */
+function colaboradoresConGastos(){
+  return DB.colaboradores.filter(c=>c.activo && (c.modulos||[]).includes('gastos'));
+}
+function fondoCajaChicaDe(colaboradorId){
+  return DB.fondos.find(f=>f.colaboradorId===colaboradorId && f.tipo==='CAJA_CHICA' && f.estado==='ABIERTO') || null;
+}
+// El saldo (tope/sustentado/disponible) SIEMPRE se lee de v_fondos_saldo, no
+// se recalcula en JS: esa vista ya excluye lo que quedo liquidado
+// (REINTEGRADA/CERRADA), que es justo la correccion que hizo que una Caja
+// Chica pudiera volver a su tope despues de reponerse (ver
+// supabase_rendiciones_2_reglas.sql). Tener una sola fuente de verdad evita
+// que la pantalla y el PDF alguna vez muestren numeros distintos.
+function saldoDeFondo(fondoId){
+  return DB.fondosSaldo.find(f=>f.id===fondoId) || null;
+}
+
+/* ---------- Nuevo Comprobante ---------- */
+function renderNuevoComprobante(){
+  const user = getCurrentUser();
+  if(!user) return;
+  const soyAdmin = !!user.isAdmin;
+  const sel = document.getElementById('cmpColaborador');
+  const lista = soyAdmin ? colaboradoresConGastos() : [user];
+  sel.innerHTML = lista.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+  sel.value = user.id;
+  sel.disabled = !soyAdmin;
+  document.getElementById('cmpProveedorRuc').value = '';
+  document.getElementById('cmpProveedorRazon').value = '';
+  document.getElementById('cmpSerie').value = '';
+  document.getElementById('cmpNumero').value = '';
+  document.getElementById('cmpConcepto').value = '';
+  document.getElementById('cmpTotal').value = '';
+  document.getElementById('cmpAdjunto').value = '';
+  document.getElementById('cmpFormError').style.display = 'none';
+  const fechaEl = document.getElementById('cmpFecha');
+  if(!fechaEl.value) fechaEl.value = todayLocalISO();
+  actualizarCajaChicaDestino();
+}
+function actualizarCajaChicaDestino(){
+  const sel = document.getElementById('cmpColaborador');
+  if(!sel) return null;
+  const colabId = sel.value;
+  const info = document.getElementById('cmpCajaInfo');
+  const fondo = fondoCajaChicaDe(colabId);
+  if(!fondo){
+    info.classList.add('over');
+    info.innerHTML = 'Este colaborador no tiene una <b>Caja Chica</b> asignada. Pidele a un administrador que se la asigne primero.';
+    return null;
+  }
+  info.classList.remove('over');
+  const saldo = saldoDeFondo(fondo.id);
+  const disponible = saldo ? Number(saldo.disponible) : Number(fondo.monto);
+  info.innerHTML = 'Se cargara contra la Caja Chica <b>' + fondo.correlativo + '</b> &middot; disponible: <b>' + money(disponible) + '</b>';
+  return fondo;
+}
+// Autocompleta la razon social si el RUC ya esta en el directorio propio de
+// MANGRO (no es una consulta a SUNAT). Si es un RUC nuevo, se registra al
+// guardar el comprobante.
+function buscarProveedorPorRuc(){
+  const ruc = document.getElementById('cmpProveedorRuc').value.trim();
+  if(ruc.length < 8) return;
+  const prov = DB.proveedores.find(p=>p.ruc===ruc);
+  if(prov) document.getElementById('cmpProveedorRazon').value = prov.razonSocial;
+}
+async function saveComprobante(){
+  const errEl = document.getElementById('cmpFormError');
+  errEl.style.display = 'none';
+  const colabId = document.getElementById('cmpColaborador').value;
+  const fondo = fondoCajaChicaDe(colabId);
+  if(!fondo){ errEl.textContent = 'Este colaborador no tiene una Caja Chica asignada.'; errEl.style.display=''; return; }
+  const fecha = document.getElementById('cmpFecha').value;
+  const tipoDocumento = document.getElementById('cmpTipoDocumento').value;
+  const serie = document.getElementById('cmpSerie').value.trim().toUpperCase() || null;
+  const numero = document.getElementById('cmpNumero').value.trim().toUpperCase() || null;
+  const ruc = document.getElementById('cmpProveedorRuc').value.trim();
+  const razon = document.getElementById('cmpProveedorRazon').value.trim().toUpperCase();
+  const concepto = document.getElementById('cmpConcepto').value.trim().toUpperCase();
+  const moneda = document.getElementById('cmpMoneda').value;
+  const total = Number(document.getElementById('cmpTotal').value);
+  const file = document.getElementById('cmpAdjunto').files[0];
+
+  if(!fecha){ errEl.textContent = 'Selecciona la fecha del comprobante.'; errEl.style.display=''; return; }
+  if(!ruc || ruc.length < 8){ errEl.textContent = 'Ingresa el RUC del proveedor.'; errEl.style.display=''; return; }
+  if(!razon){ errEl.textContent = 'Ingresa la razon social del proveedor.'; errEl.style.display=''; return; }
+  if(!concepto){ errEl.textContent = 'Ingresa el concepto del gasto.'; errEl.style.display=''; return; }
+  if(!total || total <= 0){ errEl.textContent = 'Ingresa un total valido.'; errEl.style.display=''; return; }
+
+  const btn = document.getElementById('btnGuardarComprobante');
+  btn.disabled = true;
+  try{
+    let proveedorId = null;
+    const existente = DB.proveedores.find(p=>p.ruc===ruc);
+    if(existente){
+      proveedorId = existente.id;
+    } else {
+      const { data: nuevoProv, error: errProv } = await sb.from('proveedores')
+        .insert({ ruc, razon_social: razon }).select().single();
+      if(errProv){ console.error('crear proveedor', errProv); toast('No se pudo registrar el proveedor', true); return; }
+      proveedorId = nuevoProv.id;
+      await refreshProveedores();
+    }
+
+    const correlativo = await nextCorrelativoGastos('CMP', 5);
+
+    // El adjunto se sube a un bucket PRIVADO (comprobantes/<colaborador>/...):
+    // si falla, el comprobante igual se guarda -- el adjunto se puede
+    // completar despues, no vale la pena perder todo el registro por eso.
+    let adjuntoUrl = null;
+    if(file){
+      const ext = (file.name.split('.').pop() || 'dat').toLowerCase();
+      const path = colabId + '/' + correlativo + '.' + ext;
+      const { error: errUp } = await sb.storage.from('comprobantes').upload(path, file, { upsert:true });
+      if(errUp){ console.error('subir adjunto', errUp); toast('El comprobante se guardo, pero el adjunto no se pudo subir', true); }
+      else adjuntoUrl = path;
+    }
+
+    const { error } = await sb.from('comprobantes').insert({
+      correlativo, colaborador_id: colabId, fondo_id: fondo.id,
+      tipo_documento: tipoDocumento, serie, numero, fecha,
+      proveedor_id: proveedorId, proveedor_ruc: ruc, proveedor_razon_social: razon,
+      concepto, moneda, total, signo: 1, adjunto_url: adjuntoUrl
+    });
+    if(error){ console.error('saveComprobante', error); toast('No se pudo guardar el comprobante', true); return; }
+
+    await refreshComprobantes();
+    await refreshFondosSaldo();
+    await refreshSaldosColaborador();
+    toast('Comprobante ' + correlativo + ' guardado');
+    showSection('cajaChica');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ---------- Caja Chica ---------- */
+function renderCajaChica(){
+  const user = getCurrentUser();
+  if(!user) return;
+  const soyAdmin = !!user.isAdmin;
+  const filtros = document.getElementById('cajaChicaFiltros');
+  const selColab = document.getElementById('cajaChicaColaborador');
+  let colabId;
+  if(soyAdmin){
+    filtros.style.display = 'flex';
+    const lista = DB.colaboradores.filter(c=>c.activo);
+    const anterior = selColab.value;
+    selColab.innerHTML = lista.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+    selColab.value = (anterior && lista.some(c=>c.id===anterior)) ? anterior : user.id;
+    colabId = selColab.value;
+  } else {
+    filtros.style.display = 'none';
+    colabId = user.id;
+  }
+
+  const fondo = fondoCajaChicaDe(colabId);
+  const sinFondo = document.getElementById('cajaChicaSinFondo');
+  const conFondo = document.getElementById('cajaChicaConFondo');
+  if(!fondo){
+    sinFondo.style.display = '';
+    conFondo.style.display = 'none';
+    const colab = DB.colaboradores.find(c=>c.id===colabId);
+    document.getElementById('cajaChicaSinFondoTexto').textContent = soyAdmin
+      ? (nombreCompleto(colab) + ' todavia no tiene una Caja Chica asignada. Usa "+ Asignar Caja Chica" para crearsela.')
+      : 'Todavia no tienes una Caja Chica asignada. Pidele a un administrador que te la asigne.';
+    window._ccFondoActivo = null;
+    window._ccColabActivo = null;
+    return;
+  }
+  sinFondo.style.display = 'none';
+  conFondo.style.display = '';
+  const saldo = saldoDeFondo(fondo.id);
+  const tope = Number(fondo.monto);
+  const gastado = saldo ? Number(saldo.sustentado) : 0;
+  const disponible = saldo ? Number(saldo.disponible) : tope;
+  document.getElementById('ccTope').textContent = money(tope);
+  document.getElementById('ccGastado').textContent = money(gastado);
+  document.getElementById('ccDisponible').textContent = money(disponible);
+
+  // Pendientes de reponer: comprobantes de este fondo que todavia no entraron
+  // a ninguna liquidacion. Una vez que "Armar liquidacion de reposicion" los
+  // adjunta a una, se ven desde la pantalla de Liquidaciones, no aca.
+  const pendientes = DB.comprobantes.filter(c=>c.fondoId===fondo.id && !c.liquidacionId)
+    .sort((a,b)=> (a.fecha < b.fecha ? 1 : -1));
+  const body = document.getElementById('ccPendientesBody');
+  const empty = document.getElementById('ccPendientesEmpty');
+  const btnArmar = document.getElementById('btnArmarReposicion');
+  if(!pendientes.length){
+    body.innerHTML = '';
+    empty.style.display = '';
+    if(btnArmar) btnArmar.disabled = true;
+  } else {
+    empty.style.display = 'none';
+    if(btnArmar) btnArmar.disabled = false;
+    body.innerHTML = pendientes.map(c=>`
+      <tr>
+        <td data-label="N°">${c.correlativo}</td>
+        <td data-label="Fecha">${fmtFecha(c.fecha)}</td>
+        <td data-label="Tipo">${c.tipoDocumento}</td>
+        <td data-label="Proveedor">${c.proveedorRazonSocial||''}</td>
+        <td data-label="Concepto">${c.concepto}</td>
+        <td data-label="Total" class="right">${money(c.total)}</td>
+      </tr>`).join('');
+  }
+  window._ccFondoActivo = fondo;
+  window._ccColabActivo = colabId;
+  actualizarResumenCajaChicaDashboard();
+}
+// Resumen de Inicio: SIEMPRE la Caja Chica del usuario que abrio sesion, no
+// la que se este mirando en la pantalla de Caja Chica (que un admin puede
+// haber cambiado a la de otro colaborador).
+function actualizarResumenCajaChicaDashboard(){
+  const user = getCurrentUser();
+  if(!user) return;
+  const conCaja = document.getElementById('dashboardGastosConCaja');
+  const sinCaja = document.getElementById('dashboardGastosSinCaja');
+  if(!conCaja || !sinCaja) return;
+  const fondo = fondoCajaChicaDe(user.id);
+  if(!fondo){
+    conCaja.style.display = 'none';
+    sinCaja.style.display = '';
+    return;
+  }
+  conCaja.style.display = '';
+  sinCaja.style.display = 'none';
+  const saldo = saldoDeFondo(fondo.id);
+  document.getElementById('statCajaTope').textContent = money(fondo.monto);
+  document.getElementById('statCajaGastado').textContent = money(saldo ? saldo.sustentado : 0);
+  document.getElementById('statCajaDisponible').textContent = money(saldo ? saldo.disponible : fondo.monto);
+}
+function abrirAsignarCajaChica(){
+  const sel = document.getElementById('asignarCajaColaborador');
+  const sinCaja = DB.colaboradores.filter(c=>c.activo && (c.modulos||[]).includes('gastos') && !fondoCajaChicaDe(c.id));
+  if(!sinCaja.length){ toast('Todos los colaboradores con acceso a Gastos ya tienen una Caja Chica asignada', true); return; }
+  sel.innerHTML = sinCaja.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+  document.getElementById('asignarCajaMonto').value = '';
+  document.getElementById('asignarCajaMedio').value = 'EFECTIVO';
+  document.getElementById('asignarCajaModalOverlay').classList.add('open');
+}
+function cerrarAsignarCajaChica(){
+  document.getElementById('asignarCajaModalOverlay').classList.remove('open');
+}
+async function confirmarAsignarCajaChica(){
+  const colabId = document.getElementById('asignarCajaColaborador').value;
+  const monto = Number(document.getElementById('asignarCajaMonto').value);
+  const medio = document.getElementById('asignarCajaMedio').value;
+  if(!colabId){ toast('Selecciona un colaborador', true); return; }
+  if(!monto || monto <= 0){ toast('Ingresa un tope valido', true); return; }
+  const btn = document.getElementById('btnConfirmarAsignarCaja');
+  btn.disabled = true;
+  try{
+    // CAJ para Caja Chica, ENT para Entrega a rendir cuenta (ver
+    // PROPUESTA_RENDICIONES.md): son series distintas aunque ambas viven en
+    // la misma tabla `fondos`, para que el correlativo del Acta de Entrega
+    // ya diga de un vistazo de que tipo de fondo se trata.
+    const correlativo = await nextCorrelativoGastos('CAJ', 4);
+    const { data, error } = await sb.from('fondos').insert({
+      correlativo, tipo: 'CAJA_CHICA', colaborador_id: colabId, monto, medio
+    }).select().single();
+    if(error){
+      console.error('confirmarAsignarCajaChica', error);
+      toast('No se pudo crear la Caja Chica (revisa si este colaborador ya tiene una abierta)', true);
+      return;
+    }
+    await refreshFondos();
+    await refreshFondosSaldo();
+    await refreshSaldosColaborador();
+    cerrarAsignarCajaChica();
+    toast('Caja Chica ' + correlativo + ' creada');
+    const colab = DB.colaboradores.find(c=>c.id===colabId);
+    const admin = getCurrentUser();
+    if(colab){
+      await descargarActaEntregaFondoPDF(rowToFondo(data), colab, { nombre: nombreCompleto(admin), cargo: admin.isAdmin ? 'Administrador' : '' });
+    }
+    renderCajaChica();
+  } finally {
+    btn.disabled = false;
+  }
+}
+// Junta todos los comprobantes pendientes del fondo en una sola liquidacion
+// REPOSICION, en BORRADOR (el colaborador todavia puede revisarla antes de
+// enviarla desde la pantalla de Liquidaciones).
+async function armarLiquidacionReposicion(){
+  const fondo = window._ccFondoActivo;
+  const colabId = window._ccColabActivo;
+  if(!fondo){ toast('No hay una Caja Chica seleccionada', true); return; }
+  const pendientes = DB.comprobantes.filter(c=>c.fondoId===fondo.id && !c.liquidacionId);
+  if(!pendientes.length){ toast('No hay comprobantes pendientes para armar una liquidacion', true); return; }
+  const btn = document.getElementById('btnArmarReposicion');
+  btn.disabled = true;
+  try{
+    const totalSustentado = pendientes.reduce((s,c)=>s+Number(c.total||0), 0);
+    const fechas = pendientes.map(c=>c.fecha).sort();
+    const correlativo = await nextCorrelativoGastos('LIQ', 4);
+    const { data, error } = await sb.from('liquidaciones').insert({
+      correlativo, tipo: 'REPOSICION', colaborador_id: colabId, fondo_id: fondo.id,
+      periodo_desde: fechas[0], periodo_hasta: fechas[fechas.length-1],
+      total_sustentado: totalSustentado, total_devuelto: 0, saldo: 0, estado: 'BORRADOR'
+    }).select().single();
+    if(error){ console.error('armarLiquidacionReposicion', error); toast('No se pudo armar la liquidacion', true); return; }
+
+    const ids = pendientes.map(c=>c.id);
+    const { error: errUpd } = await sb.from('comprobantes').update({ liquidacion_id: data.id }).in('id', ids);
+    if(errUpd){
+      console.error('armarLiquidacionReposicion (adjuntar comprobantes)', errUpd);
+      toast('La liquidacion se creo, pero no se pudieron adjuntar todos los comprobantes', true);
+    }
+    await refreshComprobantes();
+    await refreshLiquidaciones();
+    await refreshFondosSaldo();
+    await refreshSaldosColaborador();
+    toast('Liquidacion ' + correlativo + ' armada. Revisala y enviala desde Liquidaciones.');
+    showSection('liquidaciones');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ---------- Liquidaciones ---------- */
+let liqTabActual = 'armar';
+function showLiqTab(tab){
+  liqTabActual = tab;
+  document.getElementById('liqTabArmar').classList.toggle('active', tab==='armar');
+  document.getElementById('liqTabAprobar').classList.toggle('active', tab==='aprobar');
+  document.getElementById('liqTabHistorial').classList.toggle('active', tab==='historial');
+  renderLiquidaciones();
+}
+const LIQ_BADGE = { BORRADOR:'gray', OBSERVADA:'orange', ENVIADA:'purple', APROBADA:'purple', REINTEGRADA:'green', CERRADA:'green' };
+function renderLiquidaciones(){
+  const user = getCurrentUser();
+  if(!user) return;
+  const soyAdmin = !!user.isAdmin;
+  let lista;
+  if(liqTabActual === 'aprobar'){
+    lista = DB.liquidaciones.filter(l=>l.estado==='ENVIADA' || l.estado==='APROBADA');
+  } else if(liqTabActual === 'historial'){
+    lista = DB.liquidaciones.filter(l=>l.estado==='REINTEGRADA' || l.estado==='CERRADA');
+  } else {
+    lista = DB.liquidaciones.filter(l=>l.estado==='BORRADOR' || l.estado==='OBSERVADA');
+  }
+  lista = lista.slice().sort((a,b)=> (a.correlativo < b.correlativo ? 1 : -1));
+
+  const body = document.getElementById('liqBody');
+  const empty = document.getElementById('liqEmpty');
+  if(!lista.length){
+    body.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  body.innerHTML = lista.map(l=>{
+    const colab = DB.colaboradores.find(c=>c.id===l.colaboradorId);
+    const esDuenio = l.colaboradorId === user.id;
+    const acciones = [];
+    if((l.estado==='BORRADOR' || l.estado==='OBSERVADA') && (esDuenio || soyAdmin)){
+      acciones.push(`<button class="icon-action" title="Enviar" onclick="enviarLiquidacion('${l.id}')">${ICO.activar}</button>`);
+    }
+    if(l.estado==='ENVIADA' && soyAdmin){
+      acciones.push(`<button class="icon-action" title="Aprobar" onclick="aprobarLiquidacion('${l.id}')">${ICO.activar}</button>`);
+      acciones.push(`<button class="icon-action danger" title="Observar" onclick="abrirObservarLiquidacion('${l.id}')">${ICO.anular}</button>`);
+    }
+    if(l.estado==='APROBADA' && soyAdmin){
+      acciones.push(`<button class="icon-action" title="Registrar reposicion" onclick="abrirReintegroLiquidacion('${l.id}')">${ICO.billete}</button>`);
+    }
+    if(l.estado==='REINTEGRADA' && soyAdmin){
+      acciones.push(`<button class="icon-action" title="Cerrar" onclick="cerrarLiquidacionFinal('${l.id}')">${ICO.activar}</button>`);
+    }
+    if(l.estado==='CERRADA' && soyAdmin){
+      acciones.push(`<button class="icon-action" title="Reabrir" onclick="abrirReabrirLiquidacion('${l.id}')">${ICO.revertir}</button>`);
+    }
+    acciones.push(`<button class="icon-action" title="Descargar PDF" onclick="descargarLiqPDF('${l.id}')">${ICO.pdf}</button>`);
+    return `<tr>
+      <td data-label="N°">${l.correlativo}</td>
+      <td data-label="Colaborador">${colab ? nombreCompleto(colab) : ''}</td>
+      <td data-label="Tipo">${l.tipo}</td>
+      <td data-label="Fecha">${fmtFecha(l.fecha)}</td>
+      <td data-label="Total" class="right">${money(l.totalSustentado)}</td>
+      <td data-label="Estado" class="center"><span class="badge ${LIQ_BADGE[l.estado]||'gray'}">${(l.estado||'').replace('_',' ')}</span></td>
+      <td data-label="Acciones" class="center"><div class="row-actions">${acciones.join('')}</div></td>
+    </tr>`;
+  }).join('');
+}
+async function enviarLiquidacion(id){
+  const { error } = await sb.from('liquidaciones').update({ estado: 'ENVIADA' }).eq('id', id);
+  if(error){ console.error('enviarLiquidacion', error); toast('No se pudo enviar la liquidacion', true); return; }
+  await refreshLiquidaciones();
+  renderLiquidaciones();
+  toast('Liquidacion enviada');
+}
+async function aprobarLiquidacion(id){
+  const { error } = await sb.from('liquidaciones').update({ estado: 'APROBADA' }).eq('id', id);
+  if(error){ console.error('aprobarLiquidacion', error); toast('No se pudo aprobar la liquidacion', true); return; }
+  await refreshLiquidaciones();
+  renderLiquidaciones();
+  toast('Liquidacion aprobada');
+}
+let observarLiqTargetId = null;
+function abrirObservarLiquidacion(id){
+  observarLiqTargetId = id;
+  document.getElementById('observarLiqMotivo').value = '';
+  document.getElementById('observarLiqModalOverlay').classList.add('open');
+}
+function cerrarObservarLiquidacion(){
+  observarLiqTargetId = null;
+  document.getElementById('observarLiqModalOverlay').classList.remove('open');
+}
+async function confirmarObservarLiquidacion(){
+  if(!observarLiqTargetId) return;
+  const motivo = document.getElementById('observarLiqMotivo').value.trim();
+  if(!motivo){ toast('Escribe el motivo de la observacion', true); return; }
+  const btn = document.getElementById('btnConfirmarObservarLiq');
+  btn.disabled = true;
+  try{
+    const { error } = await sb.from('liquidaciones').update({ estado:'OBSERVADA', observacion: motivo }).eq('id', observarLiqTargetId);
+    if(error){ console.error('confirmarObservarLiquidacion', error); toast('No se pudo observar la liquidacion', true); return; }
+    cerrarObservarLiquidacion();
+    await refreshLiquidaciones();
+    renderLiquidaciones();
+    toast('Liquidacion observada');
+  } finally { btn.disabled = false; }
+}
+let reintegroLiqTargetId = null;
+function abrirReintegroLiquidacion(id){
+  reintegroLiqTargetId = id;
+  document.getElementById('reintegroLiqMedio').value = 'TRANSFERENCIA';
+  document.getElementById('reintegroLiqOperacion').value = '';
+  document.getElementById('reintegroLiqModalOverlay').classList.add('open');
+}
+function cerrarReintegroLiquidacion(){
+  reintegroLiqTargetId = null;
+  document.getElementById('reintegroLiqModalOverlay').classList.remove('open');
+}
+async function confirmarReintegroLiquidacion(){
+  if(!reintegroLiqTargetId) return;
+  const medio = document.getElementById('reintegroLiqMedio').value;
+  const operacion = document.getElementById('reintegroLiqOperacion').value.trim().toUpperCase() || null;
+  const liq = DB.liquidaciones.find(l=>l.id===reintegroLiqTargetId);
+  const btn = document.getElementById('btnConfirmarReintegroLiq');
+  btn.disabled = true;
+  try{
+    const { error } = await sb.from('liquidaciones').update({
+      estado: 'REINTEGRADA', reintegro_medio: medio, reintegro_operacion: operacion,
+      reintegro_monto: liq ? liq.totalSustentado : null
+    }).eq('id', reintegroLiqTargetId);
+    if(error){ console.error('confirmarReintegroLiquidacion', error); toast('No se pudo registrar la reposicion', true); return; }
+    cerrarReintegroLiquidacion();
+    await refreshLiquidaciones();
+    await refreshFondosSaldo();
+    await refreshSaldosColaborador();
+    renderLiquidaciones();
+    toast('Reposicion registrada: la Caja Chica vuelve a su tope');
+  } finally { btn.disabled = false; }
+}
+async function cerrarLiquidacionFinal(id){
+  if(!confirm('¿Cerrar esta liquidacion? Quedara bloqueada para todos.')) return;
+  const { error } = await sb.from('liquidaciones').update({ estado:'CERRADA' }).eq('id', id);
+  if(error){ console.error('cerrarLiquidacionFinal', error); toast('No se pudo cerrar la liquidacion', true); return; }
+  await refreshLiquidaciones();
+  renderLiquidaciones();
+  toast('Liquidacion cerrada');
+}
+let reabrirLiqTargetId = null;
+function abrirReabrirLiquidacion(id){
+  reabrirLiqTargetId = id;
+  document.getElementById('reabrirLiqMotivo').value = '';
+  document.getElementById('reabrirLiqModalOverlay').classList.add('open');
+}
+function cerrarReabrirLiquidacion(){
+  reabrirLiqTargetId = null;
+  document.getElementById('reabrirLiqModalOverlay').classList.remove('open');
+}
+async function confirmarReabrirLiquidacion(){
+  if(!reabrirLiqTargetId) return;
+  const motivo = document.getElementById('reabrirLiqMotivo').value.trim();
+  if(!motivo){ toast('Escribe el motivo para reabrirla', true); return; }
+  const btn = document.getElementById('btnConfirmarReabrirLiq');
+  btn.disabled = true;
+  try{
+    const { error } = await sb.from('liquidaciones').update({ estado:'BORRADOR', observacion: motivo }).eq('id', reabrirLiqTargetId);
+    if(error){ console.error('confirmarReabrirLiquidacion', error); toast('No se pudo reabrir la liquidacion', true); return; }
+    cerrarReabrirLiquidacion();
+    await refreshLiquidaciones();
+    await refreshComprobantes();
+    await refreshFondosSaldo();
+    await refreshSaldosColaborador();
+    renderLiquidaciones();
+    toast('Liquidacion reabierta: volvio a Por Armar');
+  } finally { btn.disabled = false; }
+}
+async function descargarLiqPDF(id){
+  const liq = DB.liquidaciones.find(l=>l.id===id);
+  if(!liq) return;
+  const colaborador = DB.colaboradores.find(c=>c.id===liq.colaboradorId);
+  const comprobantes = DB.comprobantes.filter(c=>c.liquidacionId===id);
+  const aprobadoPor = liq.aprobadaPor ? DB.colaboradores.find(c=>c.id===liq.aprobadaPor) : null;
+  await descargarLiquidacionPDF(liq, colaborador, comprobantes, aprobadoPor);
+}
+
+/* ============================================================
    CONFIGURACION
    ============================================================ */
 /* ------------------------------------------------------------------
@@ -5944,19 +6840,36 @@ function boot(){
   if(navConfig) navConfig.style.display = user.isAdmin ? '' : 'none';
   aplicarVisibilidadPorModulos();
   applyThemeToggleUI();
-  ['formFecha','planFechaInicio','planFechaFin'].forEach(id=>{
+  ['formFecha','planFechaInicio','planFechaFin','cmpFecha'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) setupDatePicker(el);
   });
   revisarPrimerIngreso();
   iniciarPollingNotificaciones();
 }
+// Un grupo del sidebar por modulo: que submenu abre expandido y que
+// pantallas ofrece cuando la barra esta minimizada (flyout). Agregar un
+// modulo nuevo es sumar una entrada aca, nada mas.
+const SIDE_GROUPS = {
+  movilidad: { submenu:'groupMovilidad', titulo:'Planillas de Movilidad', items:[
+    {sec:'nueva', label:'Nueva Movilidad'},
+    {sec:'historial', label:'Movilidades'},
+    {sec:'planillas', label:'Generar Planilla'}
+  ]},
+  gastos: { submenu:'groupGastos', titulo:'Gastos', items:[
+    {sec:'nuevoComprobante', label:'Nuevo Comprobante'},
+    {sec:'cajaChica', label:'Caja Chica'},
+    {sec:'liquidaciones', label:'Liquidaciones'}
+  ]}
+};
 function toggleSideGroup(btn){
   const sidebar = document.getElementById('sidebar');
   // Con la barra minimizada NO se vuelve a expandir: se abre un desplegable
   // flotante al costado, que es justamente el punto de tenerla minimizada.
   if(sidebar && sidebar.classList.contains('collapsed')){ toggleSideFlyout(btn); return; }
-  const sub = document.getElementById('groupMovilidad');
+  const cfg = SIDE_GROUPS[btn.dataset.group];
+  if(!cfg) return;
+  const sub = document.getElementById(cfg.submenu);
   if(!sub) return;
   const abrir = !sub.classList.contains('open');
   sub.classList.toggle('open', abrir);
@@ -5966,6 +6879,19 @@ function toggleSideFlyout(btn){
   const fly = document.getElementById('sideFlyout');
   if(!fly) return;
   if(fly.classList.contains('open')){ closeSideFlyout(); return; }
+  const cfg = SIDE_GROUPS[btn.dataset.group];
+  if(!cfg) return;
+  const titulo = document.getElementById('sideFlyoutTitle');
+  if(titulo) titulo.textContent = cfg.titulo;
+  fly.querySelectorAll('.side-flyout-item').forEach(b=>b.remove());
+  cfg.items.forEach(it=>{
+    const b = document.createElement('button');
+    b.className = 'side-flyout-item';
+    b.dataset.fly = it.sec;
+    b.textContent = it.label;
+    b.onclick = function(){ goFromFlyout(it.sec); };
+    fly.appendChild(b);
+  });
   const r = btn.getBoundingClientRect();
   fly.style.left = (r.right + 10) + 'px';
   fly.style.top  = r.top + 'px';
@@ -5974,7 +6900,7 @@ function toggleSideFlyout(btn){
   if(r.top + alto > window.innerHeight - 12){
     fly.style.top = Math.max(12, window.innerHeight - alto - 12) + 'px';
   }
-  const activa = document.querySelector('#section-nueva.active, #section-historial.active, #section-planillas.active');
+  const activa = document.querySelector(cfg.items.map(it=>'#section-'+it.sec+'.active').join(', '));
   const sec = activa ? activa.id.replace('section-','') : null;
   fly.querySelectorAll('.side-flyout-item').forEach(b=>b.classList.toggle('active', b.dataset.fly === sec));
 }

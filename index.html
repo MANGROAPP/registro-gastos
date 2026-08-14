@@ -1108,6 +1108,16 @@ try{
      a la celda cuando el encabezado queda fijo. */
   .tbl-cards{ border-collapse:separate; border-spacing:0; }
 
+  /* Entre el celular (donde .tbl-cards se apila como tarjetas, mas abajo) y el
+     escritorio ancho, faltaba este contenedor: si la tarjeta es mas angosta
+     que la tabla (columnas + iconos de accion), la tabla se salia del card
+     sin ninguna forma de hacer scroll, empujando el layout entero y cortando
+     los iconos del borde derecho. Con este wrapper, si no entra, aparece un
+     scroll horizontal SOLO de la tabla -- el resto de la tarjeta (filtros,
+     titulo) se queda quieto. */
+  .tbl-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .tbl-scroll > table{ min-width:100%; }
+
   .tbl-cards thead th{
     background:linear-gradient(180deg, var(--thead-bg) 0%, var(--thead-bg-2) 100%);
     color:var(--thead-text);
@@ -1452,7 +1462,7 @@ try{
           <div class="avatar" id="currentAvatar">--</div>
           <div>
             <div class="uname" id="currentUserName">--</div>
-            <div class="urole">Colaborador</div>
+            <div class="urole" id="currentUserRole">Colaborador</div>
           </div>
         </div>
       </div>
@@ -1538,10 +1548,10 @@ try{
           <h3 style="margin:0;font-size:16px;">Mis ultimas movilidades</h3>
           <button class="btn btn-ghost btn-sm" onclick="showSection('historial')">Ver todas</button>
         </div>
-        <table class="tbl-mov tbl-cards">
+        <div class="tbl-scroll"><table class="tbl-mov tbl-cards">
           <thead><tr><th class="col-num">N&deg; de Movilidad</th><th class="col-fecha">Fecha</th><th class="col-motivo">Motivo</th><th class="col-dist center">Partida</th><th class="col-dist center">Llegada</th><th class="col-imp right">Importe</th></tr></thead>
           <tbody id="dashboardRecentBody"></tbody>
-        </table>
+        </table></div>
         <div id="dashboardEmpty" class="empty-state" style="display:none;">
           <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;vertical-align:-2px;vertical-align:middle;"><path d="M5 17h14M6.5 17v1.5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V17M20.5 17v1.5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V17"/><path d="M3.5 17v-4.2a2 2 0 0 1 .18-.83l1.9-4.1A2 2 0 0 1 7.4 6.7h9.2a2 2 0 0 1 1.82 1.17l1.9 4.1a2 2 0 0 1 .18.83V17z"/><path d="M5 12.5h14"/><circle cx="7.5" cy="14.6" r=".9"/><circle cx="16.5" cy="14.6" r=".9"/></svg></div>
           Aun no tienes movilidades registradas. Crea la primera con "Nueva Movilidad".
@@ -1686,7 +1696,7 @@ try{
           <button class="btn btn-outline btn-sm" onclick="exportExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar Excel</button>
           <button class="btn btn-outline btn-sm" onclick="exportJson()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar Copia (JSON)</button>
         </div>
-        <table class="tbl-mov tbl-cards">
+        <div class="tbl-scroll"><table class="tbl-mov tbl-cards">
           <thead><tr>
             <th class="th-sort col-num" data-sort="correlativo" onclick="setHistorialSort('correlativo')">N&deg; de Movilidad<span class="sort-arrow">&#8645;</span></th>
             <th class="th-sort col-fecha" data-sort="fecha" onclick="setHistorialSort('fecha')">Fecha<span class="sort-arrow">&#8645;</span></th>
@@ -1696,7 +1706,7 @@ try{
             <th class="th-sort col-imp right" data-sort="importe" onclick="setHistorialSort('importe')">Importe<span class="sort-arrow">&#8645;</span></th>
             <th class="col-obs center">Obs.</th><th class="col-estado center">Estado</th></tr></thead>
           <tbody id="historialBody"></tbody>
-        </table>
+        </table></div>
         <div class="pager" id="historialPager" style="display:none;"></div>
         <div id="historialEmpty" class="empty-state" style="display:none;">
           <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;vertical-align:-2px;vertical-align:middle;"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></div>
@@ -1714,10 +1724,10 @@ try{
         <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
           <button class="btn btn-primary" id="btnAgregarColaborador" onclick="openColabModal()">+ Agregar Colaborador</button>
         </div>
-        <table class="tbl-cards">
+        <div class="tbl-scroll"><table class="tbl-cards">
           <thead><tr><th>Apellidos y Nombres</th><th>DNI</th><th>Firma</th><th>Módulos</th><th>Estado</th><th></th></tr></thead>
           <tbody id="colabBody"></tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
@@ -1768,7 +1778,7 @@ try{
             <button class="btn btn-ghost btn-sm" onclick="limpiarFiltrosPlan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path d="M18 6L6 18M6 6l12 12"/></svg>Limpiar filtros</button>
             <span class="plan-conteo" id="planConteo"></span>
           </div>
-          <table class="tbl-mov tbl-cards">
+          <div class="tbl-scroll"><table class="tbl-mov tbl-cards">
             <thead><tr><th style="width:34px;"></th>
               <th class="th-sort col-num" data-plansort="correlativo" onclick="setPlanSort('correlativo')">N&deg; de Movilidad<span class="sort-arrow">&#8645;</span></th>
               <th class="th-sort col-fecha" data-plansort="fecha" onclick="setPlanSort('fecha')">Fecha<span class="sort-arrow">&#8645;</span></th>
@@ -1777,7 +1787,7 @@ try{
               <th class="th-sort col-dist center" data-plansort="llegada" onclick="setPlanSort('llegada')">Llegada<span class="sort-arrow">&#8645;</span></th>
               <th class="th-sort col-imp right" data-plansort="importe" onclick="setPlanSort('importe')">Importe<span class="sort-arrow">&#8645;</span></th></tr></thead>
             <tbody id="candidatosBody"></tbody>
-          </table>
+          </table></div>
           <div class="total-bar"><span>Total seleccionado:</span> <span class="amount" id="candidatosTotal">S/ 0.00</span></div>
           <div class="modal-actions" style="justify-content:flex-start;">
             <button class="btn btn-purple" id="btnGenerarPlanilla" onclick="confirmarGenerarPlanilla()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-2px;margin-right:6px;"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4"/></svg>Generar Planilla</button>
@@ -1809,7 +1819,7 @@ try{
             <span class="plan-conteo" id="planHistConteo"></span>
             <button class="btn btn-ghost btn-sm" id="btnRefrescarPlanHist" onclick="refrescarPlanillasHistorial()"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
           </div>
-          <table class="tbl-mov tbl-cards">
+          <div class="tbl-scroll"><table class="tbl-mov tbl-cards">
             <thead><tr>
               <th class="th-sort col-num" data-plhsort="correlativo" onclick="setPlanHistSort('correlativo')">N&deg; Planilla<span class="sort-arrow">&#8645;</span></th>
               <th id="thPlanHistTrabajador" class="th-sort col-trab" data-plhsort="trabajador" onclick="setPlanHistSort('trabajador')">Colaborador<span class="sort-arrow">&#8645;</span></th>
@@ -1818,7 +1828,7 @@ try{
               <th class="th-sort col-fecha" data-plhsort="fecha" onclick="setPlanHistSort('fecha')">Generada<span class="sort-arrow">&#8645;</span></th>
               <th class="col-estado center">Estado</th><th></th></tr></thead>
             <tbody id="planillasHistBody"></tbody>
-          </table>
+          </table></div>
           <div class="empty-state" id="planillasHistEmpty" style="display:none;">Aun no se han generado planillas.</div>
         </div>
         <div class="card" id="planHistPreviewCard" style="display:none;margin-top:18px;"></div>
@@ -1956,10 +1966,10 @@ try{
           <div class="spacer" style="flex:1;"></div>
           <button class="btn btn-primary btn-sm" id="btnNuevoProveedor" onclick="openProveedorModal()">+ Nuevo Proveedor</button>
         </div>
-        <table class="tbl-cards">
+        <div class="tbl-scroll"><table class="tbl-cards">
           <thead><tr><th>RUC</th><th>Razon Social</th><th class="center">Estado</th><th></th></tr></thead>
           <tbody id="provBody"></tbody>
-        </table>
+        </table></div>
         <div class="empty-state" id="provEmpty" style="display:none;">No hay proveedores registrados todavia.</div>
       </div>
     </div>
@@ -2002,17 +2012,20 @@ try{
           </div>
           <div class="saldo-info" id="ccAviso" style="display:none;margin-top:14px;"></div>
 
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px;flex-wrap:wrap;gap:10px;">
             <h3 style="margin:0;font-size:14px;">Comprobantes pendientes de reintegro</h3>
             <div style="display:flex;gap:8px;">
               <button class="btn btn-outline btn-sm" onclick="showSection('nuevoComprobante')">+ Nuevo Comprobante</button>
               <button class="btn btn-primary btn-sm" id="btnArmarReposicion" onclick="armarLiquidacionReposicion()">Armar liquidaci&oacute;n de reintegro</button>
             </div>
           </div>
-          <table class="tbl-cards">
-            <thead><tr><th>N&deg;</th><th>Fecha</th><th>Tipo</th><th>Proveedor</th><th>Concepto</th><th class="right">Total</th></tr></thead>
+          <label id="ccPendientesSelAllWrap" style="display:none;align-items:center;gap:8px;font-weight:600;font-size:12.5px;color:var(--text-mut);cursor:pointer;margin-bottom:8px;">
+            <input type="checkbox" id="selAllCcPendientes" onchange="toggleAllCcPendientes(this.checked)"> Seleccionar todos
+          </label>
+          <div class="tbl-scroll"><table class="tbl-cards">
+            <thead><tr><th style="width:34px;"></th><th>N&deg;</th><th>Fecha</th><th>Tipo</th><th>Proveedor</th><th>Concepto</th><th class="right">Total</th></tr></thead>
             <tbody id="ccPendientesBody"></tbody>
-          </table>
+          </table></div>
           <div class="empty-state" id="ccPendientesEmpty" style="display:none;">No hay comprobantes pendientes de reponer.</div>
         </div>
       </div>
@@ -2036,10 +2049,10 @@ try{
           <div class="spacer" style="flex:1;"></div>
           <button class="btn btn-ghost btn-sm" onclick="refrescarComprobantes()" id="btnRefrescarCmp"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
         </div>
-        <table class="tbl-cards">
+        <div class="tbl-scroll"><table class="tbl-cards">
           <thead><tr><th>N&deg;</th><th>Fecha</th><th>Colaborador</th><th>Destino</th><th>Tipo</th><th>Proveedor / Concepto</th><th class="right">Total</th><th class="center">Estado</th><th></th></tr></thead>
           <tbody id="cmpListaBody"></tbody>
-        </table>
+        </table></div>
         <div class="empty-state" id="cmpListaEmpty" style="display:none;">No hay comprobantes con estos filtros.</div>
       </div>
     </div>
@@ -2077,10 +2090,10 @@ try{
           <div class="spacer" style="flex:1;"></div>
           <button class="btn btn-ghost btn-sm" onclick="refrescarLiquidaciones()" id="btnRefrescarLiq"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
         </div>
-        <table class="tbl-cards">
+        <div class="tbl-scroll"><table class="tbl-cards">
           <thead><tr><th>N&deg; Liquidacion</th><th>Colaborador</th><th>Tipo</th><th>Fecha</th><th class="right">Total Sustentado</th><th class="center">Estado</th><th></th></tr></thead>
           <tbody id="liqBody"></tbody>
-        </table>
+        </table></div>
         <div class="empty-state" id="liqEmpty" style="display:none;">No hay liquidaciones en esta vista.</div>
       </div>
     </div>
@@ -2155,7 +2168,7 @@ try{
 
 <!-- ===================== MODAL ARMAR LIQUIDACION (Rendicion / Reposicion / Reembolso) ===================== -->
 <div class="modal-overlay" id="armarLiqModalOverlay">
-  <div class="modal" style="max-width:480px;">
+  <div class="modal" style="max-width:640px;">
     <button class="close-x" onclick="cerrarArmarLiq()">&times;</button>
     <h2 id="armarLiqTitulo">Armar liquidacion</h2>
     <p class="sub" id="armarLiqSub">Junta los comprobantes pendientes en una liquidacion nueva, en Borrador.</p>
@@ -2170,6 +2183,21 @@ try{
       </div>
       <div class="field" style="grid-column:1/-1;">
         <div class="saldo-info" id="armarLiqPreview">Selecciona un colaborador.</div>
+      </div>
+      <div class="field" id="armarLiqListaField" style="grid-column:1/-1;display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:12.5px;color:var(--text-mut);cursor:pointer;">
+            <input type="checkbox" id="selAllArmarLiq" onchange="toggleAllArmarLiqPendientes(this.checked)"> Seleccionar todas
+          </label>
+          <span style="font-size:12.5px;color:var(--text-mut);">Comprobantes pendientes de este colaborador. Destilde los que no quieras incluir todavia.</span>
+        </div>
+        <div class="tbl-scroll" style="max-height:260px;overflow-y:auto;border:1px solid var(--thead-line);border-radius:12px;">
+          <table class="tbl-cards">
+            <thead><tr><th style="width:34px;"></th><th>Fecha</th><th>Documento</th><th>Proveedor / Concepto</th><th class="right">Total</th></tr></thead>
+            <tbody id="armarLiqPendientesBody"></tbody>
+          </table>
+        </div>
+        <div class="total-bar" style="margin-top:10px;"><span>Total seleccionado:</span> <span class="amount" id="armarLiqTotalSeleccionado">S/ 0.00</span></div>
       </div>
     </div>
     <div class="modal-actions">
@@ -2942,7 +2970,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.12.0';
+const APP_VERSION = '2.13.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -6435,11 +6463,7 @@ async function drawLiquidacionPdf(pdf, liquidacion, colaborador, comprobantes, a
   pdf.setFont('courier','bold'); pdf.setFontSize(10.5);
   pdf.text(labelFinal, totX+padIn, ty);
   pdf.text('S/ ' + Number(valorFinal||0).toFixed(2), totX+totW-padIn, ty, {align:'right'});
-  doc.y += boxH + 16;
-
-  pdf.setFont('courier','normal'); pdf.setFontSize(8);
-  pdf.text('Comprobantes adjuntos: ' + (comprobantes||[]).length, doc.M, doc.y);
-  doc.y += 20;
+  doc.y += boxH + 26;
 
   // ---- firmas: la del colaborador jala la MISMA firma ya cargada en la
   // ficha del colaborador (la misma que usa la planilla de movilidad -
@@ -7034,15 +7058,18 @@ function renderCajaChica(){
   const body = document.getElementById('ccPendientesBody');
   const empty = document.getElementById('ccPendientesEmpty');
   const btnArmar = document.getElementById('btnArmarReposicion');
+  const selAllWrap = document.getElementById('ccPendientesSelAllWrap');
   if(!pendientes.length){
     body.innerHTML = '';
     empty.style.display = '';
     if(btnArmar) btnArmar.disabled = true;
+    if(selAllWrap) selAllWrap.style.display = 'none';
   } else {
     empty.style.display = 'none';
-    if(btnArmar) btnArmar.disabled = false;
+    if(selAllWrap) selAllWrap.style.display = 'flex';
     body.innerHTML = pendientes.map(c=>`
-      <tr>
+      <tr data-id="${c.id}">
+        <td data-label="Incluir"><input type="checkbox" class="cc-pend-chk" checked onchange="recalcCcPendientesSeleccion()"></td>
         <td data-label="N°">${c.correlativo}</td>
         <td data-label="Fecha">${fmtFecha(c.fecha)}</td>
         <td data-label="Tipo">${c.tipoDocumento}</td>
@@ -7050,10 +7077,27 @@ function renderCajaChica(){
         <td data-label="Concepto">${c.concepto}</td>
         <td data-label="Total" class="right">${money(c.total)}</td>
       </tr>`).join('');
+    document.getElementById('selAllCcPendientes').checked = true;
+    recalcCcPendientesSeleccion();
   }
   window._ccFondoActivo = fondo;
   window._ccColabActivo = colabId;
   actualizarResumenCajaChicaDashboard();
+}
+function toggleAllCcPendientes(checked){
+  document.querySelectorAll('.cc-pend-chk').forEach(c=>c.checked=checked);
+  recalcCcPendientesSeleccion();
+}
+function recalcCcPendientesSeleccion(){
+  const filas = [...document.querySelectorAll('#ccPendientesBody tr')];
+  const seleccionadas = filas.filter(tr=>{
+    const chk = tr.querySelector('.cc-pend-chk');
+    return chk && chk.checked;
+  }).length;
+  const selAll = document.getElementById('selAllCcPendientes');
+  if(selAll) selAll.checked = filas.length>0 && seleccionadas===filas.length;
+  const btnArmar = document.getElementById('btnArmarReposicion');
+  if(btnArmar) btnArmar.disabled = seleccionadas===0;
 }
 // Resumen de Inicio: SIEMPRE la Caja Chica del usuario que abrio sesion, no
 // la que se este mirando en la pantalla de Caja Chica (que un admin puede
@@ -7172,10 +7216,19 @@ async function confirmarAsignarCajaChica(){
 //               devolucion del vuelto no usado (signo -1).
 //   REEMBOLSO   sin fondo (fondoId null): los gastos "de mi bolsillo" de
 //               ese colaborador.
-async function armarLiquidacion(tipo, colabId, fondoId){
-  const pendientes = tipo === 'REEMBOLSO'
+async function armarLiquidacion(tipo, colabId, fondoId, idsSeleccionados){
+  let pendientes = tipo === 'REEMBOLSO'
     ? DB.comprobantes.filter(c=>c.colaboradorId===colabId && !c.fondoId && !c.liquidacionId)
     : DB.comprobantes.filter(c=>c.fondoId===fondoId && !c.liquidacionId);
+  // idsSeleccionados es lo que el usuario dejo tildado en el modal (pudo
+  // destildar alguno para dejarlo afuera de esta liquidacion y rendirlo
+  // despues). Se filtra sobre los YA elegibles (nunca sobre lo que mande el
+  // cliente a ciegas), asi que aunque alguien manipule el pedido no puede
+  // colar un comprobante que no le correspondia.
+  if(Array.isArray(idsSeleccionados)){
+    const permitidos = new Set(idsSeleccionados);
+    pendientes = pendientes.filter(c=>permitidos.has(c.id));
+  }
   if(!pendientes.length){ toast('No hay comprobantes pendientes para armar esta liquidacion', true); return null; }
 
   const totalSustentado = pendientes.filter(c=>c.signo===1).reduce((s,c)=>s+Number(c.total||0), 0);
@@ -7215,10 +7268,14 @@ async function armarLiquidacionReposicion(){
   const fondo = window._ccFondoActivo;
   const colabId = window._ccColabActivo;
   if(!fondo){ toast('No hay una Caja Chica seleccionada', true); return; }
+  const idsSeleccionados = [...document.querySelectorAll('#ccPendientesBody tr')]
+    .filter(tr=>tr.querySelector('.cc-pend-chk').checked)
+    .map(tr=>tr.dataset.id);
+  if(!idsSeleccionados.length){ toast('Selecciona al menos un comprobante', true); return; }
   const btn = document.getElementById('btnArmarReposicion');
   btn.disabled = true;
   try{
-    const liq = await armarLiquidacion('REPOSICION', colabId, fondo.id);
+    const liq = await armarLiquidacion('REPOSICION', colabId, fondo.id, idsSeleccionados);
     if(liq) showSection('liquidaciones');
   } finally {
     btn.disabled = false;
@@ -7270,22 +7327,30 @@ function abrirArmarLiq(tipo){
   document.getElementById('armarLiqModalOverlay').classList.add('open');
   actualizarPreviewArmarLiq();
 }
+// Lista de comprobantes pendientes que se esta mostrando ahora mismo en el
+// modal de "Armar liquidacion", con casillas para incluir/excluir uno por
+// uno -- el mismo patron que ya usamos para elegir que movilidades entran en
+// una planilla (ver candidatosBody / toggleAllCandidatos). Antes de esto, el
+// modal juntaba TODOS los pendientes sin dar opcion a dejar alguno afuera.
+let armarLiqPendientesActuales = [];
 function actualizarPreviewArmarLiq(){
   const tipo = armarLiqTipoActual;
   const colabId = document.getElementById('armarLiqColaborador').value;
   const preview = document.getElementById('armarLiqPreview');
   const fondoSel = document.getElementById('armarLiqFondo');
+  const listaField = document.getElementById('armarLiqListaField');
   const btn = document.getElementById('btnConfirmarArmarLiq');
-  if(!colabId){ preview.textContent = 'Selecciona un colaborador.'; btn.disabled = true; return; }
+  const ocultarLista = ()=>{ listaField.style.display = 'none'; armarLiqPendientesActuales = []; };
+  if(!colabId){ preview.style.display=''; preview.textContent = 'Selecciona un colaborador.'; btn.disabled = true; ocultarLista(); return; }
 
   let fondoId = null;
   if(tipo === 'REPOSICION'){
     const fondo = fondoCajaChicaDe(colabId);
-    if(!fondo){ preview.textContent = 'Este colaborador no tiene una Caja Chica abierta.'; btn.disabled = true; return; }
+    if(!fondo){ preview.style.display=''; preview.textContent = 'Este colaborador no tiene una Caja Chica abierta.'; btn.disabled = true; ocultarLista(); return; }
     fondoId = fondo.id;
   } else if(tipo === 'RENDICION'){
     const entregas = entregasAbiertasDe(colabId);
-    if(!entregas.length){ preview.textContent = 'Este colaborador no tiene una Entrega abierta.'; btn.disabled = true; fondoSel.innerHTML=''; return; }
+    if(!entregas.length){ preview.style.display=''; preview.textContent = 'Este colaborador no tiene una Entrega abierta.'; btn.disabled = true; fondoSel.innerHTML=''; ocultarLista(); return; }
     // Solo repoblar las opciones cuando cambia el colaborador: si no, el
     // propio onchange del selector de Entrega (que llama a esta misma
     // funcion) se pisaria a si mismo y siempre volveria a la primera opcion.
@@ -7296,20 +7361,50 @@ function actualizarPreviewArmarLiq(){
     fondoId = fondoSel.value;
   }
 
-  const pendientes = tipo === 'REEMBOLSO'
+  const pendientes = (tipo === 'REEMBOLSO'
     ? DB.comprobantes.filter(c=>c.colaboradorId===colabId && !c.fondoId && !c.liquidacionId)
-    : DB.comprobantes.filter(c=>c.fondoId===fondoId && !c.liquidacionId);
+    : DB.comprobantes.filter(c=>c.fondoId===fondoId && !c.liquidacionId)
+  ).slice().sort((a,b)=> (a.fecha < b.fecha ? 1 : -1));
   if(!pendientes.length){
+    preview.style.display = '';
     preview.textContent = 'No hay comprobantes pendientes para armar esta liquidacion.';
     btn.disabled = true;
+    ocultarLista();
     return;
   }
-  const totalSustentado = pendientes.filter(c=>c.signo===1).reduce((s,c)=>s+Number(c.total||0), 0);
-  const totalDevuelto = pendientes.filter(c=>c.signo===-1).reduce((s,c)=>s+Number(c.total||0), 0);
-  let texto = pendientes.length + (pendientes.length===1 ? ' comprobante pendiente' : ' comprobantes pendientes') + ', total S/ ' + totalSustentado.toFixed(2);
-  if(totalDevuelto > 0) texto += ' + devolucion S/ ' + totalDevuelto.toFixed(2);
-  preview.textContent = texto;
-  btn.disabled = false;
+  // Se ven todos los pendientes (sustentos Y devoluciones): destildar uno
+  // deja afuera exactamente ese comprobante de la liquidacion nueva.
+  preview.style.display = 'none';
+  armarLiqPendientesActuales = pendientes;
+  document.getElementById('armarLiqPendientesBody').innerHTML = pendientes.map(c=>`
+    <tr data-id="${c.id}" data-total="${c.signo===-1 ? -Number(c.total||0) : Number(c.total||0)}">
+      <td data-label="Incluir"><input type="checkbox" class="armarliq-chk" checked onchange="recalcArmarLiqSeleccion()"></td>
+      <td data-label="Fecha">${fmtFecha(c.fecha)}</td>
+      <td data-label="Documento">${docComprobanteTexto(c)}</td>
+      <td data-label="Proveedor / Concepto">${(c.proveedorRazonSocial||'')}${c.concepto ? (' — '+c.concepto) : ''}</td>
+      <td data-label="Total" class="right">${c.signo===-1 ? ('− '+money(Math.abs(c.total))) : money(c.total)}</td>
+    </tr>`).join('');
+  document.getElementById('selAllArmarLiq').checked = true;
+  listaField.style.display = '';
+  recalcArmarLiqSeleccion();
+}
+function toggleAllArmarLiqPendientes(checked){
+  document.querySelectorAll('.armarliq-chk').forEach(c=>c.checked=checked);
+  recalcArmarLiqSeleccion();
+}
+function recalcArmarLiqSeleccion(){
+  const filas = [...document.querySelectorAll('#armarLiqPendientesBody tr')];
+  let total = 0, seleccionadas = 0;
+  filas.forEach(tr=>{
+    const chk = tr.querySelector('.armarliq-chk');
+    if(chk && chk.checked){ total += Number(tr.dataset.total); seleccionadas++; }
+  });
+  const totalEl = document.getElementById('armarLiqTotalSeleccionado');
+  if(totalEl) totalEl.textContent = money(total);
+  const selAll = document.getElementById('selAllArmarLiq');
+  if(selAll) selAll.checked = filas.length>0 && seleccionadas===filas.length;
+  const btn = document.getElementById('btnConfirmarArmarLiq');
+  if(btn) btn.disabled = seleccionadas===0;
 }
 function cerrarArmarLiq(){
   document.getElementById('armarLiqModalOverlay').classList.remove('open');
@@ -7327,10 +7422,14 @@ async function confirmarArmarLiq(){
     fondoId = document.getElementById('armarLiqFondo').value;
     if(!fondoId){ toast('Selecciona una Entrega', true); return; }
   }
+  const idsSeleccionados = [...document.querySelectorAll('#armarLiqPendientesBody tr')]
+    .filter(tr=>tr.querySelector('.armarliq-chk').checked)
+    .map(tr=>tr.dataset.id);
+  if(!idsSeleccionados.length){ toast('Selecciona al menos un comprobante', true); return; }
   const btn = document.getElementById('btnConfirmarArmarLiq');
   btn.disabled = true;
   try{
-    const liq = await armarLiquidacion(tipo, colabId, fondoId);
+    const liq = await armarLiquidacion(tipo, colabId, fondoId, idsSeleccionados);
     if(liq){ cerrarArmarLiq(); showSection('liquidaciones'); }
   } finally {
     btn.disabled = false;
@@ -7886,6 +7985,7 @@ function boot(){
   document.getElementById('appRoot').style.display = 'flex';
   document.getElementById('currentUserName').textContent = nombreCorto(user);
   document.getElementById('currentAvatar').textContent = initials(nombreCorto(user));
+  document.getElementById('currentUserRole').textContent = user.isAdmin ? 'Administrador' : 'Colaborador';
   fillDistritoSelect(document.getElementById('formPartida'));
   fillDistritoSelect(document.getElementById('formLlegada'));
   resetForm();

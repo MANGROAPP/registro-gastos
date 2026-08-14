@@ -1384,7 +1384,9 @@ try{
       <button class="nav-btn side-item side-group-btn" id="groupGastosBtn" data-group="gastos" title="Gastos" onclick="toggleSideGroup(this)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><span class="side-label">Gastos</span><svg class="side-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
       <div class="side-submenu" id="groupGastos">
         <button class="nav-btn side-item side-subitem" data-section="nuevoComprobante" title="Nuevo Comprobante" onclick="showSection('nuevoComprobante')"><span class="side-label">Nuevo Comprobante</span></button>
+        <button class="nav-btn side-item side-subitem" data-section="proveedores" title="Proveedores" onclick="showSection('proveedores')"><span class="side-label">Proveedores</span></button>
         <button class="nav-btn side-item side-subitem" data-section="cajaChica" title="Caja Chica" onclick="showSection('cajaChica')"><span class="side-label">Caja Chica</span></button>
+        <button class="nav-btn side-item side-subitem" data-section="comprobantes" title="Comprobantes" onclick="showSection('comprobantes')"><span class="side-label">Comprobantes</span></button>
         <button class="nav-btn side-item side-subitem" data-section="liquidaciones" title="Liquidaciones" onclick="showSection('liquidaciones')"><span class="side-label">Liquidaciones</span></button>
       </div>
       <button class="nav-btn side-item" data-section="colaboradores" title="Colaboradores" onclick="showSection('colaboradores')"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20"/><circle cx="9.5" cy="8" r="3.5"/><path d="M20 20v-1.5a3.2 3.2 0 0 0-2.2-3.03"/><path d="M14.7 4.6a3.5 3.5 0 0 1 0 6.8"/></svg></span><span class="side-label">Colaboradores</span></button>
@@ -1796,7 +1798,7 @@ try{
     <!-- ================= GASTOS: NUEVO COMPROBANTE ================= -->
     <div class="section" id="section-nuevoComprobante">
       <h1 class="page-title">Nuevo Comprobante</h1>
-      <p class="page-sub">Registra una factura, boleta u otro sustento contra tu Caja Chica.</p>
+      <p class="page-sub">Registra una factura, boleta u otro sustento de gasto.</p>
 
       <div class="card" style="margin-top:18px;max-width:760px;">
         <div class="form-grid">
@@ -1804,61 +1806,131 @@ try{
             <label>Colaborador</label>
             <select id="cmpColaborador" onchange="actualizarCajaChicaDestino()"></select>
           </div>
-          <div class="field" style="grid-column:1/-1;">
-            <div class="saldo-info" id="cmpCajaInfo">Selecciona un colaborador para ver su Caja Chica.</div>
-            <div class="form-error" id="cmpFormError" style="display:none;"></div>
-          </div>
           <div class="field">
-            <label>Fecha</label>
-            <input type="text" class="date-input" id="cmpFecha" readonly placeholder="Selecciona una fecha">
-          </div>
-          <div class="field">
-            <label>Tipo de documento</label>
-            <select id="cmpTipoDocumento">
-              <option value="FACTURA">FACTURA</option>
-              <option value="BOLETA">BOLETA</option>
-              <option value="RECIBO POR HONORARIOS">RECIBO POR HONORARIOS</option>
-              <option value="PASAJE AEREO">PASAJE AEREO</option>
-              <option value="TICKET">TICKET</option>
+            <label>Destino del gasto</label>
+            <select id="cmpDestino" onchange="actualizarCajaChicaDestino()">
+              <option value="CAJA_CHICA">CAJA CHICA</option>
+              <option value="ENTREGA">ENTREGA A RENDIR CUENTA</option>
+              <option value="REEMBOLSO">DE MI BOLSILLO (REEMBOLSO)</option>
             </select>
           </div>
-          <div class="field">
-            <label>Serie</label>
-            <input type="text" id="cmpSerie" placeholder="EJ: F001">
-          </div>
-          <div class="field">
-            <label>Numero</label>
-            <input type="text" id="cmpNumero" placeholder="EJ: 00001234">
-          </div>
-          <div class="field">
-            <label>RUC del proveedor</label>
-            <input type="text" id="cmpProveedorRuc" placeholder="11 digitos" maxlength="11" oninput="buscarProveedorPorRuc()">
-          </div>
-          <div class="field">
-            <label>Razon social</label>
-            <input type="text" id="cmpProveedorRazon" placeholder="RAZON SOCIAL DEL PROVEEDOR">
+          <div class="field" id="cmpEntregaField" style="grid-column:1/-1;display:none;">
+            <label>Entrega</label>
+            <select id="cmpEntrega" onchange="actualizarCajaChicaDestino()"></select>
           </div>
           <div class="field" style="grid-column:1/-1;">
-            <label>Concepto</label>
-            <input type="text" id="cmpConcepto" placeholder="EJ: UTILES DE OFICINA">
+            <div class="saldo-info" id="cmpCajaInfo">Selecciona un colaborador para ver su destino.</div>
+            <div class="form-error" id="cmpFormError" style="display:none;"></div>
           </div>
-          <div class="field">
-            <label>Moneda</label>
-            <select id="cmpMoneda"><option value="PEN">SOLES (PEN)</option><option value="USD">DOLARES (USD)</option></select>
+
+          <!-- Cuando el destino es una Entrega, ademas de registrar gastos se
+               puede registrar la devolucion del vuelto no usado -- son dos
+               acciones distintas (una suma al gasto, la otra resta), asi que
+               se ofrecen como un interruptor que cambia el formulario, en vez
+               de mezclarlas en los mismos campos. -->
+          <div class="field" id="cmpModoField" style="grid-column:1/-1;display:none;">
+            <label>Que vas a registrar</label>
+            <div class="pill-nav" style="display:inline-flex;">
+              <button type="button" id="cmpModoGastoBtn" class="active" onclick="cambiarModoComprobante('GASTO')">Un gasto</button>
+              <button type="button" id="cmpModoDevolucionBtn" onclick="cambiarModoComprobante('DEVOLUCION')">Devolucion de saldo no usado</button>
+            </div>
           </div>
-          <div class="field">
-            <label>Total</label>
-            <input type="number" id="cmpTotal" step="0.01" min="0" placeholder="0.00">
+
+          <div id="cmpCamposGasto" style="display:contents;">
+            <div class="field">
+              <label>Fecha</label>
+              <input type="text" class="date-input" id="cmpFecha" readonly placeholder="Selecciona una fecha">
+            </div>
+            <div class="field">
+              <label>Tipo de documento</label>
+              <select id="cmpTipoDocumento">
+                <option value="FACTURA">FACTURA</option>
+                <option value="BOLETA">BOLETA</option>
+                <option value="RECIBO POR HONORARIOS">RECIBO POR HONORARIOS</option>
+                <option value="PASAJE AEREO">PASAJE AEREO</option>
+                <option value="TICKET">TICKET</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Serie</label>
+              <input type="text" id="cmpSerie" placeholder="EJ: F001">
+            </div>
+            <div class="field">
+              <label>Numero</label>
+              <input type="text" id="cmpNumero" placeholder="EJ: 00001234">
+            </div>
+            <div class="field">
+              <label>RUC del proveedor</label>
+              <input type="text" id="cmpProveedorRuc" placeholder="11 digitos" maxlength="11" oninput="buscarProveedorPorRuc()">
+            </div>
+            <div class="field">
+              <label>Razon social</label>
+              <input type="text" id="cmpProveedorRazon" placeholder="RAZON SOCIAL DEL PROVEEDOR">
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Concepto</label>
+              <input type="text" id="cmpConcepto" placeholder="EJ: UTILES DE OFICINA">
+            </div>
+            <div class="field">
+              <label>Moneda</label>
+              <select id="cmpMoneda"><option value="PEN">SOLES (PEN)</option><option value="USD">DOLARES (USD)</option></select>
+            </div>
+            <div class="field">
+              <label>Total</label>
+              <input type="number" id="cmpTotal" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Adjunto (foto o PDF del comprobante, opcional)</label>
+              <input type="file" id="cmpAdjunto" accept="image/*,application/pdf">
+            </div>
           </div>
-          <div class="field" style="grid-column:1/-1;">
-            <label>Adjunto (foto o PDF del comprobante, opcional)</label>
-            <input type="file" id="cmpAdjunto" accept="image/*,application/pdf">
+
+          <div id="cmpCamposDevolucion" style="display:none;">
+            <div class="field">
+              <label>Fecha de la devolucion</label>
+              <input type="text" class="date-input" id="cmpDevFecha" readonly placeholder="Selecciona una fecha">
+            </div>
+            <div class="field">
+              <label>Monto devuelto (S/)</label>
+              <input type="number" id="cmpDevTotal" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="field">
+              <label>Medio</label>
+              <select id="cmpDevMedio">
+                <option value="EFECTIVO">EFECTIVO</option>
+                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                <option value="DEPOSITO">DEPOSITO</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>N&deg; de operacion (opcional)</label>
+              <input type="text" id="cmpDevOperacion" placeholder="EJ: 88213340">
+            </div>
           </div>
         </div>
         <div class="modal-actions" style="justify-content:flex-start;">
           <button class="btn btn-purple" id="btnGuardarComprobante" onclick="saveComprobante()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;"><path d="M20 6L9 17l-5-5"/></svg>Guardar Comprobante</button>
           <button class="btn btn-outline" onclick="showSection('cajaChica')">Cancelar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ================= GASTOS: PROVEEDORES ================= -->
+    <div class="section" id="section-proveedores">
+      <h1 class="page-title">Proveedores</h1>
+      <p class="page-sub">Directorio propio de MANGRO (no es una consulta a SUNAT). Se completa solo al registrar comprobantes, o puedes agregarlos aqui.</p>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="filters" style="margin-bottom:16px;">
+          <input type="text" id="provBuscar" placeholder="BUSCAR POR RUC O RAZON SOCIAL..." oninput="renderProveedores()">
+          <div class="spacer" style="flex:1;"></div>
+          <button class="btn btn-primary btn-sm" id="btnNuevoProveedor" onclick="openProveedorModal()">+ Nuevo Proveedor</button>
+        </div>
+        <table class="tbl-cards">
+          <thead><tr><th>RUC</th><th>Razon Social</th><th class="center">Estado</th><th></th></tr></thead>
+          <tbody id="provBody"></tbody>
+        </table>
+        <div class="empty-state" id="provEmpty" style="display:none;">No hay proveedores registrados todavia.</div>
       </div>
     </div>
 
@@ -1871,7 +1943,7 @@ try{
         <div class="filters" id="cajaChicaFiltros" style="margin-bottom:16px;display:none;">
           <select id="cajaChicaColaborador" onchange="renderCajaChica()"></select>
           <div class="spacer" style="flex:1;"></div>
-          <button class="btn btn-outline btn-sm" onclick="abrirAsignarCajaChica()">+ Asignar Caja Chica</button>
+          <button class="btn btn-outline btn-sm" onclick="abrirAsignarCajaChica('CAJA_CHICA')">+ Asignar Caja Chica</button>
         </div>
 
         <div id="cajaChicaSinFondo" class="empty-state" style="display:none;">
@@ -1914,15 +1986,47 @@ try{
       </div>
     </div>
 
+    <!-- ================= GASTOS: COMPROBANTES ================= -->
+    <div class="section" id="section-comprobantes">
+      <h1 class="page-title">Comprobantes</h1>
+      <p class="page-sub">Todos los comprobantes registrados: de tu Caja Chica, tus Entregas y tus Reembolsos.</p>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="filters" style="margin-bottom:16px;">
+          <select id="cmpFiltroColab" style="display:none;" onchange="renderComprobantes()"></select>
+          <select id="cmpFiltroDestino" onchange="renderComprobantes()">
+            <option value="">TODOS LOS DESTINOS</option>
+            <option value="CAJA_CHICA">CAJA CHICA</option>
+            <option value="ENTREGA">ENTREGA / RENDICION</option>
+            <option value="REEMBOLSO">REEMBOLSO</option>
+          </select>
+          <input type="text" id="cmpFiltroTexto" placeholder="BUSCAR POR PROVEEDOR O CONCEPTO..." oninput="renderComprobantes()">
+        </div>
+        <table class="tbl-cards">
+          <thead><tr><th>N&deg;</th><th>Fecha</th><th>Colaborador</th><th>Destino</th><th>Tipo</th><th>Proveedor / Concepto</th><th class="right">Total</th><th class="center">Estado</th><th></th></tr></thead>
+          <tbody id="cmpListaBody"></tbody>
+        </table>
+        <div class="empty-state" id="cmpListaEmpty" style="display:none;">No hay comprobantes con estos filtros.</div>
+      </div>
+    </div>
+
     <!-- ================= GASTOS: LIQUIDACIONES ================= -->
     <div class="section" id="section-liquidaciones">
       <h1 class="page-title">Liquidaciones</h1>
       <p class="page-sub">Ciclo de reposicion de Caja Chica: armar, enviar, aprobar y registrar el reintegro.</p>
 
-      <div class="pill-nav" style="display:inline-flex;margin:14px 0 20px;">
-        <button id="liqTabArmar" class="active" onclick="showLiqTab('armar')">Por armar</button>
-        <button id="liqTabAprobar" onclick="showLiqTab('aprobar')">Por aprobar</button>
-        <button id="liqTabHistorial" onclick="showLiqTab('historial')">Historial</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:14px 0 20px;">
+        <div class="pill-nav" style="display:inline-flex;">
+          <button id="liqTabArmar" class="active" onclick="showLiqTab('armar')">Por armar</button>
+          <button id="liqTabAprobar" onclick="showLiqTab('aprobar')">Por aprobar</button>
+          <button id="liqTabHistorial" onclick="showLiqTab('historial')">Historial</button>
+        </div>
+        <div id="liqBotonesArmar" style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="abrirArmarLiq('RENDICION')">+ Rendicion</button>
+          <button class="btn btn-outline btn-sm" onclick="abrirArmarLiq('REPOSICION')">+ Reposicion</button>
+          <button class="btn btn-outline btn-sm" onclick="abrirArmarLiq('REEMBOLSO')">+ Reembolso</button>
+          <button class="btn btn-outline btn-sm" onclick="abrirAsignarCajaChica('ENTREGA')">+ Nueva Entrega</button>
+        </div>
       </div>
 
       <div class="card">
@@ -1936,19 +2040,26 @@ try{
 
   </div>
 
-<!-- ===================== MODAL ASIGNAR CAJA CHICA ===================== -->
+<!-- ===================== MODAL ASIGNAR FONDO (Caja Chica o Entrega) ===================== -->
 <div class="modal-overlay" id="asignarCajaModalOverlay">
   <div class="modal" style="max-width:460px;">
     <button class="close-x" onclick="cerrarAsignarCajaChica()">&times;</button>
-    <h2>Asignar Caja Chica</h2>
-    <p class="sub">Se crea el fondo y se descarga el Acta de Entrega para que la firme el colaborador.</p>
+    <h2 id="asignarCajaTitulo">Asignar Caja Chica</h2>
+    <p class="sub" id="asignarCajaSub">Se crea el fondo y se descarga el Acta de Entrega para que la firme el colaborador.</p>
     <div class="form-grid full">
+      <div class="field" id="asignarCajaTipoField" style="display:none;">
+        <label>Tipo de fondo</label>
+        <select id="asignarCajaTipo" onchange="actualizarTextosAsignarFondo()">
+          <option value="CAJA_CHICA">CAJA CHICA (fondo rotativo)</option>
+          <option value="ENTREGA">ENTREGA A RENDIR CUENTA</option>
+        </select>
+      </div>
       <div class="field">
         <label>Colaborador</label>
         <select id="asignarCajaColaborador"></select>
       </div>
       <div class="field">
-        <label>Tope de la Caja Chica (S/)</label>
+        <label id="asignarCajaMontoLabel">Tope de la Caja Chica (S/)</label>
         <input type="number" id="asignarCajaMonto" step="0.10" min="0" placeholder="0.00">
       </div>
       <div class="field">
@@ -1964,6 +2075,59 @@ try{
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="cerrarAsignarCajaChica()">Cancelar</button>
       <button class="btn btn-purple" id="btnConfirmarAsignarCaja" onclick="confirmarAsignarCajaChica()">Crear Caja Chica</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL PROVEEDOR ===================== -->
+<div class="modal-overlay" id="proveedorModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarProveedorModal()">&times;</button>
+    <h2 id="proveedorModalTitulo">Nuevo Proveedor</h2>
+    <input type="hidden" id="provEditId">
+    <div class="form-grid full">
+      <div class="field">
+        <label>RUC</label>
+        <input type="text" id="provRuc" placeholder="11 digitos" maxlength="11">
+      </div>
+      <div class="field">
+        <label>Razon social</label>
+        <input type="text" id="provRazon" placeholder="RAZON SOCIAL DEL PROVEEDOR">
+      </div>
+      <div class="field">
+        <label>Direccion (opcional)</label>
+        <input type="text" id="provDireccion" placeholder="DIRECCION">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarProveedorModal()">Cancelar</button>
+      <button class="btn btn-purple" id="btnGuardarProveedor" onclick="guardarProveedor()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL ARMAR LIQUIDACION (Rendicion / Reposicion / Reembolso) ===================== -->
+<div class="modal-overlay" id="armarLiqModalOverlay">
+  <div class="modal" style="max-width:480px;">
+    <button class="close-x" onclick="cerrarArmarLiq()">&times;</button>
+    <h2 id="armarLiqTitulo">Armar liquidacion</h2>
+    <p class="sub" id="armarLiqSub">Junta los comprobantes pendientes en una liquidacion nueva, en Borrador.</p>
+    <div class="form-grid full">
+      <div class="field" id="armarLiqColabField">
+        <label>Colaborador</label>
+        <select id="armarLiqColaborador" onchange="actualizarPreviewArmarLiq()"></select>
+      </div>
+      <div class="field" id="armarLiqFondoField" style="display:none;">
+        <label id="armarLiqFondoLabel">Entrega</label>
+        <select id="armarLiqFondo" onchange="actualizarPreviewArmarLiq()"></select>
+      </div>
+      <div class="field" style="grid-column:1/-1;">
+        <div class="saldo-info" id="armarLiqPreview">Selecciona un colaborador.</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarArmarLiq()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarArmarLiq" onclick="confirmarArmarLiq()">Armar liquidacion</button>
     </div>
   </div>
 </div>
@@ -2660,7 +2824,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.9.0';
+const APP_VERSION = '2.10.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -3656,11 +3820,13 @@ const CRUMBS = {
   planillas:{parent:'Planillas de Movilidad', current:'Generar Planilla'},
   colaboradores:{current:'Colaboradores'},
   nuevoComprobante:{parent:'Gastos', current:'Nuevo Comprobante'},
+  proveedores:{parent:'Gastos', current:'Proveedores'},
   cajaChica:{parent:'Gastos', current:'Caja Chica'},
+  comprobantes:{parent:'Gastos', current:'Comprobantes'},
   liquidaciones:{parent:'Gastos', current:'Liquidaciones'},
 };
 const SECCIONES_MOVILIDAD = ['nueva','historial','planillas'];
-const SECCIONES_GASTOS = ['nuevoComprobante','cajaChica','liquidaciones'];
+const SECCIONES_GASTOS = ['nuevoComprobante','proveedores','cajaChica','comprobantes','liquidaciones'];
 
 function showSection(name){
   // Control de acceso por modulo: si el colaborador no tiene Movilidad o
@@ -3708,7 +3874,9 @@ function showSection(name){
   if(name==='planillas'){ populatePlanColab(); showPlanTab('nueva'); }
   if(name==='nueva' && !document.getElementById('editId').value) resetForm();
   if(name==='nuevoComprobante') renderNuevoComprobante();
+  if(name==='proveedores') renderProveedores();
   if(name==='cajaChica') renderCajaChica();
+  if(name==='comprobantes') renderComprobantes();
   if(name==='liquidaciones') renderLiquidaciones();
   closeMobileSidebar();
 }
@@ -6099,6 +6267,12 @@ function colaboradoresConGastos(){
 function fondoCajaChicaDe(colaboradorId){
   return DB.fondos.find(f=>f.colaboradorId===colaboradorId && f.tipo==='CAJA_CHICA' && f.estado==='ABIERTO') || null;
 }
+// A diferencia de la Caja Chica (una sola, rotativa), una persona puede
+// tener VARIAS Entregas abiertas al mismo tiempo (cada una es un anticipo de
+// un solo uso que se cierra con su propia Rendicion).
+function entregasAbiertasDe(colaboradorId){
+  return DB.fondos.filter(f=>f.colaboradorId===colaboradorId && f.tipo==='ENTREGA' && f.estado==='ABIERTO');
+}
 // El saldo (tope/sustentado/disponible) SIEMPRE se lee de v_fondos_saldo, no
 // se recalcula en JS: esa vista ya excluye lo que quedo liquidado
 // (REINTEGRADA/CERRADA), que es justo la correccion que hizo que una Caja
@@ -6110,6 +6284,7 @@ function saldoDeFondo(fondoId){
 }
 
 /* ---------- Nuevo Comprobante ---------- */
+let cmpModo = 'GASTO'; // 'GASTO' o 'DEVOLUCION' -- solo aplica cuando el destino es ENTREGA
 function renderNuevoComprobante(){
   const user = getCurrentUser();
   if(!user) return;
@@ -6119,6 +6294,7 @@ function renderNuevoComprobante(){
   sel.innerHTML = lista.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
   sel.value = user.id;
   sel.disabled = !soyAdmin;
+  document.getElementById('cmpDestino').value = 'CAJA_CHICA';
   document.getElementById('cmpProveedorRuc').value = '';
   document.getElementById('cmpProveedorRazon').value = '';
   document.getElementById('cmpSerie').value = '';
@@ -6126,16 +6302,69 @@ function renderNuevoComprobante(){
   document.getElementById('cmpConcepto').value = '';
   document.getElementById('cmpTotal').value = '';
   document.getElementById('cmpAdjunto').value = '';
+  document.getElementById('cmpDevTotal').value = '';
+  document.getElementById('cmpDevOperacion').value = '';
   document.getElementById('cmpFormError').style.display = 'none';
   const fechaEl = document.getElementById('cmpFecha');
   if(!fechaEl.value) fechaEl.value = todayLocalISO();
+  const fechaDevEl = document.getElementById('cmpDevFecha');
+  if(!fechaDevEl.value) fechaDevEl.value = todayLocalISO();
+  cambiarModoComprobante('GASTO');
   actualizarCajaChicaDestino();
 }
+function cambiarModoComprobante(modo){
+  cmpModo = modo;
+  document.getElementById('cmpModoGastoBtn').classList.toggle('active', modo==='GASTO');
+  document.getElementById('cmpModoDevolucionBtn').classList.toggle('active', modo==='DEVOLUCION');
+  document.getElementById('cmpCamposGasto').style.display = modo==='GASTO' ? 'contents' : 'none';
+  document.getElementById('cmpCamposDevolucion').style.display = modo==='DEVOLUCION' ? 'contents' : 'none';
+}
+// Repuebla el selector de Entrega (si aplica) y el cartel de "contra que se
+// va a cargar esto", segun el colaborador y el destino elegidos. Devuelve
+// el fondo objetivo (o null si el destino es Reembolso, que no usa fondo).
 function actualizarCajaChicaDestino(){
-  const sel = document.getElementById('cmpColaborador');
-  if(!sel) return null;
-  const colabId = sel.value;
+  const selColab = document.getElementById('cmpColaborador');
+  if(!selColab) return null;
+  const colabId = selColab.value;
+  const destino = document.getElementById('cmpDestino').value;
   const info = document.getElementById('cmpCajaInfo');
+  const entregaField = document.getElementById('cmpEntregaField');
+  const modoField = document.getElementById('cmpModoField');
+
+  if(destino === 'REEMBOLSO'){
+    entregaField.style.display = 'none';
+    modoField.style.display = 'none';
+    cambiarModoComprobante('GASTO');
+    info.classList.remove('over');
+    info.innerHTML = 'Se registrara como <b>Reembolso</b>: dinero de tu propio bolsillo que la empresa te debe. No se descuenta de ninguna Caja Chica ni Entrega.';
+    return null;
+  }
+
+  if(destino === 'ENTREGA'){
+    modoField.style.display = '';
+    entregaField.style.display = '';
+    const abiertas = entregasAbiertasDe(colabId);
+    const selEntrega = document.getElementById('cmpEntrega');
+    const anterior = selEntrega.value;
+    selEntrega.innerHTML = abiertas.map(f=>`<option value="${f.id}">${f.correlativo} &middot; ${money(f.monto)}</option>`).join('');
+    if(anterior && abiertas.some(f=>f.id===anterior)) selEntrega.value = anterior;
+    if(!abiertas.length){
+      info.classList.add('over');
+      info.innerHTML = 'Este colaborador no tiene una <b>Entrega</b> abierta. Pidele a un administrador que le cree una desde Liquidaciones.';
+      return null;
+    }
+    const fondo = abiertas.find(f=>f.id===selEntrega.value) || abiertas[0];
+    info.classList.remove('over');
+    const saldo = saldoDeFondo(fondo.id);
+    const disponible = saldo ? Number(saldo.disponible) : Number(fondo.monto);
+    info.innerHTML = 'Se cargara contra la Entrega <b>' + fondo.correlativo + '</b> &middot; sin rendir: <b>' + money(disponible) + '</b>';
+    return fondo;
+  }
+
+  // CAJA_CHICA (destino por defecto)
+  entregaField.style.display = 'none';
+  modoField.style.display = 'none';
+  cambiarModoComprobante('GASTO');
   const fondo = fondoCajaChicaDe(colabId);
   if(!fondo){
     info.classList.add('over');
@@ -6161,8 +6390,53 @@ async function saveComprobante(){
   const errEl = document.getElementById('cmpFormError');
   errEl.style.display = 'none';
   const colabId = document.getElementById('cmpColaborador').value;
-  const fondo = fondoCajaChicaDe(colabId);
-  if(!fondo){ errEl.textContent = 'Este colaborador no tiene una Caja Chica asignada.'; errEl.style.display=''; return; }
+  const destino = document.getElementById('cmpDestino').value;
+  const fondo = destino === 'REEMBOLSO' ? null : actualizarCajaChicaDestino();
+  if(destino !== 'REEMBOLSO' && !fondo){
+    errEl.textContent = destino==='ENTREGA' ? 'Este colaborador no tiene una Entrega abierta.' : 'Este colaborador no tiene una Caja Chica asignada.';
+    errEl.style.display = '';
+    return;
+  }
+
+  // Modo devolucion (solo tiene sentido contra una Entrega): comprobante
+  // aparte, con su propia validacion, nunca se mezcla con los campos de un
+  // gasto normal (ver comentario en drawLiquidacionPdf sobre por que esto
+  // solo existe para Rendicion).
+  if(destino === 'ENTREGA' && cmpModo === 'DEVOLUCION'){
+    const fecha = document.getElementById('cmpDevFecha').value;
+    const total = Number(document.getElementById('cmpDevTotal').value);
+    const medio = document.getElementById('cmpDevMedio').value;
+    const operacion = document.getElementById('cmpDevOperacion').value.trim().toUpperCase() || null;
+    if(!fecha){ errEl.textContent = 'Selecciona la fecha de la devolucion.'; errEl.style.display=''; return; }
+    if(!total || total <= 0){ errEl.textContent = 'Ingresa el monto devuelto.'; errEl.style.display=''; return; }
+    const saldo = saldoDeFondo(fondo.id);
+    const disponible = saldo ? Number(saldo.disponible) : Number(fondo.monto);
+    if(total > disponible + 0.01){
+      errEl.textContent = 'El monto devuelto (' + money(total) + ') no puede ser mayor a lo que todavia no se sustenta de esta Entrega (' + money(disponible) + ').';
+      errEl.style.display = '';
+      return;
+    }
+    const btn = document.getElementById('btnGuardarComprobante');
+    btn.disabled = true;
+    try{
+      const correlativo = await nextCorrelativoGastos('CMP', 5);
+      const { error } = await sb.from('comprobantes').insert({
+        correlativo, colaborador_id: colabId, fondo_id: fondo.id,
+        tipo_documento: 'DEVOLUCION', fecha, concepto: 'DEVOLUCION DE SALDO NO UTILIZADO',
+        total, signo: -1, medio, operacion_numero: operacion
+      });
+      if(error){ console.error('saveComprobante (devolucion)', error); toast('No se pudo registrar la devolucion', true); return; }
+      await refreshComprobantes();
+      await refreshFondosSaldo();
+      await refreshSaldosColaborador();
+      toast('Devolucion ' + correlativo + ' registrada');
+      showSection('liquidaciones');
+    } finally {
+      btn.disabled = false;
+    }
+    return;
+  }
+
   const fecha = document.getElementById('cmpFecha').value;
   const tipoDocumento = document.getElementById('cmpTipoDocumento').value;
   const serie = document.getElementById('cmpSerie').value.trim().toUpperCase() || null;
@@ -6210,7 +6484,7 @@ async function saveComprobante(){
     }
 
     const { error } = await sb.from('comprobantes').insert({
-      correlativo, colaborador_id: colabId, fondo_id: fondo.id,
+      correlativo, colaborador_id: colabId, fondo_id: fondo ? fondo.id : null,
       tipo_documento: tipoDocumento, serie, numero, fecha,
       proveedor_id: proveedorId, proveedor_ruc: ruc, proveedor_razon_social: razon,
       concepto, moneda, total, signo: 1, adjunto_url: adjuntoUrl
@@ -6221,10 +6495,164 @@ async function saveComprobante(){
     await refreshFondosSaldo();
     await refreshSaldosColaborador();
     toast('Comprobante ' + correlativo + ' guardado');
-    showSection('cajaChica');
+    showSection(destino==='CAJA_CHICA' ? 'cajaChica' : 'comprobantes');
   } finally {
     btn.disabled = false;
   }
+}
+
+/* ---------- Proveedores ---------- */
+function renderProveedores(){
+  const user = getCurrentUser();
+  if(!user) return;
+  const soyAdmin = !!user.isAdmin;
+  const btnNuevo = document.getElementById('btnNuevoProveedor');
+  if(btnNuevo) btnNuevo.style.display = ''; // cualquiera puede crear (igual que al registrar un comprobante)
+  const q = up(document.getElementById('provBuscar').value.trim());
+  let lista = DB.proveedores.slice().sort((a,b)=> a.razonSocial < b.razonSocial ? -1 : 1);
+  if(q) lista = lista.filter(p=> up(p.ruc).includes(q) || up(p.razonSocial).includes(q));
+  const body = document.getElementById('provBody');
+  const empty = document.getElementById('provEmpty');
+  if(!lista.length){
+    body.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  body.innerHTML = lista.map(p=>`
+    <tr>
+      <td data-label="RUC">${p.ruc}</td>
+      <td data-label="Razon Social">${p.razonSocial}</td>
+      <td data-label="Estado" class="center"><span class="badge ${p.activo?'green':'red'}">${p.activo?'ACTIVO':'INACTIVO'}</span></td>
+      <td data-label="Acciones" class="center">
+        ${soyAdmin ? `<div class="row-actions">
+          <button class="icon-action" title="Editar" onclick="openProveedorModal('${p.id}')">${ICO.editar}</button>
+          <button class="icon-action ${p.activo?'danger':''}" title="${p.activo?'Desactivar':'Activar'}" onclick="toggleProveedor('${p.id}')">${p.activo?ICO.anular:ICO.activar}</button>
+        </div>` : ''}
+      </td>
+    </tr>`).join('');
+}
+function openProveedorModal(id){
+  document.getElementById('provEditId').value = id || '';
+  const p = id ? DB.proveedores.find(x=>x.id===id) : null;
+  document.getElementById('proveedorModalTitulo').textContent = p ? 'Editar Proveedor' : 'Nuevo Proveedor';
+  document.getElementById('provRuc').value = p ? p.ruc : '';
+  document.getElementById('provRazon').value = p ? p.razonSocial : '';
+  document.getElementById('provDireccion').value = p ? (p.direccion||'') : '';
+  document.getElementById('proveedorModalOverlay').classList.add('open');
+}
+function cerrarProveedorModal(){
+  document.getElementById('proveedorModalOverlay').classList.remove('open');
+}
+async function guardarProveedor(){
+  const id = document.getElementById('provEditId').value;
+  const ruc = document.getElementById('provRuc').value.trim();
+  const razon = document.getElementById('provRazon').value.trim().toUpperCase();
+  const direccion = document.getElementById('provDireccion').value.trim().toUpperCase() || null;
+  if(!ruc || ruc.length < 8){ toast('Ingresa un RUC valido', true); return; }
+  if(!razon){ toast('Ingresa la razon social', true); return; }
+  const btn = document.getElementById('btnGuardarProveedor');
+  btn.disabled = true;
+  try{
+    let error;
+    if(id){
+      ({ error } = await sb.from('proveedores').update({ ruc, razon_social: razon, direccion }).eq('id', id));
+    } else {
+      ({ error } = await sb.from('proveedores').insert({ ruc, razon_social: razon, direccion }));
+    }
+    if(error){ console.error('guardarProveedor', error); toast('No se pudo guardar el proveedor (revisa si el RUC ya existe)', true); return; }
+    await refreshProveedores();
+    cerrarProveedorModal();
+    renderProveedores();
+    toast('Proveedor guardado');
+  } finally {
+    btn.disabled = false;
+  }
+}
+async function toggleProveedor(id){
+  const p = DB.proveedores.find(x=>x.id===id);
+  if(!p) return;
+  const { error } = await sb.from('proveedores').update({ activo: !p.activo }).eq('id', id);
+  if(error){ console.error('toggleProveedor', error); toast('No se pudo actualizar el proveedor', true); return; }
+  await refreshProveedores();
+  renderProveedores();
+  toast(!p.activo ? 'Proveedor activado' : 'Proveedor desactivado');
+}
+
+/* ---------- Comprobantes (lista completa) ---------- */
+// A que "destino" pertenece un comprobante, para filtrar/mostrar de forma
+// consistente con Nuevo Comprobante: CAJA_CHICA / ENTREGA (por el tipo del
+// fondo al que esta atado) / REEMBOLSO (sin fondo).
+function destinoDeComprobante(c){
+  if(!c.fondoId) return 'REEMBOLSO';
+  const f = DB.fondos.find(x=>x.id===c.fondoId);
+  return f ? f.tipo : 'REEMBOLSO';
+}
+function estadoDeComprobante(c){
+  if(!c.liquidacionId) return { texto:'PENDIENTE', clase:'gray' };
+  const liq = DB.liquidaciones.find(l=>l.id===c.liquidacionId);
+  if(!liq) return { texto:'PENDIENTE', clase:'gray' };
+  const clase = LIQ_BADGE[liq.estado] || 'gray';
+  return { texto: liq.correlativo + ' (' + liq.estado + ')', clase };
+}
+function renderComprobantes(){
+  const user = getCurrentUser();
+  if(!user) return;
+  const soyAdmin = !!user.isAdmin;
+  const selColab = document.getElementById('cmpFiltroColab');
+  if(soyAdmin){
+    selColab.style.display = '';
+    const anterior = selColab.value;
+    selColab.innerHTML = '<option value="">TODOS LOS COLABORADORES</option>' + DB.colaboradores.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+    selColab.value = anterior || '';
+  } else {
+    selColab.style.display = 'none';
+  }
+  const colabFiltro = soyAdmin ? selColab.value : user.id;
+  const destinoFiltro = document.getElementById('cmpFiltroDestino').value;
+  const texto = up(document.getElementById('cmpFiltroTexto').value.trim());
+
+  let lista = DB.comprobantes.filter(c=> !colabFiltro || c.colaboradorId === colabFiltro);
+  if(destinoFiltro) lista = lista.filter(c=> destinoDeComprobante(c) === destinoFiltro);
+  if(texto) lista = lista.filter(c=> up(c.proveedorRazonSocial||'').includes(texto) || up(c.concepto||'').includes(texto));
+  lista = lista.slice().sort((a,b)=> (a.fecha < b.fecha ? 1 : -1));
+
+  const body = document.getElementById('cmpListaBody');
+  const empty = document.getElementById('cmpListaEmpty');
+  if(!lista.length){
+    body.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  const DESTINO_LABEL = { CAJA_CHICA:'Caja Chica', ENTREGA:'Entrega', REEMBOLSO:'Reembolso' };
+  body.innerHTML = lista.map(c=>{
+    const colab = DB.colaboradores.find(x=>x.id===c.colaboradorId);
+    const destino = destinoDeComprobante(c);
+    const estado = estadoDeComprobante(c);
+    const esDevolucion = c.tipoDocumento === 'DEVOLUCION';
+    const totalTxt = (esDevolucion ? '- ' : '') + money(c.total);
+    return `<tr>
+      <td data-label="N°">${c.correlativo}</td>
+      <td data-label="Fecha">${fmtFecha(c.fecha)}</td>
+      <td data-label="Colaborador">${colab ? nombreCompleto(colab) : ''}</td>
+      <td data-label="Destino">${DESTINO_LABEL[destino]||destino}</td>
+      <td data-label="Tipo">${c.tipoDocumento}</td>
+      <td data-label="Proveedor / Concepto">${c.proveedorRazonSocial ? (c.proveedorRazonSocial + ' &middot; ') : ''}${c.concepto||''}</td>
+      <td data-label="Total" class="right">${totalTxt}</td>
+      <td data-label="Estado" class="center"><span class="badge ${estado.clase}">${estado.texto}</span></td>
+      <td data-label="Acciones" class="center">${c.adjuntoUrl ? `<button class="icon-action" title="Ver adjunto" onclick="verAdjuntoComprobante('${c.id}')">${ICO.ver}</button>` : ''}</td>
+    </tr>`;
+  }).join('');
+}
+// El bucket es privado: no hay una URL publica fija, hay que pedir una URL
+// firmada (temporal) cada vez que alguien quiere ver el archivo.
+async function verAdjuntoComprobante(id){
+  const c = DB.comprobantes.find(x=>x.id===id);
+  if(!c || !c.adjuntoUrl) return;
+  const { data, error } = await sb.storage.from('comprobantes').createSignedUrl(c.adjuntoUrl, 120);
+  if(error || !data){ console.error('verAdjuntoComprobante', error); toast('No se pudo abrir el adjunto', true); return; }
+  window.open(data.signedUrl, '_blank');
 }
 
 /* ---------- Caja Chica ---------- */
@@ -6322,24 +6750,60 @@ function actualizarResumenCajaChicaDashboard(){
   document.getElementById('statCajaGastado').textContent = money(saldo ? saldo.sustentado : 0);
   document.getElementById('statCajaDisponible').textContent = money(saldo ? saldo.disponible : fondo.monto);
 }
-function abrirAsignarCajaChica(){
-  const sel = document.getElementById('asignarCajaColaborador');
-  const sinCaja = DB.colaboradores.filter(c=>c.activo && (c.modulos||[]).includes('gastos') && !fondoCajaChicaDe(c.id));
-  if(!sinCaja.length){ toast('Todos los colaboradores con acceso a Gastos ya tienen una Caja Chica asignada', true); return; }
-  sel.innerHTML = sinCaja.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+// tipoFijo: si se abre desde la pantalla de Caja Chica, siempre CAJA_CHICA
+// (y no se deja elegir); si se abre desde Liquidaciones/Entregas, se puede
+// elegir el tipo (una Entrega es de uso unico, una persona puede tener
+// varias abiertas a la vez, a diferencia de la Caja Chica que es una sola).
+function abrirAsignarCajaChica(tipoFijo){
+  const tipoField = document.getElementById('asignarCajaTipoField');
+  const tipoSel = document.getElementById('asignarCajaTipo');
+  if(tipoFijo){
+    tipoField.style.display = 'none';
+    tipoSel.value = tipoFijo;
+  } else {
+    tipoField.style.display = '';
+    tipoSel.value = 'CAJA_CHICA';
+  }
+  actualizarTextosAsignarFondo();
   document.getElementById('asignarCajaMonto').value = '';
   document.getElementById('asignarCajaMedio').value = 'EFECTIVO';
   document.getElementById('asignarCajaModalOverlay').classList.add('open');
+}
+// Repuebla el selector de colaborador segun el tipo elegido: para Caja
+// Chica solo tiene sentido ofrecer a quien todavia no tiene una abierta (el
+// sistema solo permite una por persona); para Entrega se ofrece a
+// cualquiera, porque una persona puede tener varias entregas abiertas a la
+// vez.
+function actualizarTextosAsignarFondo(){
+  const tipo = document.getElementById('asignarCajaTipo').value;
+  const esCaja = tipo === 'CAJA_CHICA';
+  document.getElementById('asignarCajaTitulo').textContent = esCaja ? 'Asignar Caja Chica' : 'Nueva Entrega a Rendir Cuenta';
+  document.getElementById('asignarCajaSub').textContent = esCaja
+    ? 'Se crea el fondo y se descarga el Acta de Entrega para que la firme el colaborador.'
+    : 'Se crea el anticipo y se descarga el Acta de Entrega para que la firme el colaborador. El colaborador tendra que rendir cuenta de este monto con una Liquidacion de Rendicion.';
+  document.getElementById('asignarCajaMontoLabel').textContent = esCaja ? 'Tope de la Caja Chica (S/)' : 'Monto de la Entrega (S/)';
+  document.getElementById('btnConfirmarAsignarCaja').textContent = esCaja ? 'Crear Caja Chica' : 'Crear Entrega';
+  const sel = document.getElementById('asignarCajaColaborador');
+  const elegibles = esCaja
+    ? DB.colaboradores.filter(c=>c.activo && (c.modulos||[]).includes('gastos') && !fondoCajaChicaDe(c.id))
+    : DB.colaboradores.filter(c=>c.activo && (c.modulos||[]).includes('gastos'));
+  if(!elegibles.length){
+    sel.innerHTML = '';
+    toast(esCaja ? 'Todos los colaboradores con acceso a Gastos ya tienen una Caja Chica asignada' : 'No hay colaboradores con acceso a Gastos', true);
+    return;
+  }
+  sel.innerHTML = elegibles.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
 }
 function cerrarAsignarCajaChica(){
   document.getElementById('asignarCajaModalOverlay').classList.remove('open');
 }
 async function confirmarAsignarCajaChica(){
+  const tipo = document.getElementById('asignarCajaTipo').value;
   const colabId = document.getElementById('asignarCajaColaborador').value;
   const monto = Number(document.getElementById('asignarCajaMonto').value);
   const medio = document.getElementById('asignarCajaMedio').value;
   if(!colabId){ toast('Selecciona un colaborador', true); return; }
-  if(!monto || monto <= 0){ toast('Ingresa un tope valido', true); return; }
+  if(!monto || monto <= 0){ toast('Ingresa un monto valido', true); return; }
   const btn = document.getElementById('btnConfirmarAsignarCaja');
   btn.disabled = true;
   try{
@@ -6347,64 +6811,200 @@ async function confirmarAsignarCajaChica(){
     // PROPUESTA_RENDICIONES.md): son series distintas aunque ambas viven en
     // la misma tabla `fondos`, para que el correlativo del Acta de Entrega
     // ya diga de un vistazo de que tipo de fondo se trata.
-    const correlativo = await nextCorrelativoGastos('CAJ', 4);
+    const correlativo = await nextCorrelativoGastos(tipo === 'CAJA_CHICA' ? 'CAJ' : 'ENT', 4);
     const { data, error } = await sb.from('fondos').insert({
-      correlativo, tipo: 'CAJA_CHICA', colaborador_id: colabId, monto, medio
+      correlativo, tipo, colaborador_id: colabId, monto, medio
     }).select().single();
     if(error){
       console.error('confirmarAsignarCajaChica', error);
-      toast('No se pudo crear la Caja Chica (revisa si este colaborador ya tiene una abierta)', true);
+      toast(tipo==='CAJA_CHICA' ? 'No se pudo crear la Caja Chica (revisa si este colaborador ya tiene una abierta)' : 'No se pudo crear la Entrega', true);
       return;
     }
     await refreshFondos();
     await refreshFondosSaldo();
     await refreshSaldosColaborador();
     cerrarAsignarCajaChica();
-    toast('Caja Chica ' + correlativo + ' creada');
+    toast((tipo==='CAJA_CHICA' ? 'Caja Chica ' : 'Entrega ') + correlativo + ' creada');
     const colab = DB.colaboradores.find(c=>c.id===colabId);
     const admin = getCurrentUser();
     if(colab){
       await descargarActaEntregaFondoPDF(rowToFondo(data), colab, { nombre: nombreCompleto(admin), cargo: admin.isAdmin ? 'Administrador' : '' });
     }
     renderCajaChica();
+    if(document.getElementById('section-liquidaciones').classList.contains('active')) renderLiquidaciones();
   } finally {
     btn.disabled = false;
   }
 }
-// Junta todos los comprobantes pendientes del fondo en una sola liquidacion
-// REPOSICION, en BORRADOR (el colaborador todavia puede revisarla antes de
-// enviarla desde la pantalla de Liquidaciones).
+// Junta todos los comprobantes pendientes en una sola liquidacion, en
+// BORRADOR (el colaborador todavia puede revisarla antes de enviarla desde
+// Liquidaciones). Sirve para los 3 tipos:
+//   REPOSICION  fondoId = la Caja Chica. Solo puede tener gastos (signo 1),
+//               nunca devoluciones -- eso ya lo impide el trigger de Supabase.
+//   RENDICION   fondoId = una Entrega puntual. Puede tener gastos Y la
+//               devolucion del vuelto no usado (signo -1).
+//   REEMBOLSO   sin fondo (fondoId null): los gastos "de mi bolsillo" de
+//               ese colaborador.
+async function armarLiquidacion(tipo, colabId, fondoId){
+  const pendientes = tipo === 'REEMBOLSO'
+    ? DB.comprobantes.filter(c=>c.colaboradorId===colabId && !c.fondoId && !c.liquidacionId)
+    : DB.comprobantes.filter(c=>c.fondoId===fondoId && !c.liquidacionId);
+  if(!pendientes.length){ toast('No hay comprobantes pendientes para armar esta liquidacion', true); return null; }
+
+  const totalSustentado = pendientes.filter(c=>c.signo===1).reduce((s,c)=>s+Number(c.total||0), 0);
+  const totalDevuelto = pendientes.filter(c=>c.signo===-1).reduce((s,c)=>s+Number(c.total||0), 0);
+  const fondo = fondoId ? DB.fondos.find(f=>f.id===fondoId) : null;
+  // Saldo: solo tiene sentido en RENDICION (hay un anticipo con el que
+  // comparar). >= 0 es a favor del colaborador (gasto/devolvio mas de lo que
+  // se le entrego); < 0 es a favor de la empresa (todavia le falta rendir o
+  // devolver una parte del anticipo). Ver drawLiquidacionPdf para el detalle.
+  const saldo = (tipo === 'RENDICION' && fondo) ? (totalSustentado + totalDevuelto) - Number(fondo.monto) : 0;
+  const fechas = pendientes.map(c=>c.fecha).sort();
+  const correlativo = await nextCorrelativoGastos('LIQ', 4);
+  const { data, error } = await sb.from('liquidaciones').insert({
+    correlativo, tipo, colaborador_id: colabId, fondo_id: fondoId || null,
+    periodo_desde: fechas[0], periodo_hasta: fechas[fechas.length-1],
+    total_sustentado: totalSustentado, total_devuelto: totalDevuelto, saldo, estado: 'BORRADOR'
+  }).select().single();
+  if(error){ console.error('armarLiquidacion', error); toast('No se pudo armar la liquidacion', true); return null; }
+
+  const ids = pendientes.map(c=>c.id);
+  const { error: errUpd } = await sb.from('comprobantes').update({ liquidacion_id: data.id }).in('id', ids);
+  if(errUpd){
+    console.error('armarLiquidacion (adjuntar comprobantes)', errUpd);
+    toast('La liquidacion se creo, pero no se pudieron adjuntar todos los comprobantes', true);
+  }
+  await refreshComprobantes();
+  await refreshLiquidaciones();
+  await refreshFondosSaldo();
+  await refreshSaldosColaborador();
+  toast('Liquidacion ' + correlativo + ' armada. Revisala y enviala desde Liquidaciones.');
+  return data;
+}
+// Boton rapido de la pantalla de Caja Chica: ya sabe el fondo y el
+// colaborador de contexto (window._ccFondoActivo / _ccColabActivo), asi que
+// arma la reposicion sin pasar por el modal generico.
 async function armarLiquidacionReposicion(){
   const fondo = window._ccFondoActivo;
   const colabId = window._ccColabActivo;
   if(!fondo){ toast('No hay una Caja Chica seleccionada', true); return; }
-  const pendientes = DB.comprobantes.filter(c=>c.fondoId===fondo.id && !c.liquidacionId);
-  if(!pendientes.length){ toast('No hay comprobantes pendientes para armar una liquidacion', true); return; }
   const btn = document.getElementById('btnArmarReposicion');
   btn.disabled = true;
   try{
-    const totalSustentado = pendientes.reduce((s,c)=>s+Number(c.total||0), 0);
-    const fechas = pendientes.map(c=>c.fecha).sort();
-    const correlativo = await nextCorrelativoGastos('LIQ', 4);
-    const { data, error } = await sb.from('liquidaciones').insert({
-      correlativo, tipo: 'REPOSICION', colaborador_id: colabId, fondo_id: fondo.id,
-      periodo_desde: fechas[0], periodo_hasta: fechas[fechas.length-1],
-      total_sustentado: totalSustentado, total_devuelto: 0, saldo: 0, estado: 'BORRADOR'
-    }).select().single();
-    if(error){ console.error('armarLiquidacionReposicion', error); toast('No se pudo armar la liquidacion', true); return; }
+    const liq = await armarLiquidacion('REPOSICION', colabId, fondo.id);
+    if(liq) showSection('liquidaciones');
+  } finally {
+    btn.disabled = false;
+  }
+}
+// Modal generico de "Armar liquidacion", reachable desde el boton
+// correspondiente en Liquidaciones (o desde "+ Nueva Entrega", que usa el
+// modal de Asignar Fondo en vez de este). Sirve para los 3 tipos porque cada
+// uno solo cambia que colaboradores son elegibles y si hace falta elegir un
+// fondo (Entrega) o no.
+let armarLiqTipoActual = null;
+function abrirArmarLiq(tipo){
+  armarLiqTipoActual = tipo;
+  const user = getCurrentUser();
+  document.getElementById('armarLiqTitulo').textContent =
+    tipo === 'RENDICION' ? 'Armar Rendicion' :
+    tipo === 'REPOSICION' ? 'Armar Reposicion de Caja Chica' : 'Armar Reembolso';
+  document.getElementById('armarLiqSub').textContent =
+    tipo === 'RENDICION' ? 'Junta los gastos y la devolucion pendientes de una Entrega en una liquidacion nueva, en Borrador.' :
+    tipo === 'REPOSICION' ? 'Junta los gastos pendientes de la Caja Chica en una liquidacion nueva, en Borrador.' :
+    'Junta los gastos pendientes pagados de su bolsillo (sin fondo) en una liquidacion nueva, en Borrador.';
 
-    const ids = pendientes.map(c=>c.id);
-    const { error: errUpd } = await sb.from('comprobantes').update({ liquidacion_id: data.id }).in('id', ids);
-    if(errUpd){
-      console.error('armarLiquidacionReposicion (adjuntar comprobantes)', errUpd);
-      toast('La liquidacion se creo, pero no se pudieron adjuntar todos los comprobantes', true);
+  const fondoField = document.getElementById('armarLiqFondoField');
+  document.getElementById('armarLiqFondoLabel').textContent = 'Entrega';
+  fondoField.style.display = tipo === 'RENDICION' ? '' : 'none';
+  // Forzar a que actualizarPreviewArmarLiq() repueble las opciones de
+  // Entrega la primera vez, aunque el colaborador que quede seleccionado
+  // sea el mismo de la ultima vez que se abrio este modal.
+  document.getElementById('armarLiqFondo').innerHTML = '';
+  delete document.getElementById('armarLiqFondo').dataset.colabId;
+
+  const sel = document.getElementById('armarLiqColaborador');
+  let elegibles = tipo === 'REPOSICION' ? colaboradoresConGastos().filter(c=>fondoCajaChicaDe(c.id)) :
+    tipo === 'RENDICION' ? colaboradoresConGastos().filter(c=>entregasAbiertasDe(c.id).length) :
+    colaboradoresConGastos();
+  if(!user.isAdmin) elegibles = elegibles.filter(c=>c.id===user.id);
+  sel.disabled = !user.isAdmin;
+
+  if(!elegibles.length){
+    sel.innerHTML = '';
+    document.getElementById('armarLiqPreview').textContent =
+      tipo === 'REPOSICION' ? 'No hay colaboradores con una Caja Chica abierta.' :
+      tipo === 'RENDICION' ? 'No hay colaboradores con una Entrega abierta.' :
+      'No hay colaboradores con acceso a Gastos.';
+    document.getElementById('btnConfirmarArmarLiq').disabled = true;
+  } else {
+    sel.innerHTML = elegibles.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
+  }
+  document.getElementById('armarLiqModalOverlay').classList.add('open');
+  actualizarPreviewArmarLiq();
+}
+function actualizarPreviewArmarLiq(){
+  const tipo = armarLiqTipoActual;
+  const colabId = document.getElementById('armarLiqColaborador').value;
+  const preview = document.getElementById('armarLiqPreview');
+  const fondoSel = document.getElementById('armarLiqFondo');
+  const btn = document.getElementById('btnConfirmarArmarLiq');
+  if(!colabId){ preview.textContent = 'Selecciona un colaborador.'; btn.disabled = true; return; }
+
+  let fondoId = null;
+  if(tipo === 'REPOSICION'){
+    const fondo = fondoCajaChicaDe(colabId);
+    if(!fondo){ preview.textContent = 'Este colaborador no tiene una Caja Chica abierta.'; btn.disabled = true; return; }
+    fondoId = fondo.id;
+  } else if(tipo === 'RENDICION'){
+    const entregas = entregasAbiertasDe(colabId);
+    if(!entregas.length){ preview.textContent = 'Este colaborador no tiene una Entrega abierta.'; btn.disabled = true; fondoSel.innerHTML=''; return; }
+    // Solo repoblar las opciones cuando cambia el colaborador: si no, el
+    // propio onchange del selector de Entrega (que llama a esta misma
+    // funcion) se pisaria a si mismo y siempre volveria a la primera opcion.
+    if(fondoSel.dataset.colabId !== colabId){
+      fondoSel.innerHTML = entregas.map(f=>`<option value="${f.id}">${f.correlativo} (S/ ${Number(f.monto).toFixed(2)})</option>`).join('');
+      fondoSel.dataset.colabId = colabId;
     }
-    await refreshComprobantes();
-    await refreshLiquidaciones();
-    await refreshFondosSaldo();
-    await refreshSaldosColaborador();
-    toast('Liquidacion ' + correlativo + ' armada. Revisala y enviala desde Liquidaciones.');
-    showSection('liquidaciones');
+    fondoId = fondoSel.value;
+  }
+
+  const pendientes = tipo === 'REEMBOLSO'
+    ? DB.comprobantes.filter(c=>c.colaboradorId===colabId && !c.fondoId && !c.liquidacionId)
+    : DB.comprobantes.filter(c=>c.fondoId===fondoId && !c.liquidacionId);
+  if(!pendientes.length){
+    preview.textContent = 'No hay comprobantes pendientes para armar esta liquidacion.';
+    btn.disabled = true;
+    return;
+  }
+  const totalSustentado = pendientes.filter(c=>c.signo===1).reduce((s,c)=>s+Number(c.total||0), 0);
+  const totalDevuelto = pendientes.filter(c=>c.signo===-1).reduce((s,c)=>s+Number(c.total||0), 0);
+  let texto = pendientes.length + (pendientes.length===1 ? ' comprobante pendiente' : ' comprobantes pendientes') + ', total S/ ' + totalSustentado.toFixed(2);
+  if(totalDevuelto > 0) texto += ' + devolucion S/ ' + totalDevuelto.toFixed(2);
+  preview.textContent = texto;
+  btn.disabled = false;
+}
+function cerrarArmarLiq(){
+  document.getElementById('armarLiqModalOverlay').classList.remove('open');
+}
+async function confirmarArmarLiq(){
+  const tipo = armarLiqTipoActual;
+  const colabId = document.getElementById('armarLiqColaborador').value;
+  if(!colabId){ toast('Selecciona un colaborador', true); return; }
+  let fondoId = null;
+  if(tipo === 'REPOSICION'){
+    const fondo = fondoCajaChicaDe(colabId);
+    if(!fondo){ toast('Este colaborador no tiene una Caja Chica abierta', true); return; }
+    fondoId = fondo.id;
+  } else if(tipo === 'RENDICION'){
+    fondoId = document.getElementById('armarLiqFondo').value;
+    if(!fondoId){ toast('Selecciona una Entrega', true); return; }
+  }
+  const btn = document.getElementById('btnConfirmarArmarLiq');
+  btn.disabled = true;
+  try{
+    const liq = await armarLiquidacion(tipo, colabId, fondoId);
+    if(liq){ cerrarArmarLiq(); showSection('liquidaciones'); }
   } finally {
     btn.disabled = false;
   }
@@ -6417,6 +7017,8 @@ function showLiqTab(tab){
   document.getElementById('liqTabArmar').classList.toggle('active', tab==='armar');
   document.getElementById('liqTabAprobar').classList.toggle('active', tab==='aprobar');
   document.getElementById('liqTabHistorial').classList.toggle('active', tab==='historial');
+  const botones = document.getElementById('liqBotonesArmar');
+  if(botones) botones.style.display = tab==='armar' ? 'flex' : 'none';
   renderLiquidaciones();
 }
 const LIQ_BADGE = { BORRADOR:'gray', OBSERVADA:'orange', ENVIADA:'purple', APROBADA:'purple', REINTEGRADA:'green', CERRADA:'green' };
@@ -6858,7 +7460,9 @@ const SIDE_GROUPS = {
   ]},
   gastos: { submenu:'groupGastos', titulo:'Gastos', items:[
     {sec:'nuevoComprobante', label:'Nuevo Comprobante'},
+    {sec:'proveedores', label:'Proveedores'},
     {sec:'cajaChica', label:'Caja Chica'},
+    {sec:'comprobantes', label:'Comprobantes'},
     {sec:'liquidaciones', label:'Liquidaciones'}
   ]}
 };

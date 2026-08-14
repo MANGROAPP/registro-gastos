@@ -768,27 +768,13 @@ try{
   .quick-action-card .qa-label{font-weight:700;font-size:13px;}
   .quick-action-card .qa-sub{font-size:11.5px;color:var(--text-mut);margin-top:1px;}
 
-  /* Accesos de otros modulos: mas chicos y solo icono + etiqueta, para que
-     quepan varios sin competir con las 3 acciones principales de arriba.
-     Cada modulo nuevo que se agregue a futuro suma una ficha mas aqui, sin
-     tener que rediseniar nada (el flex-wrap las va acomodando solo). */
-  .module-shortcuts-label{font-size:11.5px;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:.04em;margin:-10px 0 10px;}
-  .module-shortcuts-row{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 28px;}
-  .module-shortcut-tile{
-    display:flex;flex-direction:column;align-items:center;gap:6px;width:78px;padding:12px 6px 10px;
-    background:var(--card);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;
-    transition:transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
-  }
-  .module-shortcut-tile:hover{transform:translateY(-2px);box-shadow:var(--sh-2);border-color:var(--purple);}
-  .module-shortcut-tile:active{transform:scale(.97);transition-duration:.08s;}
-  .module-shortcut-tile .mst-ico{
-    width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;
-    background:var(--purple-grad);color:#fff;
-  }
-  .module-shortcut-tile .mst-ico svg{width:14px;height:14px;}
-  .module-shortcut-tile .mst-label{font-size:10.5px;font-weight:700;text-align:center;line-height:1.2;}
-  .module-shortcut-tile.mst-soon{opacity:.5;}
-  .module-shortcut-tile.mst-soon .mst-ico{background:var(--text-mut);}
+  /* Fila de accesos rapidos de un modulo con menos de 3 acciones (hoy,
+     Gastos: Nuevo Comprobante + Liquidaciones): mismas tarjetas grandes de
+     .quick-actions, pero en 2 columnas en vez de 3 para que no quede un
+     tercer hueco vacio. Si a futuro Gastos suma una tercera accion (p.ej.
+     Caja Chica), alcanza con quitar esta clase y usar la grilla de 3. */
+  .quick-actions-2col{grid-template-columns:repeat(2,1fr);}
+  @media (max-width:600px){ .quick-actions-2col{grid-template-columns:1fr;} }
 
   .module-block{margin-bottom:36px;}
   .module-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;}
@@ -1129,19 +1115,18 @@ try{
   .tbl-cards thead th:first-child{ border-left:1px solid var(--thead-line); border-radius:10px 0 0 10px; }
   .tbl-cards thead th:last-child{ border-right:1px solid var(--thead-line); border-radius:0 10px 10px 0; }
 
-  /* Fijo debajo de la barra superior. El -1px es a proposito: superpone un pixel
-     con la barra para que nunca se abra la rendija por la que asomaba el
-     contenido. */
-  @media (min-width:901px){
-    .tbl-cards thead th{
-      position:sticky; top:calc(var(--topbar-h, 64px) - 1px); z-index:6;
-      transition:box-shadow .22s var(--ease);
-    }
-    /* La sombra aparece solo cuando de verdad hay algo pasando por debajo. */
-    body.hay-scroll .tbl-cards thead th{ box-shadow:0 10px 16px -12px rgba(23,25,60,.45); }
-    html[data-theme="dark"] body.hay-scroll .tbl-cards thead th{ box-shadow:0 10px 16px -12px rgba(0,0,0,.7); }
-  }
-  @media (max-width:900px){ .tbl-cards thead th{ position:static; } }
+  /* El encabezado de las tablas YA NO queda fijo (sticky) al hacer scroll de
+     la pagina -- se probo (ronda 39) pero al agregar el envoltorio
+     .tbl-scroll (scroll horizontal cuando la tabla no entra, ver mas abajo)
+     cualquier valor de overflow-x distinto de "visible" en un elemento
+     tambien lo convierte, por spec, en el contenedor de referencia del
+     "position:sticky" de sus hijos -- el encabezado terminaba pegandose
+     dentro de ese envoltorio angosto en vez de la pagina, y aparecia
+     flotando en medio de las filas en vez de arriba de todo. No hay forma de
+     tener scroll horizontal Y encabezado sticky-a-la-pagina en el mismo
+     envoltorio, asi que se prefirio la version simple y siempre correcta
+     (encabezado fijo en su lugar de siempre, sin pegarse al hacer scroll). */
+  .tbl-cards thead th{ position:static; }
 
   /* La flecha de ordenamiento tenia menos peso que el propio titulo y se perdia. */
   .tbl-cards .th-sort{ transition:color .15s var(--ease), background-color .15s var(--ease); }
@@ -1496,26 +1481,6 @@ try{
         </button>
       </div>
 
-      <!-- Accesos de otros modulos: chicos y solo icono + etiqueta (a
-           diferencia de las 3 tarjetas grandes de arriba, que son las
-           acciones del dia a dia de Movilidad). Antes esto era una unica
-           ficha generica "Gastos" que no decia que accion concreta hacia al
-           tocarla; ahora son 2 fichas especificas, la misma idea de "accion
-           del dia a dia" que ya tienen las 3 de Movilidad: registrar un
-           comprobante nuevo, y ver como van las liquidaciones que uno
-           presento. Cualquier modulo que se agregue despues suma su propia
-           ficha aqui mismo, sin rediseniar nada. -->
-      <div class="module-shortcuts-label" id="otrosModulosLabel">Otros modulos</div>
-      <div class="module-shortcuts-row">
-        <button class="module-shortcut-tile mst-gastos" id="mstNuevoComprobante" onclick="showSection('nuevoComprobante')" title="Gastos: Registrar un comprobante nuevo">
-          <span class="mst-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span>
-          <span class="mst-label">Nuevo Comprobante</span>
-        </button>
-        <button class="module-shortcut-tile mst-gastos" id="mstLiquidaciones" onclick="showSection('liquidaciones')" title="Gastos: Ver como van tus liquidaciones (por armar, por aprobar, historial)">
-          <span class="mst-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 9.5l1.5 1.5L14 8"/></svg></span>
-          <span class="mst-label">Liquidaciones</span>
-        </button>
-      </div>
 
       <div class="module-block" id="dashboardBlockMovilidad">
         <div class="module-head"><div class="module-head-left"><span class="module-dot"></span><h2>Movilidad</h2></div></div>
@@ -1600,6 +1565,23 @@ try{
       <div class="module-block" id="dashboardBlockGastos">
         <div class="module-head">
           <div class="module-head-left"><span class="module-dot"></span><h2>Gastos</h2></div>
+        </div>
+        <!-- Accesos rapidos de Gastos: MISMO tamano y estilo que las 3
+             tarjetas grandes de Movilidad de arriba (icono + titulo +
+             subtitulo) -- antes vivian en una fila aparte, rotulada "Otros
+             modulos", con fichas chicas de solo icono que se veian como un
+             anexo de segunda categoria; y de paso duplicaban este mismo
+             encabezado "Gastos" con uno propio arriba. Ahora son parte del
+             mismo bloque de Gastos, justo debajo de su unico encabezado. -->
+        <div class="quick-actions quick-actions-2col" id="quickActionsGastos" style="margin-top:0;">
+          <button class="quick-action-card" onclick="showSection('nuevoComprobante')">
+            <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span>
+            <span><span class="qa-label">+ Nuevo Comprobante</span><span class="qa-sub" style="display:block;">Registrar un gasto</span></span>
+          </button>
+          <button class="quick-action-card" onclick="showSection('liquidaciones')">
+            <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 9.5l1.5 1.5L14 8"/></svg></span>
+            <span><span class="qa-label">Liquidaciones</span><span class="qa-sub" style="display:block;">Por armar, por aprobar, historial</span></span>
+          </button>
         </div>
         <div class="stats-row" id="dashboardGastosConCaja" style="display:none;">
           <div class="stat-card acc-purple">
@@ -2970,7 +2952,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.13.0';
+const APP_VERSION = '2.13.1';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -3011,15 +2993,14 @@ function aplicarVisibilidadPorModulos(){
 
   const gastosBtn = document.getElementById('groupGastosBtn');
   if(gastosBtn) gastosBtn.style.display = tieneGastos ? '' : 'none';
-  // Las fichas chicas de Gastos en "Otros modulos" comparten la clase
-  // mst-gastos para no tener que acordarse de cada id si se agrega una mas.
-  document.querySelectorAll('.mst-gastos').forEach(el=>{ el.style.display = tieneGastos ? '' : 'none'; });
+  // quickActionsGastos ya vive DENTRO de dashboardBlockGastos (mismo bloque,
+  // un solo encabezado "Gastos"): ocultar el bloque ya oculta sus accesos
+  // rapidos con el, pero se deja el toggle explicito por si el dia de manana
+  // se vuelven a separar.
+  const qaGastos = document.getElementById('quickActionsGastos');
+  if(qaGastos) qaGastos.style.display = tieneGastos ? '' : 'none';
   const bGastos = document.getElementById('dashboardBlockGastos');
   if(bGastos) bGastos.style.display = tieneGastos ? '' : 'none';
-  // "Otros modulos" hoy solo trae fichas de Gastos; si no aplica, se oculta
-  // tambien el rotulo para no dejar un titulo suelto sin nada debajo.
-  const otrosLabel = document.getElementById('otrosModulosLabel');
-  if(otrosLabel) otrosLabel.style.display = tieneGastos ? '' : 'none';
 }
 
 const safeStorage = (function(){

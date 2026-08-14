@@ -378,6 +378,11 @@ try{
   }
   .saldo-info b{font-weight:700;}
   .saldo-info.over{background:var(--red-bg);}
+  /* "over" (rojo) queda reservado para cuando de verdad no se puede seguir
+     (sin Caja Chica/Entrega asignada). Acercarse o pasar el tope de la Caja
+     Chica NO bloquea nada -- solo amerita un aviso (naranja), no un error. */
+  .saldo-info.warn{background:var(--orange-bg);color:#92400E;}
+  html[data-theme="dark"] .saldo-info.warn{color:var(--orange);}
   .form-error{
     margin-top:10px;padding:10px 14px;background:var(--red-bg);border:1px solid #F9C6CA;border-radius:11px;
     font-size:12.5px;color:var(--red);font-weight:600;display:flex;align-items:center;gap:8px;
@@ -412,19 +417,25 @@ try{
   .sig-preview img{max-width:100%;max-height:100%;}
   .sig-preview span{color:var(--text-mut);font-size:12px;}
 
+  /* Antes vivia abajo a la derecha -- en pantallas grandes queda lejos de
+     donde esta mirando la persona (que suele estar cerca del boton que
+     acaba de tocar, mas al centro/arriba) y es facil que pase desapercibido.
+     Ahora se muestra centrado en la pantalla, tanto en web como en movil,
+     para que la confirmacion de "guardado"/"eliminado" no se pierda. */
   .toast{
-    position:fixed;bottom:26px;right:26px;background:var(--navy);color:#fff;padding:14px 20px;border-radius:12px;
-    font-size:13.5px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:500;display:none;align-items:center;gap:10px;
-    max-width:380px;
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);
+    background:var(--navy);color:#fff;padding:16px 24px;border-radius:14px;
+    font-size:14px;font-weight:600;box-shadow:0 20px 50px rgba(0,0,0,.3);z-index:500;display:none;align-items:center;gap:10px;
+    max-width:min(420px, calc(100vw - 32px));text-align:center;
   }
-  .toast::before{content:'\2713';display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;font-size:12px;}
+  .toast::before{content:'\2713';display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;font-size:13px;}
   .toast.error::before{content:'!';}
   .toast.show{display:flex;animation:toastIn .18s ease;}
   .toast.error{background:var(--red);}
-  @keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes toastIn{from{opacity:0;transform:translate(-50%,-50%) scale(.9);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
 
   @media (max-width:900px){
-    .toast{left:16px;right:16px;bottom:16px;max-width:none;justify-content:center;text-align:center;font-size:13px;}
+    .toast{max-width:calc(100vw - 32px);font-size:13.5px;}
   }
 
   .login-screen{
@@ -1989,6 +2000,7 @@ try{
               <div class="stat-value" id="ccDisponible">S/ 0.00</div>
             </div>
           </div>
+          <div class="saldo-info" id="ccAviso" style="display:none;margin-top:14px;"></div>
 
           <div style="display:flex;justify-content:space-between;align-items:center;margin:22px 0 12px;">
             <h3 style="margin:0;font-size:14px;">Comprobantes pendientes de reintegro</h3>
@@ -2214,6 +2226,24 @@ try{
   </div>
 </div>
 
+<!-- ===================== MODAL CONFIRMACION GENERICA =====================
+     Reemplaza al window.confirm() nativo del navegador (que se ve como una
+     ventana de Chrome, no como la app) para "Eliminar movilidad", "Anular
+     planilla", "Revertir reintegro" y similares. Se abre con
+     confirmarAccion({...}) y devuelve una Promise<boolean> -- true si la
+     persona le dio a Confirmar, false si cancelo o cerro la ventana. ==== -->
+<div class="modal-overlay" id="confirmAccionModalOverlay">
+  <div class="modal" style="max-width:440px;">
+    <button class="close-x" onclick="_resolverConfirmAccion(false)">&times;</button>
+    <h2 id="confirmAccionTitulo">Confirmar</h2>
+    <p class="sub" id="confirmAccionMsg">&nbsp;</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="_resolverConfirmAccion(false)">Cancelar</button>
+      <button class="btn btn-purple" id="confirmAccionBtnOk" onclick="_resolverConfirmAccion(true)">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== MODAL REABRIR LIQUIDACION ===================== -->
 <div class="modal-overlay" id="reabrirLiqModalOverlay">
   <div class="modal" style="max-width:460px;">
@@ -2229,6 +2259,28 @@ try{
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="cerrarReabrirLiquidacion()">Cancelar</button>
       <button class="btn btn-purple" id="btnConfirmarReabrirLiq" onclick="confirmarReabrirLiquidacion()">Reabrir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL DESHACER REINTEGRO (LIQUIDACION) =====================
+     Solo para administrador general (ni el aprobador especifico ni el dueno
+     pueden, ver liq_guardia() en supabase_rendiciones_5_revertir_reintegro.sql).
+     Vuelve la liquidacion de REINTEGRADA a ENVIADA para poder corregirla. ==== -->
+<div class="modal-overlay" id="deshacerReintegroLiqModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarDeshacerReintegroLiquidacion()">&times;</button>
+    <h2>Deshacer reintegro</h2>
+    <p class="sub">Esta liquidacion ya fue reintegrada. Volvera a "Por aprobar" para corregirla. Escribe el motivo.</p>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Motivo</label>
+        <textarea id="deshacerReintegroLiqMotivo" rows="3" placeholder="EJ: FALTABA UN COMPROBANTE POR AGREGAR"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarDeshacerReintegroLiquidacion()">Cancelar</button>
+      <button class="btn btn-purple" id="btnConfirmarDeshacerReintegroLiq" onclick="confirmarDeshacerReintegroLiquidacion()">Deshacer reintegro</button>
     </div>
   </div>
 </div>
@@ -2890,7 +2942,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.11.0';
+const APP_VERSION = '2.12.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -3308,7 +3360,13 @@ async function nextCorrelativoGastos(serie, ancho){
    HELPERS
    ============================================================ */
 function up(v){ return (v||'').toString().toUpperCase(); }
-function money(n){ return 'S/ ' + Number(n||0).toFixed(2); }
+// El signo va ANTES del "S/", no despues (evita el confuso "S/ -245.00"):
+// esto importa sobre todo ahora que un disponible de Caja Chica puede
+// quedar negativo (se permite gastar mas del tope, ver actualizarCajaChicaDestino()).
+function money(n){
+  const v = Number(n||0);
+  return (v<0?'-':'') + 'S/ ' + Math.abs(v).toFixed(2);
+}
 function clamp255(v){ return v<0?0:(v>255?255:v); }
 function initials(name){
   const parts = up(name).trim().split(/\s+/);
@@ -3342,6 +3400,31 @@ function toast(msg, isError){
   t.className = 'toast show' + (isError?' error':'');
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(()=>{ t.className='toast'; }, 3800);
+}
+/* ------------------------------------------------------------------
+   Reemplazo de window.confirm(): un dialogo nativo del navegador se ve como
+   una ventana de Chrome (icono, "Este sitio dice...", botones del sistema),
+   no como la app -- rompe la ilusion de estar en una app instalada, y en
+   movil se ve todavia peor. confirmarAccion() abre el mismo modal de
+   siempre (mismo estilo que el resto de la app) y se puede usar exactamente
+   igual que el confirm() nativo, con await:
+     if(!(await confirmarAccion('¿Anular esta planilla?'))) return;
+   Se puede pasar un string (mensaje simple) o un objeto {titulo, mensaje,
+   textoConfirmar, peligro} para personalizar titulo/boton/color. ------- */
+let _confirmAccionResolve = null;
+function confirmarAccion(opciones){
+  const o = typeof opciones === 'string' ? { mensaje: opciones } : (opciones || {});
+  document.getElementById('confirmAccionTitulo').textContent = o.titulo || 'Confirmar';
+  document.getElementById('confirmAccionMsg').textContent = o.mensaje || '¿Deseas continuar?';
+  const btnOk = document.getElementById('confirmAccionBtnOk');
+  btnOk.textContent = o.textoConfirmar || 'Confirmar';
+  btnOk.className = 'btn ' + (o.peligro ? 'btn-danger' : 'btn-purple');
+  document.getElementById('confirmAccionModalOverlay').classList.add('open');
+  return new Promise(resolve=>{ _confirmAccionResolve = resolve; });
+}
+function _resolverConfirmAccion(valor){
+  document.getElementById('confirmAccionModalOverlay').classList.remove('open');
+  if(_confirmAccionResolve){ const r = _confirmAccionResolve; _confirmAccionResolve = null; r(valor); }
 }
 function fillDistritoSelect(sel){
   sel.innerHTML = '';
@@ -4394,7 +4477,7 @@ async function deleteMovilidad(id){
     toast('No puedes eliminar una movilidad ya incluida en una planilla generada. Anula la planilla primero.', true);
     return;
   }
-  if(!confirm('¿Eliminar esta movilidad? Esta accion no se puede deshacer.')) return;
+  if(!(await confirmarAccion({ titulo:'Eliminar movilidad', mensaje:'¿Eliminar esta movilidad? Esta accion no se puede deshacer.', textoConfirmar:'Eliminar', peligro:true }))) return;
   const { error } = await sb.from('movilidades').delete().eq('id', id);
   if(error){ toast('No se pudo eliminar la movilidad', true); return; }
   await refreshMovilidades();
@@ -5615,7 +5698,7 @@ function verPlanillaHistorial(id){
 async function anularPlanilla(id){
   const p = getPlanilla(id);
   if(p && p.estado === 'REINTEGRADA'){ toast('Esta planilla ya fue reintegrada. Revierte el estado antes de anularla.', true); return; }
-  if(!confirm('¿Anular esta planilla? Las movilidades incluidas quedaran disponibles nuevamente para generar una nueva planilla.')) return;
+  if(!(await confirmarAccion({ titulo:'Anular planilla', mensaje:'¿Anular esta planilla? Las movilidades incluidas quedaran disponibles nuevamente para generar una nueva planilla.', textoConfirmar:'Anular', peligro:true }))) return;
   const { error: errMov } = await sb.from('movilidades').update({ planilla_id: null }).eq('planilla_id', id);
   if(errMov){ toast('No se pudo anular la planilla', true); return; }
   const { error: errPlan } = await sb.from('planillas').delete().eq('id', id);
@@ -5669,7 +5752,7 @@ async function confirmarReintegroPlanilla(){
 async function revertirReintegroPlanilla(id){
   const p = getPlanilla(id);
   if(!p) return;
-  if(!confirm('¿Revertir el reintegro de la planilla ' + p.correlativo + '? Volvera a quedar pendiente de pago.')) return;
+  if(!(await confirmarAccion({ titulo:'Revertir reintegro', mensaje:'¿Revertir el reintegro de la planilla ' + p.correlativo + '? Volvera a quedar pendiente de pago.', textoConfirmar:'Revertir' }))) return;
   const { error } = await sb.from('planillas').update({ estado: 'PENDIENTE_REINTEGRO' }).eq('id', id);
   if(error){ toast('No se pudo revertir el reintegro', true); return; }
   await refreshPlanillas();
@@ -6540,6 +6623,21 @@ function cambiarModoComprobante(modo){
   document.getElementById('cmpCamposGasto').style.display = modo==='GASTO' ? 'contents' : 'none';
   document.getElementById('cmpCamposDevolucion').style.display = modo==='DEVOLUCION' ? 'contents' : 'none';
 }
+// Aviso (nunca bloqueo): a veces el gasto real de una Caja Chica termina
+// siendo unos centimos o soles mas de lo asignado (ej. S/1,500.20 en vez de
+// S/1,500 exactos) -- no tiene sentido impedir registrar ese comprobante
+// solo porque supera el tope al centavo. Lo que si ayuda es avisar a tiempo
+// para que la persona arme el Reintegro antes de seguir acumulando gasto.
+function avisoCajaChica(tope, disponible){
+  if(!tope || tope<=0) return null;
+  if(disponible <= 0){
+    return 'Ya se llego (o se paso) el tope de esta Caja Chica. Se puede seguir registrando gastos con normalidad, pero conviene armar el Reintegro pronto.';
+  }
+  if(disponible <= tope * 0.1){
+    return 'Esta Caja Chica ya esta cerca de su tope (queda ' + money(disponible) + ' de ' + money(tope) + '). Conviene ir pensando en armar el Reintegro.';
+  }
+  return null;
+}
 // Repuebla el selector de Entrega (si aplica) y el cartel de "contra que se
 // va a cargar esto", segun el colaborador y el destino elegidos. Devuelve
 // el fondo objetivo (o null si el destino es Reembolso, que no usa fondo).
@@ -6595,7 +6693,9 @@ function actualizarCajaChicaDestino(){
   info.classList.remove('over');
   const saldo = saldoDeFondo(fondo.id);
   const disponible = saldo ? Number(saldo.disponible) : Number(fondo.monto);
-  info.innerHTML = 'Se cargara contra la Caja Chica <b>' + fondo.correlativo + '</b> &middot; disponible: <b>' + money(disponible) + '</b>';
+  const aviso = avisoCajaChica(Number(fondo.monto), disponible);
+  info.classList.toggle('warn', !!aviso);
+  info.innerHTML = 'Se cargara contra la Caja Chica <b>' + fondo.correlativo + '</b> &middot; disponible: <b>' + money(disponible) + '</b>' + (aviso ? '<br>' + aviso : '');
   return fondo;
 }
 // Autocompleta la razon social si el RUC ya esta en el directorio propio de
@@ -6921,6 +7021,10 @@ function renderCajaChica(){
   document.getElementById('ccTope').textContent = money(tope);
   document.getElementById('ccGastado').textContent = money(gastado);
   document.getElementById('ccDisponible').textContent = money(disponible);
+  const ccAviso = document.getElementById('ccAviso');
+  const aviso = avisoCajaChica(tope, disponible);
+  if(aviso){ ccAviso.textContent = aviso; ccAviso.className = 'saldo-info warn'; ccAviso.style.display = ''; }
+  else { ccAviso.style.display = 'none'; }
 
   // Pendientes de reponer: comprobantes de este fondo que todavia no entraron
   // a ninguna liquidacion. Una vez que "Armar liquidacion de reposicion" los
@@ -7331,6 +7435,13 @@ function renderLiquidaciones(){
     if((l.estado==='BORRADOR' || l.estado==='OBSERVADA') && (esDuenio || soyAdmin)){
       acciones.push(`<button class="icon-action" title="Enviar" onclick="enviarLiquidacion('${l.id}')">${ICO.activar}</button>`);
     }
+    // Eliminar solo existe en BORRADOR -- la base de datos no deja borrar una
+    // liquidacion que ya salio de ahi (liq_no_borrar()), para no perder la
+    // serie de correlativos que contabilidad necesita completa. Los
+    // comprobantes que tenia adjuntos quedan disponibles de nuevo solos.
+    if(l.estado==='BORRADOR' && (esDuenio || soyAdmin)){
+      acciones.push(`<button class="icon-action danger" title="Eliminar" onclick="eliminarLiquidacion('${l.id}')">${ICO.eliminar}</button>`);
+    }
     if(l.estado==='ENVIADA' && puedeAprobar){
       acciones.push(`<button class="icon-action" title="Aprobar" onclick="aprobarLiquidacion('${l.id}')">${ICO.activar}</button>`);
       acciones.push(`<button class="icon-action danger" title="Observar" onclick="abrirObservarLiquidacion('${l.id}')">${ICO.anular}</button>`);
@@ -7340,6 +7451,12 @@ function renderLiquidaciones(){
     }
     if(l.estado==='REINTEGRADA' && puedeAprobar){
       acciones.push(`<button class="icon-action" title="Cerrar" onclick="cerrarLiquidacionFinal('${l.id}')">${ICO.activar}</button>`);
+    }
+    // Deshacer reintegro: SOLO administrador general, nunca el aprobador
+    // especifico ni el dueno (ver liq_guardia() en el script 5) -- deshacer
+    // un reintegro ya registrado es tan delicado como reabrir una CERRADA.
+    if(l.estado==='REINTEGRADA' && soyAdmin){
+      acciones.push(`<button class="icon-action" title="Deshacer reintegro" onclick="abrirDeshacerReintegroLiquidacion('${l.id}')">${ICO.revertir}</button>`);
     }
     if(l.estado==='CERRADA' && soyAdmin){
       acciones.push(`<button class="icon-action" title="Reabrir" onclick="abrirReabrirLiquidacion('${l.id}')">${ICO.revertir}</button>`);
@@ -7432,7 +7549,7 @@ async function confirmarReintegroLiquidacion(){
   } finally { btn.disabled = false; }
 }
 async function cerrarLiquidacionFinal(id){
-  if(!confirm('¿Cerrar esta liquidacion? Quedara bloqueada para todos.')) return;
+  if(!(await confirmarAccion({ titulo:'Cerrar liquidacion', mensaje:'¿Cerrar esta liquidacion? Quedara bloqueada para todos.', textoConfirmar:'Cerrar' }))) return;
   const { error } = await sb.from('liquidaciones').update({ estado:'CERRADA' }).eq('id', id);
   if(error){ console.error('cerrarLiquidacionFinal', error); toast('No se pudo cerrar la liquidacion', true); return; }
   await refreshLiquidaciones();
@@ -7466,6 +7583,67 @@ async function confirmarReabrirLiquidacion(){
     renderLiquidaciones();
     toast('Liquidacion reabierta: volvio a Por Armar');
   } finally { btn.disabled = false; }
+}
+/* ------------------------------------------------------------------
+   Deshacer un reintegro ya registrado (REINTEGRADA -> ENVIADA). Solo un
+   administrador general llega a ver este boton (ver renderLiquidaciones);
+   ademas la base de datos lo exige por su cuenta (liq_guardia(), script 5):
+   ni el aprobador especifico ni el dueno pueden, aunque llamaran a esta
+   funcion directamente. Requiere motivo, igual que Reabrir.
+   ------------------------------------------------------------------ */
+let deshacerReintegroLiqTargetId = null;
+function abrirDeshacerReintegroLiquidacion(id){
+  deshacerReintegroLiqTargetId = id;
+  document.getElementById('deshacerReintegroLiqMotivo').value = '';
+  document.getElementById('deshacerReintegroLiqModalOverlay').classList.add('open');
+}
+function cerrarDeshacerReintegroLiquidacion(){
+  deshacerReintegroLiqTargetId = null;
+  document.getElementById('deshacerReintegroLiqModalOverlay').classList.remove('open');
+}
+async function confirmarDeshacerReintegroLiquidacion(){
+  if(!deshacerReintegroLiqTargetId) return;
+  const motivo = document.getElementById('deshacerReintegroLiqMotivo').value.trim();
+  if(!motivo){ toast('Escribe el motivo para deshacer el reintegro', true); return; }
+  const btn = document.getElementById('btnConfirmarDeshacerReintegroLiq');
+  btn.disabled = true;
+  try{
+    const { error } = await sb.from('liquidaciones').update({ estado:'ENVIADA', observacion: motivo }).eq('id', deshacerReintegroLiqTargetId);
+    if(error){ console.error('confirmarDeshacerReintegroLiquidacion', error); toast('No se pudo deshacer el reintegro', true); return; }
+    cerrarDeshacerReintegroLiquidacion();
+    await refreshLiquidaciones();
+    await refreshFondosSaldo();
+    await refreshSaldosColaborador();
+    renderLiquidaciones();
+    toast('Reintegro deshecho: la liquidacion volvio a Por Aprobar');
+  } finally { btn.disabled = false; }
+}
+/* ------------------------------------------------------------------
+   Eliminar una liquidacion en BORRADOR. Igual que "Anular planilla": los
+   comprobantes que tenia adjuntos quedan disponibles de nuevo (la base de
+   datos ya lo hace sola, comprobantes.liquidacion_id tiene "on delete set
+   null" desde el script 1), no se borran. Solo existe para BORRADOR: una
+   liquidacion que ya salio de ahi no se hace desaparecer (liq_no_borrar()
+   lo exige del lado del servidor); si esta OBSERVADA/CERRADA/REINTEGRADA,
+   primero hay que devolverla a BORRADOR (Reabrir / Deshacer reintegro /
+   la propia liquidacion Observada vuelta a Borrador por su dueno).
+   ------------------------------------------------------------------ */
+async function eliminarLiquidacion(id){
+  const liq = DB.liquidaciones.find(l=>l.id===id);
+  if(!liq) return;
+  if(!(await confirmarAccion({
+    titulo:'Eliminar liquidacion',
+    mensaje:'¿Eliminar la liquidacion ' + liq.correlativo + '? Los comprobantes que tenia adjuntos quedaran disponibles nuevamente para armar otra liquidacion.',
+    textoConfirmar:'Eliminar', peligro:true
+  }))) return;
+  const { error } = await sb.from('liquidaciones').delete().eq('id', id);
+  if(error){ console.error('eliminarLiquidacion', error); toast('No se pudo eliminar la liquidacion', true); return; }
+  await refreshLiquidaciones();
+  await refreshComprobantes();
+  await refreshFondosSaldo();
+  await refreshSaldosColaborador();
+  renderLiquidaciones();
+  toast('Liquidacion eliminada: sus comprobantes quedaron disponibles');
 }
 async function descargarLiqPDF(id){
   const liq = DB.liquidaciones.find(l=>l.id===id);

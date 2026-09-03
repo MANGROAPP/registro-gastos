@@ -344,11 +344,15 @@ try{
   .lev-resumen-stats span{font-size:11px;color:var(--text-mut);text-transform:uppercase;letter-spacing:.02em;}
   .lev-tag-nuevo{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--purple-light);color:var(--purple);padding:2px 8px;border-radius:999px;margin-left:8px;}
   .field input[readonly]{background:var(--border);color:var(--text-mut);cursor:not-allowed;}
-  .lev-ocr-row{display:flex;align-items:center;gap:10px;margin:2px 0 12px;flex-wrap:wrap;}
+  .lev-ocr-row{display:flex;align-items:center;gap:10px;margin:2px 0 4px;flex-wrap:wrap;}
   .lev-ocr-estado{font-size:11.5px;color:var(--text-mut);}
+  .lev-ocr-hint{margin:0 0 12px;font-size:11.5px;color:var(--text-mut);line-height:1.5;}
   .lev-ocr-detalle{margin:0 0 12px;font-size:12px;color:var(--text-mut);}
   .lev-ocr-detalle summary{cursor:pointer;font-weight:600;color:var(--purple);}
   .lev-ocr-detalle pre{white-space:pre-wrap;word-break:break-word;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:6px;font-family:inherit;font-size:11.5px;color:var(--text);}
+  .lev-ocr-badge{display:inline-flex;align-items:center;gap:3px;margin-left:7px;padding:1.5px 7px;border-radius:20px;background:var(--green-bg);color:var(--green);font-size:10px;font-weight:700;letter-spacing:.02em;vertical-align:middle;text-transform:none;}
+  .field.lev-ocr-lleno input{border-color:var(--green);background:var(--green-bg);}
+  html[data-theme="dark"] .field.lev-ocr-lleno input{background:#0F3229;color:var(--text);}
   @media (max-width:900px){
     .lev-area-card{padding:14px;}
     .lev-resumen-stats{gap:10px;}
@@ -1130,6 +1134,39 @@ try{
     .tbl-cards .col-trab, .tbl-cards .col-motivo, .tbl-cards .col-num,
     .tbl-cards .col-fecha, .tbl-cards .col-imp, .tbl-cards .col-estado{min-width:0;width:auto;}
     .badge-dist{max-width:none;white-space:normal;}
+  }
+
+  /* La tabla de Historial de Visitas (Lev. Inf. de Equipos) tiene mas columnas
+     que el resto (N°, Cliente, Sede, Fecha, Tecnico, Areas, Equipos, Estado y
+     acciones) y textos largos (razon social, direccion completa). Medido en
+     Playwright: entre 901px y ~1194px de ancho esa tabla NO entra completa en
+     la tarjeta y sobra contenido a la derecha (el scroll horizontal existe
+     pero no es obvio) -- justo el rango de anchos de un iPad en horizontal
+     (o un iPad Pro 12.9" en vertical, 1024px), que es el dispositivo real
+     donde se hace el levantamiento. Para esta tabla puntual se extiende el
+     mismo formato de tarjetas apiladas (ya usado en celular) hasta 1200px,
+     sin tocar el resto de tablas de la app que si entran bien en ese rango. */
+  @media (min-width:901px) and (max-width:1200px){
+    .tbl-cards-lev{display:block;}
+    .tbl-cards-lev thead{display:none;}
+    .tbl-cards-lev tbody, .tbl-cards-lev tr, .tbl-cards-lev td{display:block;width:100%;}
+    .tbl-cards-lev tr{
+      border:1px solid var(--border);border-radius:14px;padding:6px 14px;margin-bottom:10px;
+      background:var(--card);box-shadow:var(--sh-1);
+    }
+    .tbl-cards-lev tr:hover{background:var(--card);}
+    .tbl-cards-lev td{
+      border:none;border-bottom:1px dashed var(--border);padding:7px 0;text-align:right;
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      min-width:0;overflow-wrap:anywhere;
+    }
+    .tbl-cards-lev tr td:last-child{border-bottom:none;}
+    .tbl-cards-lev td::before{
+      content:attr(data-label);flex:none;font-size:10px;font-weight:700;letter-spacing:.05em;
+      text-transform:uppercase;color:var(--text-mut);text-align:left;
+    }
+    .tbl-cards-lev td > *{ min-width:0; }
+    .tbl-cards-lev td.center, .tbl-cards-lev td.right{text-align:right;}
   }
 
   /* ==========================================================================
@@ -2311,8 +2348,19 @@ try{
       <h1 class="page-title">Historial de Visitas</h1>
       <p class="page-sub">Historial de visitas de levantamiento de equipos por cliente.</p>
       <div class="card">
-        <div class="tbl-scroll"><table class="tbl-cards">
+        <div class="filters" style="margin-bottom:16px;">
+          <select id="levFiltroEstado" onchange="renderLevantamientosLista()">
+            <option value="">TODOS LOS ESTADOS</option>
+            <option value="borrador">BORRADOR</option>
+            <option value="finalizado">FINALIZADO</option>
+          </select>
+          <input type="text" id="levFiltroTexto" placeholder="BUSCAR POR CLIENTE, SEDE O CORRELATIVO..." oninput="renderLevantamientosLista()">
+          <div class="spacer" style="flex:1;"></div>
+          <button class="btn btn-ghost btn-sm" onclick="refrescarLevantamientos()" id="btnRefrescarLev"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
+        </div>
+        <div class="tbl-scroll"><table class="tbl-cards tbl-cards-lev">
           <thead><tr>
+            <th>N&deg;</th>
             <th>Cliente</th>
             <th>Sede</th>
             <th>Fecha</th>
@@ -2325,6 +2373,7 @@ try{
           <tbody id="levListaBody"></tbody>
         </table></div>
         <div class="empty-state" id="levListaEmpty" style="display:none;"><span class="big">&#128230;</span>A&uacute;n no hay visitas registradas.</div>
+        <div class="empty-state" id="levListaEmptyFiltro" style="display:none;">No hay visitas con estos filtros.</div>
       </div>
     </div>
 
@@ -3384,7 +3433,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.19.0';
+const APP_VERSION = '2.21.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -5777,6 +5826,7 @@ const ICO = {
   anular:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
   activar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   descargar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  pdf:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h1.5a1.5 1.5 0 0 0 0-3H9v5M13.5 12v5h1a2 2 0 0 0 0-4h-1zM18.5 12v5M18.5 14.3h1.7"/></svg>',
   billete:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>',
   revertir:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.64-6.36"/><path d="M3 3v5h5"/></svg>',
   pdf:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
@@ -9430,7 +9480,7 @@ async function levCargarDesdeServidor(id){
     localId: levNuevoIdLocal(), dbId: a.id, nombre: a.nombre || '',
     equipos: (equiposData||[]).filter(e=>e.area_id===a.id).map(e=>({
       localId: levNuevoIdLocal(), dbId: e.id, tipoEquipo: e.tipo_equipo||'', marca: e.marca||'', modelo: e.modelo||'',
-      nSerie: e.n_serie||'', codigoInterno: e.codigo_interno||'', observaciones: e.observaciones||'', ocrTexto:'',
+      nSerie: e.n_serie||'', codigoInterno: e.codigo_interno||'', observaciones: e.observaciones||'', ocrTexto:'', _ocrCampos:{},
       fotos: fotosConUrl.filter(f=>f.equipo_id===e.id).map(f=>({
         localId: levNuevoIdLocal(), dbId: f.id, storagePath: f.storage_path, blob:null, dataUrl: f._url, pendiente:false
       }))
@@ -9549,7 +9599,7 @@ function levCambiarNombreArea(areaLocalId, valor){
 function levAgregarEquipo(areaLocalId){
   const area = levDraft.areas.find(a=>a.localId===areaLocalId);
   if(!area) return;
-  area.equipos.push({ localId: levNuevoIdLocal(), dbId:null, tipoEquipo:'', marca:'', modelo:'', nSerie:'', codigoInterno:'', observaciones:'', fotos:[], ocrTexto:'' });
+  area.equipos.push({ localId: levNuevoIdLocal(), dbId:null, tipoEquipo:'', marca:'', modelo:'', nSerie:'', codigoInterno:'', observaciones:'', fotos:[], ocrTexto:'', _ocrCampos:{} });
   levRenderAreas();
   levActualizarResumen();
   levProgramarAutosave();
@@ -9595,6 +9645,31 @@ function levRenderAreas(){
       <button class="btn btn-outline btn-sm" onclick="levAgregarEquipo('${area.localId}')">+ Agregar equipo</button>
     </div>`).join('');
 }
+// Campo Marca/Modelo/N de serie que puede llegar autocompletado por la
+// lectura de placa (OCR). Cuando eq._ocrCampos[campo] esta en true, el campo
+// se pinta en verde con una insignia "Detectado por OCR" -- asi el tecnico ve
+// de un vistazo QUE se autocompleto y que no, en vez de tener que adivinarlo
+// comparando el campo contra el texto crudo. La insignia se apaga sola
+// (levLimpiarBadgeOcr) apenas el tecnico edita el campo a mano, porque en ese
+// momento el valor deja de ser "lo que detecto el OCR" para pasar a ser lo
+// que el escribio.
+function levCampoAutocompletableHtml(area, eq, campo, etiqueta){
+  const detectado = !!(eq._ocrCampos && eq._ocrCampos[campo]);
+  return `<div class="field${detectado ? ' lev-ocr-lleno' : ''}" id="levCampoBox_${eq.localId}_${campo}">
+    <label>${etiqueta}<span class="lev-ocr-badge" id="levOcrBadge_${eq.localId}_${campo}" style="${detectado ? '' : 'display:none;'}">&#10003; Detectado por OCR</span></label>
+    <input type="text" value="${escHtml(eq[campo])}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','${campo}', this.value); levLimpiarBadgeOcr('${eq.localId}','${campo}')">
+  </div>`;
+}
+function levLimpiarBadgeOcr(equipoLocalId, campo){
+  for(const area of levDraft.areas){
+    const eq = area.equipos.find(e=>e.localId===equipoLocalId);
+    if(eq){ if(eq._ocrCampos) eq._ocrCampos[campo] = false; break; }
+  }
+  const badge = document.getElementById('levOcrBadge_'+equipoLocalId+'_'+campo);
+  if(badge) badge.style.display = 'none';
+  const box = document.getElementById('levCampoBox_'+equipoLocalId+'_'+campo);
+  if(box) box.classList.remove('lev-ocr-lleno');
+}
 function levEquipoHtml(area, eq, eidx){
   const fotos = eq.fotos || [];
   const fotosHtml = fotos.map(f=>`
@@ -9615,17 +9690,18 @@ function levEquipoHtml(area, eq, eidx){
           <input type="text" list="levTiposEquipoList" placeholder="Ej. CAMARA FRIGORIFICA, COCINA INDUSTRIAL..." value="${escHtml(eq.tipoEquipo)}"
             oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','tipoEquipo', this.value)">
         </div>
-        <div class="field"><label>Marca</label><input type="text" value="${escHtml(eq.marca)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','marca', this.value)"></div>
-        <div class="field"><label>Modelo</label><input type="text" value="${escHtml(eq.modelo)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','modelo', this.value)"></div>
-        <div class="field"><label>N&deg; de serie</label><input type="text" value="${escHtml(eq.nSerie)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','nSerie', this.value)"></div>
+        ${levCampoAutocompletableHtml(area, eq, 'marca', 'Marca')}
+        ${levCampoAutocompletableHtml(area, eq, 'modelo', 'Modelo')}
+        ${levCampoAutocompletableHtml(area, eq, 'nSerie', 'N&deg; de serie')}
         <div class="field"><label>C&oacute;digo interno (opcional)</label><input type="text" value="${escHtml(eq.codigoInterno)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','codigoInterno', this.value)"></div>
         <div class="field" style="grid-column:1/-1;"><label>Observaciones</label><input type="text" value="${escHtml(eq.observaciones)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','observaciones', this.value)"></div>
       </div>
       <div class="lev-ocr-row">
-        <button type="button" class="btn btn-outline btn-sm" onclick="levLeerPlaca('${area.localId}','${eq.localId}')">Leer placa (autocompletar)</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="levLeerPlaca('${area.localId}','${eq.localId}')">&#128247; Leer placa (autocompletar)</button>
         <span class="lev-ocr-estado" id="levOcrEstado_${eq.localId}"></span>
       </div>
-      ${eq.ocrTexto ? `<details class="lev-ocr-detalle"><summary>Texto detectado en la placa</summary><pre>${escHtml(eq.ocrTexto)}</pre></details>` : ''}
+      <p class="lev-ocr-hint">Toma una foto clara de la placa del equipo. Si el sistema logra identificar Marca, Modelo o N&deg; de serie, ese campo se completa solo y queda marcado en verde con <b>&#10003; Detectado por OCR</b> &mdash; lo que no se identifique queda vac&iacute;o para que lo completes tú. Nunca se sobreescribe un campo que ya hayas llenado a mano.</p>
+      ${eq.ocrTexto ? `<details class="lev-ocr-detalle"><summary>Texto completo detectado en la placa (por si falta algo)</summary><pre>${escHtml(eq.ocrTexto)}</pre></details>` : ''}
       <div class="lev-fotos-label">Fotos (m&aacute;ximo ${LEV_MAX_FOTOS})</div>
       <div class="lev-fotos-row">
         ${fotosHtml}
@@ -9756,15 +9832,29 @@ async function levPlacaSeleccionada(ev){
     const texto = ((resultado && resultado.data && resultado.data.text) || '').trim();
     eq.ocrTexto = texto;
     const campos = levParsearPlaca(texto);
-    let completoAlgo = false;
-    if(campos.marca && !eq.marca){ eq.marca = campos.marca; completoAlgo = true; }
-    if(campos.modelo && !eq.modelo){ eq.modelo = campos.modelo; completoAlgo = true; }
-    if(campos.serie && !eq.nSerie){ eq.nSerie = campos.serie; completoAlgo = true; }
+    if(!eq._ocrCampos) eq._ocrCampos = {};
+    // Se recorre marca/modelo/nSerie por separado: un campo que YA tenia un
+    // valor (el tecnico lo escribio a mano antes de tomar la foto) no se
+    // toca ni se menciona en el aviso -- solo interesa informar que paso con
+    // los campos que estaban vacios, que es donde el OCR pudo haber ayudado.
+    const ETIQUETAS_CAMPO = { marca:'Marca', modelo:'Modelo', nSerie:'N° de serie' };
+    const CAMPO_A_OCR = { marca:'marca', modelo:'modelo', nSerie:'serie' };
+    const detectados = [], noDetectados = [];
+    Object.keys(ETIQUETAS_CAMPO).forEach(campo=>{
+      if(eq[campo]) return;
+      const valorOcr = campos[CAMPO_A_OCR[campo]];
+      if(valorOcr){ eq[campo] = valorOcr; eq._ocrCampos[campo] = true; detectados.push(ETIQUETAS_CAMPO[campo]); }
+      else { noDetectados.push(ETIQUETAS_CAMPO[campo]); }
+    });
     levRenderAreas();
     levProgramarAutosave();
-    toast(completoAlgo
-      ? 'Placa leida: revisa y corrige los campos si hace falta'
-      : 'No se identifico marca/modelo/serie automaticamente. Revisa el texto detectado abajo del equipo y completa a mano.', !completoAlgo);
+    if(detectados.length){
+      let msg = 'Se completo automaticamente: ' + detectados.join(', ') + '. Revisa que este bien.';
+      if(noDetectados.length) msg += ' No se pudo identificar: ' + noDetectados.join(', ') + ' — completa a mano o revisa el texto detectado abajo.';
+      toast(msg);
+    } else {
+      toast('No se identifico marca/modelo/serie automaticamente. Revisa el texto detectado abajo del equipo y completa a mano.', true);
+    }
   }catch(err){
     console.error('levPlacaSeleccionada', err);
     if(estadoEl) estadoEl.textContent = '';
@@ -10039,20 +10129,57 @@ window.addEventListener('offline', levActualizarSyncPill);
 async function renderLevantamientos(){
   await refreshLevantamientos();
   if(!DB.colaboradores.length) await refreshColaboradores();
+  renderLevantamientosLista();
+}
+async function refrescarLevantamientos(){
+  const btn = document.getElementById('btnRefrescarLev');
+  if(btn) btn.disabled = true;
+  await refreshLevantamientos();
+  if(btn) btn.disabled = false;
+  renderLevantamientosLista();
+  toast('Historial actualizado');
+}
+// Filtra y pinta la tabla a partir de lo que YA esta en cache (DB.levantamientos)
+// sin volver a pedirle nada a Supabase -- asi escribir en el buscador o cambiar
+// el filtro de estado responde al instante, en vez de esperar una consulta de
+// red por cada letra que se escribe.
+function renderLevantamientosLista(){
   const body = document.getElementById('levListaBody');
   const empty = document.getElementById('levListaEmpty');
+  const emptyFiltro = document.getElementById('levListaEmptyFiltro');
   if(!body) return;
   if(!DB.levantamientos.length){
     body.innerHTML = '';
     if(empty) empty.style.display = '';
+    if(emptyFiltro) emptyFiltro.style.display = 'none';
     return;
   }
   if(empty) empty.style.display = 'none';
-  body.innerHTML = DB.levantamientos.map(l=>{
+
+  const estadoFiltro = (document.getElementById('levFiltroEstado')||{}).value || '';
+  const texto = up((document.getElementById('levFiltroTexto')||{}).value || '').trim();
+  let lista = DB.levantamientos.slice();
+  if(estadoFiltro) lista = lista.filter(l=> l.estado === estadoFiltro);
+  if(texto) lista = lista.filter(l=>
+    up(l.cliente_razon_social||'').includes(texto) ||
+    up(l.sede_direccion||'').includes(texto) ||
+    up(l.correlativo||'').includes(texto)
+  );
+  lista.sort((a,b)=> (a.fecha_visita < b.fecha_visita ? 1 : -1));
+
+  if(!lista.length){
+    body.innerHTML = '';
+    if(emptyFiltro) emptyFiltro.style.display = '';
+    return;
+  }
+  if(emptyFiltro) emptyFiltro.style.display = 'none';
+
+  body.innerHTML = lista.map(l=>{
     const tec = DB.colaboradores.find(c=>c.id===l.tecnico_id);
     return `
     <tr>
-      <td data-label="Cliente"><b>${escHtml(l.cliente_razon_social)}</b>${l.correlativo?(' <span class="hint" style="margin:0;">'+escHtml(l.correlativo)+'</span>'):''}</td>
+      <td data-label="N°">${escHtml(l.correlativo)||'&mdash;'}</td>
+      <td data-label="Cliente"><b>${escHtml(l.cliente_razon_social)}</b></td>
       <td data-label="Sede">${escHtml(l.sede_direccion)||'&mdash;'}</td>
       <td data-label="Fecha">${fmtFecha(l.fecha_visita)}</td>
       <td data-label="T&eacute;cnico">${tec ? escHtml(nombreCompleto(tec)) : '&mdash;'}</td>
@@ -10062,11 +10189,42 @@ async function renderLevantamientos(){
       <td data-label="" class="center">
         <div class="row-actions">
           <button class="icon-action" title="Editar" onclick="levAbrirExistente('${l.id}')">${ICO.editar}</button>
+          <button class="icon-action" title="Descargar PDF" onclick="descargarLevantamientoPDF('${l.id}')">${ICO.pdf}</button>
           <button class="icon-action" title="Exportar CSV" onclick="levExportarCSV('${l.id}')">${ICO.descargar}</button>
+          <button class="icon-action danger" title="Eliminar visita" onclick="levEliminarVisita('${l.id}')">${ICO.eliminar}</button>
         </div>
       </td>
     </tr>`;
   }).join('');
+}
+async function levEliminarVisita(id){
+  const l = DB.levantamientos.find(x=>x.id===id);
+  if(!l) return;
+  if(!(await confirmarAccion({
+    titulo:'Eliminar visita',
+    mensaje:'¿Eliminar la visita ' + (l.correlativo||'') + ' de ' + up(l.cliente_razon_social||'') + '? Se borraran tambien todas sus areas, equipos y fotos. Esta accion no se puede deshacer.',
+    textoConfirmar:'Eliminar', peligro:true
+  }))) return;
+  try{
+    // Se leen los storage_path ANTES de borrar (el borrado en cascada se
+    // encarga de las filas de la base de datos, pero no de los archivos ya
+    // subidos al bucket -- hay que borrarlos aparte, con sus rutas exactas).
+    const { data: fotos } = await sb.from('levantamiento_equipo_fotos').select('storage_path').eq('levantamiento_id', id);
+    const { error } = await sb.from('levantamientos').delete().eq('id', id);
+    if(error){ console.error('levEliminarVisita', error); toast('No se pudo eliminar la visita', true); return; }
+    const paths = (fotos||[]).map(f=>f.storage_path).filter(Boolean);
+    if(paths.length){
+      const { error: errStorage } = await sb.storage.from('levantamientos').remove(paths);
+      if(errStorage) console.error('levEliminarVisita (storage)', errStorage);
+    }
+  }catch(err){
+    console.error('levEliminarVisita', err);
+    toast('No se pudo eliminar la visita', true);
+    return;
+  }
+  await refreshLevantamientos();
+  renderLevantamientosLista();
+  toast('Visita eliminada');
 }
 
 /* ---------- Exportar CSV (mejor opcion sin depender de internet ni de una
@@ -10075,9 +10233,14 @@ async function renderLevantamientos(){
 async function levExportarCSV(id){
   const cab = DB.levantamientos.find(x=>x.id===id);
   if(!cab){ toast('No se encontro la visita', true); return; }
+  // orden.order('created_at') en vez de order('orden'): "orden" siempre se
+  // graba en 0 (nunca se le asigna un valor al guardar), asi que no sirve
+  // para ordenar -- created_at si crece en el mismo orden en que se
+  // insertaron las areas/equipos al guardar, que es el orden en que el
+  // tecnico las registro en el formulario.
   const [{ data: areasData, error: errA }, { data: equiposData, error: errE }, { data: fotosData, error: errF }] = await Promise.all([
-    sb.from('levantamiento_areas').select('*').eq('levantamiento_id', id),
-    sb.from('levantamiento_equipos').select('*').eq('levantamiento_id', id),
+    sb.from('levantamiento_areas').select('*').eq('levantamiento_id', id).order('created_at'),
+    sb.from('levantamiento_equipos').select('*').eq('levantamiento_id', id).order('created_at'),
     sb.from('levantamiento_equipo_fotos').select('equipo_id').eq('levantamiento_id', id)
   ]);
   if(errA || errE || errF){ console.error('levExportarCSV', errA||errE||errF); toast('No se pudo exportar la visita', true); return; }
@@ -10088,10 +10251,18 @@ async function levExportarCSV(id){
   (fotosData||[]).forEach(f=>{ conteoFotos[f.equipo_id] = (conteoFotos[f.equipo_id]||0) + 1; });
   const areasPorId = {};
   (areasData||[]).forEach(a=>{ areasPorId[a.id] = a.nombre; });
+  // Los equipos se muestran agrupados por area (en el mismo orden en que se
+  // registraron las areas), no en el orden suelto que devuelva la consulta
+  // -- asi el CSV se lee igual de organizado que el formulario.
+  const equiposOrdenados = (areasData||[]).flatMap(a=> equiposData.filter(e=>e.area_id===a.id));
 
-  const encabezados = ['Cliente','RUC','Sede/Direccion','Fecha de visita','Tecnico','Area','Tipo de equipo','Marca','Modelo','N Serie','Codigo interno','Observaciones','Cantidad de fotos'];
-  const filas = equiposData.map(e=>[
-    cab.cliente_razon_social||'', cab.cliente_ruc||'', cab.sede_direccion||'', fmtFecha(cab.fecha_visita),
+  // "N°" es el correlativo de la VISITA (no cambia entre filas: se repite en
+  // cada fila para que el archivo sirva solo, sin cruzarlo con otra tabla).
+  // "Item" es un contador simple 1,2,3... de equipos dentro de esta visita,
+  // para poder referirse a "el equipo 3" al conversar sobre el archivo.
+  const encabezados = ['N° Visita','Item','Cliente','RUC','Sede/Direccion','Fecha de visita','Tecnico','Area','Tipo de equipo','Marca','Modelo','N Serie','Codigo interno','Observaciones','Cantidad de fotos'];
+  const filas = equiposOrdenados.map((e,idx)=>[
+    cab.correlativo||'', String(idx+1), cab.cliente_razon_social||'', cab.cliente_ruc||'', cab.sede_direccion||'', fmtFecha(cab.fecha_visita),
     tec ? nombreCompleto(tec) : '', areasPorId[e.area_id]||'', e.tipo_equipo||'', e.marca||'', e.modelo||'',
     e.n_serie||'', e.codigo_interno||'', e.observaciones||'', String(conteoFotos[e.id]||0)
   ]);
@@ -10106,7 +10277,146 @@ async function levExportarCSV(id){
   a.href = url; a.download = 'levantamiento_' + String(cab.correlativo||id).replace(/[^a-zA-Z0-9_-]/g,'_') + '.csv';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 4000);
-  toast('CSV descargado');
+  toast('CSV descargado. Para VER las fotos de los equipos, usa el botón de PDF: un CSV es solo texto y no puede mostrar imágenes.');
+}
+
+/* ============================================================
+   PDF DE LA VISITA (texto vectorial + fotos embebidas)
+   A diferencia del CSV (que es solo texto y no puede mostrar imagenes), este
+   PDF SI trae las fotos de cada equipo, para poder identificarlos y revisarlos
+   de un vistazo. Usa el mismo generador (jsPDF) y las mismas piezas
+   (crearLienzoDocumento/dibujarEncabezadoDocumento) que ya usan Planillas y
+   Liquidaciones -- no una libreria nueva.
+   ============================================================ */
+// Descarga una foto ya subida (storage_path) y la deja lista como data URL
+// para pdf.addImage(). Se hace con fetch()+FileReader (no con un <img> +
+// canvas) para no toparse con problemas de CORS al leer los pixeles de una
+// imagen de otro origen -- fetch trae los bytes crudos, sin ese problema.
+async function levFotoADataUrl(storagePath){
+  try{
+    const { data, error } = await sb.storage.from('levantamientos').createSignedUrl(storagePath, 300);
+    if(error || !data) return null;
+    const resp = await fetch(data.signedUrl);
+    if(!resp.ok) return null;
+    const blob = await resp.blob();
+    return await new Promise((resolve)=>{
+      const reader = new FileReader();
+      reader.onerror = ()=>resolve(null);
+      reader.onload = ()=>resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }catch(err){ console.error('levFotoADataUrl', err); return null; }
+}
+async function drawLevantamientoPdf(pdf, cab, tecnico, areas, equiposPorArea, fotosPorEquipo){
+  const doc = crearLienzoDocumento(pdf);
+  await dibujarEncabezadoDocumento(pdf, doc, cab.correlativo || '-', 'LEVANTAMIENTO DE EQUIPOS');
+
+  pdf.setFontSize(9.2);
+  doc.y += 8;
+  doc.metaLine('CLIENTE', up(cab.cliente_razon_social||''), doc.M+10, doc.y);
+  doc.metaLine('RUC', cab.cliente_ruc||'-', doc.M+doc.CW*0.68, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('SEDE / DIRECCION', up(cab.sede_direccion||'-'), doc.M+10, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('FECHA DE VISITA', fmtFecha(cab.fecha_visita), doc.M+10, doc.y);
+  doc.metaLine('TECNICO', tecnico ? up(nombreCompleto(tecnico)) : '-', doc.M+doc.CW*0.5, doc.y);
+  doc.y += 15.5;
+  doc.metaLine('ESTADO', (cab.estado==='finalizado'?'FINALIZADO':'BORRADOR'), doc.M+10, doc.y);
+  doc.y += 12;
+  pdf.setLineWidth(1); pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
+  doc.y += 20;
+
+  for(const area of areas){
+    doc.ensureSpace(26);
+    pdf.setFont('courier','bold'); pdf.setFontSize(10.5);
+    pdf.text('AREA: ' + up(area.nombre||'SIN NOMBRE'), doc.M+8, doc.y);
+    doc.y += 16;
+    const equipos = equiposPorArea[area.id] || [];
+    if(!equipos.length){
+      pdf.setFont('courier','normal'); pdf.setFontSize(8.5);
+      pdf.text('Sin equipos registrados en esta area.', doc.M+10, doc.y);
+      doc.y += 16;
+    }
+    for(let i=0;i<equipos.length;i++){
+      const eq = equipos[i];
+      const fotos = fotosPorEquipo[eq.id] || [];
+      doc.ensureSpace(74);
+      pdf.setFont('courier','bold'); pdf.setFontSize(9);
+      pdf.text((i+1) + '. ' + up(eq.tipo_equipo || 'EQUIPO SIN TIPO'), doc.M+8, doc.y+10);
+      doc.y += 16;
+      pdf.setFont('courier','normal'); pdf.setFontSize(8);
+      pdf.text('Marca: ' + (eq.marca||'-') + '   Modelo: ' + (eq.modelo||'-') + '   N Serie: ' + (eq.n_serie||'-'), doc.M+8, doc.y);
+      doc.y += 12;
+      if(eq.codigo_interno){ pdf.text('Codigo interno: ' + eq.codigo_interno, doc.M+8, doc.y); doc.y += 12; }
+      if(eq.observaciones){
+        const obsLines = pdf.splitTextToSize('Obs: ' + eq.observaciones, doc.CW-20);
+        obsLines.forEach(l=>{ doc.ensureSpace(12); pdf.text(l, doc.M+8, doc.y); doc.y += 11; });
+      }
+      if(fotos.length){
+        doc.y += 4;
+        const thumbSize = 62, gap = 8;
+        doc.ensureSpace(thumbSize + 10);
+        let fx = doc.M + 8;
+        fotos.forEach(foto=>{
+          if(fx + thumbSize > doc.M + doc.CW){ fx = doc.M+8; doc.y += thumbSize + gap; doc.ensureSpace(thumbSize+10); }
+          pdf.setLineWidth(0.5); pdf.rect(fx, doc.y, thumbSize, thumbSize);
+          if(foto.dataUrl){
+            try{ pdf.addImage(foto.dataUrl, imgFormatFromDataURL(foto.dataUrl), fx+1, doc.y+1, thumbSize-2, thumbSize-2); }
+            catch(e){ pdf.setFontSize(6.5); pdf.text('ERROR', fx+thumbSize/2, doc.y+thumbSize/2, {align:'center'}); }
+          } else {
+            pdf.setFontSize(6.5); pdf.text('SIN FOTO', fx+thumbSize/2, doc.y+thumbSize/2, {align:'center'});
+          }
+          fx += thumbSize + gap;
+        });
+        doc.y += thumbSize + 10;
+      } else {
+        pdf.setFont('courier','normal'); pdf.setFontSize(7.5); pdf.setTextColor(150);
+        doc.y += 4; pdf.text('(sin fotos)', doc.M+8, doc.y); doc.y += 10;
+        pdf.setTextColor(0);
+      }
+      pdf.setLineWidth(0.5);
+      pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
+      doc.y += 12;
+    }
+    doc.y += 6;
+  }
+  doc.closeBorder(doc.y);
+}
+async function descargarLevantamientoPDF(id){
+  toast('Generando PDF...');
+  try{
+    await new Promise(r=>setTimeout(r,10));
+    const cab = DB.levantamientos.find(x=>x.id===id);
+    if(!cab){ toast('No se encontro la visita', true); return; }
+    const [{ data: areasData, error: errA }, { data: equiposData, error: errE }, { data: fotosData, error: errF }] = await Promise.all([
+      sb.from('levantamiento_areas').select('*').eq('levantamiento_id', id).order('created_at'),
+      sb.from('levantamiento_equipos').select('*').eq('levantamiento_id', id).order('created_at'),
+      sb.from('levantamiento_equipo_fotos').select('*').eq('levantamiento_id', id).order('created_at')
+    ]);
+    if(errA || errE || errF){ console.error('descargarLevantamientoPDF', errA||errE||errF); toast('No se pudo generar el PDF', true); return; }
+    if(!DB.colaboradores.length) await refreshColaboradores();
+    const tecnico = DB.colaboradores.find(c=>c.id===cab.tecnico_id);
+
+    const equiposPorArea = {};
+    (equiposData||[]).forEach(e=>{ (equiposPorArea[e.area_id] = equiposPorArea[e.area_id]||[]).push(e); });
+
+    // Las fotos se descargan (con URL firmada) una sola vez cada una y se
+    // reutilizan como imagen embebida -- con varias fotos puede tardar unos
+    // segundos, por eso el toast de "Generando PDF..." se muestra antes.
+    const fotosPorEquipo = {};
+    for(const f of (fotosData||[])){
+      const dataUrl = f.storage_path ? await levFotoADataUrl(f.storage_path) : null;
+      (fotosPorEquipo[f.equipo_id] = fotosPorEquipo[f.equipo_id]||[]).push({ dataUrl });
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit:'pt', format:'a4', orientation:'portrait' });
+    await drawLevantamientoPdf(pdf, cab, tecnico, areasData||[], equiposPorArea, fotosPorEquipo);
+    pdf.save((cab.correlativo||id).replace(/[^a-zA-Z0-9_-]/g,'_') + '.pdf');
+  }catch(err){
+    console.error('descargarLevantamientoPDF', err);
+    toast('No se pudo generar el PDF', true);
+  }
 }
 
 try{

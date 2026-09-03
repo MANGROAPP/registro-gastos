@@ -3450,7 +3450,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.22.0';
+const APP_VERSION = '2.22.1';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -10740,24 +10740,6 @@ async function drawLevantamientoPdf(pdf, cab, tecnico, areas, equiposPorArea, fo
   levPdfBandaSeccion(pdf, doc, '03', 'RESUMEN');
   levPdfFilaCampos(pdf, doc, [{label:'Total de áreas', value:String(totalAreas)}, {label:'Total de equipos', value:String(totalEquipos)}]);
   levPdfFilaCampos(pdf, doc, [{label:'Fecha del levantamiento', value:fmtFecha(cab.fecha_visita)}, {label:'Técnico responsable', value: tecnico ? up(nombreCompleto(tecnico)) : null}]);
-
-  doc.ensureSpace(70);
-  doc.y += 24;
-  const sigW = 220, sigGap = doc.CW - sigW*2;
-  levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.negro);
-  pdf.setLineWidth(0.8);
-  pdf.line(doc.M, doc.y, doc.M+sigW, doc.y);
-  pdf.line(doc.M+sigW+sigGap, doc.y, doc.M+sigW+sigGap+sigW, doc.y);
-  doc.y += 13;
-  pdf.setFont('helvetica','bold'); pdf.setFontSize(8.3);
-  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
-  pdf.text('FIRMA DEL TÉCNICO MANGRO', doc.M, doc.y);
-  pdf.text('FIRMA DEL CLIENTE / CONTACTO', doc.M+sigW+sigGap, doc.y);
-  doc.y += 13;
-  pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
-  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
-  pdf.text(tecnico ? up(nombreCompleto(tecnico)) : '—', doc.M, doc.y);
-  pdf.text(cab.persona_contacto ? up(cab.persona_contacto) : '—', doc.M+sigW+sigGap, doc.y);
 
   const totalPaginas = pdf.internal.getNumberOfPages();
   for(let p=1;p<=totalPaginas;p++){ pdf.setPage(p); levPdfPie(pdf, doc, p, totalPaginas); }

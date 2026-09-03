@@ -1136,39 +1136,6 @@ try{
     .badge-dist{max-width:none;white-space:normal;}
   }
 
-  /* La tabla de Historial de Visitas (Lev. Inf. de Equipos) tiene mas columnas
-     que el resto (N°, Cliente, Sede, Fecha, Tecnico, Areas, Equipos, Estado y
-     acciones) y textos largos (razon social, direccion completa). Medido en
-     Playwright: entre 901px y ~1194px de ancho esa tabla NO entra completa en
-     la tarjeta y sobra contenido a la derecha (el scroll horizontal existe
-     pero no es obvio) -- justo el rango de anchos de un iPad en horizontal
-     (o un iPad Pro 12.9" en vertical, 1024px), que es el dispositivo real
-     donde se hace el levantamiento. Para esta tabla puntual se extiende el
-     mismo formato de tarjetas apiladas (ya usado en celular) hasta 1200px,
-     sin tocar el resto de tablas de la app que si entran bien en ese rango. */
-  @media (min-width:901px) and (max-width:1200px){
-    .tbl-cards-lev{display:block;}
-    .tbl-cards-lev thead{display:none;}
-    .tbl-cards-lev tbody, .tbl-cards-lev tr, .tbl-cards-lev td{display:block;width:100%;}
-    .tbl-cards-lev tr{
-      border:1px solid var(--border);border-radius:14px;padding:6px 14px;margin-bottom:10px;
-      background:var(--card);box-shadow:var(--sh-1);
-    }
-    .tbl-cards-lev tr:hover{background:var(--card);}
-    .tbl-cards-lev td{
-      border:none;border-bottom:1px dashed var(--border);padding:7px 0;text-align:right;
-      display:flex;align-items:center;justify-content:space-between;gap:14px;
-      min-width:0;overflow-wrap:anywhere;
-    }
-    .tbl-cards-lev tr td:last-child{border-bottom:none;}
-    .tbl-cards-lev td::before{
-      content:attr(data-label);flex:none;font-size:10px;font-weight:700;letter-spacing:.05em;
-      text-transform:uppercase;color:var(--text-mut);text-align:left;
-    }
-    .tbl-cards-lev td > *{ min-width:0; }
-    .tbl-cards-lev td.center, .tbl-cards-lev td.right{text-align:right;}
-  }
-
   /* ==========================================================================
      RONDA 23 - SCROLL Y ANCHO DE LA PAGINA
      El problema: .main tenia max-width:1400px y ademas es el elemento que
@@ -1579,6 +1546,7 @@ try{
       <div class="side-submenu" id="groupLevantamientos">
         <button class="nav-btn side-item side-subitem" data-section="nuevoLevantamiento" title="Nueva Visita" onclick="showSection('nuevoLevantamiento')"><span class="side-label">Nueva Visita</span></button>
         <button class="nav-btn side-item side-subitem" data-section="levantamientos" title="Historial de Visitas" onclick="showSection('levantamientos')"><span class="side-label">Historial de Visitas</span></button>
+        <button class="nav-btn side-item side-subitem" data-section="clientes" title="Clientes" onclick="showSection('clientes')"><span class="side-label">Clientes</span></button>
       </div>
 
       <button class="nav-btn side-item" data-section="colaboradores" title="Colaboradores" onclick="showSection('colaboradores')"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20"/><circle cx="9.5" cy="8" r="3.5"/><path d="M20 20v-1.5a3.2 3.2 0 0 0-2.2-3.03"/><path d="M14.7 4.6a3.5 3.5 0 0 1 0 6.8"/></svg></span><span class="side-label">Colaboradores</span></button>
@@ -2314,6 +2282,8 @@ try{
           <div class="field" style="grid-column:span 2;"><label>Sede / Direcci&oacute;n</label><input type="text" id="levSede" oninput="levCampoDato()"></div>
           <div class="field"><label>Fecha de visita</label><input type="text" class="date-input" id="levFechaVisita" readonly placeholder="Selecciona una fecha" onchange="levCampoDato()"></div>
           <div class="field" style="grid-column:span 2;"><label>T&eacute;cnico responsable</label><select id="levTecnico" onchange="levCampoDato()"></select></div>
+          <div class="field" style="grid-column:1/-1;"><label>Observaciones</label><textarea id="levObservacionesCliente" rows="2" placeholder="Notas generales sobre el cliente o la visita" oninput="levCampoDato()"></textarea></div>
+          <div class="field" style="grid-column:1/-1;"><label>Disponibilidad para mantenimiento</label><textarea id="levDisponibilidad" rows="2" placeholder="Ej. Lunes a viernes de 8:00am a 1:00pm, coordinar con el area de cocina" oninput="levCampoDato()"></textarea></div>
         </div>
       </div>
 
@@ -2355,25 +2325,45 @@ try{
             <option value="finalizado">FINALIZADO</option>
           </select>
           <input type="text" id="levFiltroTexto" placeholder="BUSCAR POR CLIENTE, SEDE O CORRELATIVO..." oninput="renderLevantamientosLista()">
+          <button class="btn btn-outline btn-sm" onclick="limpiarFiltrosLev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:-1px;margin-right:5px;"><path d="M18 6L6 18M6 6l12 12"/></svg>Limpiar filtros</button>
           <div class="spacer" style="flex:1;"></div>
           <button class="btn btn-ghost btn-sm" onclick="refrescarLevantamientos()" id="btnRefrescarLev"><span class="ico-spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>Actualizar</button>
         </div>
-        <div class="tbl-scroll"><table class="tbl-cards tbl-cards-lev">
+        <div class="tbl-scroll"><table class="tbl-cards">
           <thead><tr>
-            <th>N&deg;</th>
-            <th>Cliente</th>
+            <th class="th-sort col-num" data-levsort="correlativo" onclick="setLevSort('correlativo')">N&deg;<span class="sort-arrow">&#8645;</span></th>
+            <th class="th-sort" data-levsort="cliente" onclick="setLevSort('cliente')">Cliente<span class="sort-arrow">&#8645;</span></th>
             <th>Sede</th>
-            <th>Fecha</th>
+            <th class="th-sort col-fecha" data-levsort="fecha" onclick="setLevSort('fecha')">Fecha<span class="sort-arrow">&#8645;</span></th>
             <th>T&eacute;cnico</th>
-            <th class="center">&Aacute;reas</th>
-            <th class="center">Equipos</th>
-            <th class="center">Estado</th>
+            <th class="th-sort center" data-levsort="areas" onclick="setLevSort('areas')">&Aacute;reas<span class="sort-arrow">&#8645;</span></th>
+            <th class="th-sort center" data-levsort="equipos" onclick="setLevSort('equipos')">Equipos<span class="sort-arrow">&#8645;</span></th>
+            <th class="th-sort center" data-levsort="estado" onclick="setLevSort('estado')">Estado<span class="sort-arrow">&#8645;</span></th>
             <th></th>
           </tr></thead>
           <tbody id="levListaBody"></tbody>
         </table></div>
         <div class="empty-state" id="levListaEmpty" style="display:none;"><span class="big">&#128230;</span>A&uacute;n no hay visitas registradas.</div>
         <div class="empty-state" id="levListaEmptyFiltro" style="display:none;">No hay visitas con estos filtros.</div>
+      </div>
+    </div>
+
+    <!-- ================= LEV. INF. DE EQUIPOS: CLIENTES ================= -->
+    <div class="section" id="section-clientes">
+      <h1 class="page-title">Clientes</h1>
+      <p class="page-sub">Directorio de clientes reutilizable al registrar una visita. Se completa solo al crear uno nuevo desde &laquo;Nueva Visita&raquo;, o puedes agregarlo y editarlo aqu&iacute;.</p>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="filters" style="margin-bottom:16px;">
+          <input type="text" id="clienteLevBuscar" placeholder="BUSCAR POR RUC, RAZON SOCIAL O ALIAS..." oninput="renderClientesLev()">
+          <div class="spacer" style="flex:1;"></div>
+          <button class="btn btn-primary btn-sm" id="btnNuevoClienteLev" onclick="openClienteLevModal()">+ Nuevo Cliente</button>
+        </div>
+        <div class="tbl-scroll"><table class="tbl-cards">
+          <thead><tr><th>RUC</th><th>Raz&oacute;n Social</th><th>Alias</th><th class="center">Estado</th><th></th></tr></thead>
+          <tbody id="clienteLevBody"></tbody>
+        </table></div>
+        <div class="empty-state" id="clienteLevEmpty" style="display:none;">No hay clientes registrados todav&iacute;a.</div>
       </div>
     </div>
 
@@ -2534,6 +2524,33 @@ try{
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="cerrarProveedorModal()">Cancelar</button>
       <button class="btn btn-purple" id="btnGuardarProveedor" onclick="guardarProveedor()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL CLIENTE (Lev. Inf. de Equipos) ===================== -->
+<div class="modal-overlay" id="clienteLevModalOverlay">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" onclick="cerrarClienteLevModal()">&times;</button>
+    <h2 id="clienteLevModalTitulo">Nuevo Cliente</h2>
+    <input type="hidden" id="clienteLevEditId">
+    <div class="form-grid full">
+      <div class="field">
+        <label>RUC (opcional)</label>
+        <input type="text" id="clienteLevRuc" placeholder="11 digitos" maxlength="11">
+      </div>
+      <div class="field">
+        <label>Raz&oacute;n social</label>
+        <input type="text" id="clienteLevRazon" placeholder="RAZON SOCIAL DEL CLIENTE">
+      </div>
+      <div class="field">
+        <label>Alias (opcional)</label>
+        <input type="text" id="clienteLevAlias" placeholder="Nombre corto para identificarlo mas rapido">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarClienteLevModal()">Cancelar</button>
+      <button class="btn btn-purple" id="btnGuardarClienteLev" onclick="guardarClienteLev()">Guardar</button>
     </div>
   </div>
 </div>
@@ -3433,7 +3450,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.21.0';
+const APP_VERSION = '2.22.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -4998,11 +5015,12 @@ const CRUMBS = {
   planillaQuinta:{parent:'Nómina', current:'Planilla mensual'},
   nuevoLevantamiento:{parent:'Lev. Inf. de Equipos', current:'Nueva Visita'},
   levantamientos:{parent:'Lev. Inf. de Equipos', current:'Historial de Visitas'},
+  clientes:{parent:'Lev. Inf. de Equipos', current:'Clientes'},
 };
 const SECCIONES_MOVILIDAD = ['nueva','historial','planillas'];
 const SECCIONES_GASTOS = ['nuevoComprobante','proveedores','cajaChica','comprobantes','liquidaciones'];
 const SECCIONES_NOMINA = ['planillaQuinta'];
-const SECCIONES_LEVANTAMIENTOS = ['nuevoLevantamiento','levantamientos'];
+const SECCIONES_LEVANTAMIENTOS = ['nuevoLevantamiento','levantamientos','clientes'];
 
 function showSection(name){
   // Control de acceso por modulo: si el colaborador no tiene Movilidad o
@@ -5065,6 +5083,7 @@ function showSection(name){
   if(name==='planillaQuinta') renderPlanillaQuinta();
   if(name==='nuevoLevantamiento' && !document.getElementById('levEditId').value) resetNuevoLevantamiento();
   if(name==='levantamientos') renderLevantamientos();
+  if(name==='clientes') renderClientesLev();
   closeMobileSidebar();
 }
 
@@ -5826,10 +5845,15 @@ const ICO = {
   anular:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
   activar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   descargar:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
-  pdf:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h1.5a1.5 1.5 0 0 0 0-3H9v5M13.5 12v5h1a2 2 0 0 0 0-4h-1zM18.5 12v5M18.5 14.3h1.7"/></svg>',
+  /* Documento/hoja con esquina doblada + lineas de texto: para diferenciar a
+     simple vista el boton de "Descargar PDF" del de "Exportar CSV" (antes
+     ambos mostraban la misma flecha hacia abajo y no se distinguian). */
+  pdf:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>',
+  /* Cuadricula tipo hoja de calculo: icono propio para "Exportar CSV", distinto
+     tanto del documento de PDF como de la flecha generica "descargar". */
+  csv:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
   billete:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>',
   revertir:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.64-6.36"/><path d="M3 3v5h5"/></svg>',
-  pdf:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
 };
 /* Defensa: todo SVG dentro de un boton de accion tiene su propio tamano.
    Sin esto, un icono sin width/height declarado se dibuja gigante o no se
@@ -8019,6 +8043,91 @@ async function toggleProveedor(id){
   toast(!p.activo ? 'Proveedor activado' : 'Proveedor desactivado');
 }
 
+/* ---------- Clientes (Lev. Inf. de Equipos) ----------
+   Mismo patron que Proveedores: un directorio reutilizable que se completa
+   solo al crear un cliente nuevo desde "Nueva Visita" (ver levGuardarFinal),
+   pero que hasta esta ronda no tenia ninguna pantalla donde verlo o corregir
+   un dato -- el usuario pregunto "si quiero modificar algo de ellos donde lo
+   haria" y esta pantalla es la respuesta. La tabla `clientes` en Supabase
+   solo guarda ruc/razon_social/alias/activo (los demas datos de "Datos del
+   cliente" -- contacto, cargo, sede, etc. -- son propios de cada VISITA, no
+   del cliente reutilizable, ver el plan del modulo). */
+function renderClientesLev(){
+  const q = up((document.getElementById('clienteLevBuscar')||{}).value || '').trim();
+  let lista = DB.clientes.slice().sort((a,b)=> up(a.razon_social) < up(b.razon_social) ? -1 : 1);
+  if(q) lista = lista.filter(c=> up(c.ruc||'').includes(q) || up(c.razon_social||'').includes(q) || up(c.alias||'').includes(q));
+  const body = document.getElementById('clienteLevBody');
+  const empty = document.getElementById('clienteLevEmpty');
+  if(!body) return;
+  if(!lista.length){
+    body.innerHTML = '';
+    if(empty) empty.style.display = '';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  body.innerHTML = lista.map(c=>`
+    <tr>
+      <td data-label="RUC">${escHtml(c.ruc)||'&mdash;'}</td>
+      <td data-label="Raz&oacute;n Social"><b>${escHtml(c.razon_social)}</b></td>
+      <td data-label="Alias">${escHtml(c.alias)||'&mdash;'}</td>
+      <td data-label="Estado" class="center"><span class="badge ${c.activo!==false?'green':'red'}">${c.activo!==false?'ACTIVO':'INACTIVO'}</span></td>
+      <td data-label="Acciones" class="center">
+        <div class="row-actions">
+          <button class="icon-action" title="Editar" onclick="openClienteLevModal('${c.id}')">${ICO.editar}</button>
+          <button class="icon-action ${c.activo!==false?'danger':''}" title="${c.activo!==false?'Desactivar':'Activar'}" onclick="toggleClienteLev('${c.id}')">${c.activo!==false?ICO.anular:ICO.activar}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function openClienteLevModal(id){
+  document.getElementById('clienteLevEditId').value = id || '';
+  const c = id ? DB.clientes.find(x=>x.id===id) : null;
+  document.getElementById('clienteLevModalTitulo').textContent = c ? 'Editar Cliente' : 'Nuevo Cliente';
+  document.getElementById('clienteLevRuc').value = c ? (c.ruc||'') : '';
+  document.getElementById('clienteLevRazon').value = c ? c.razon_social : '';
+  document.getElementById('clienteLevAlias').value = c ? (c.alias||'') : '';
+  document.getElementById('clienteLevModalOverlay').classList.add('open');
+}
+function cerrarClienteLevModal(){
+  document.getElementById('clienteLevModalOverlay').classList.remove('open');
+}
+async function guardarClienteLev(){
+  const id = document.getElementById('clienteLevEditId').value;
+  const ruc = document.getElementById('clienteLevRuc').value.trim() || null;
+  const razon = document.getElementById('clienteLevRazon').value.trim().toUpperCase();
+  const alias = document.getElementById('clienteLevAlias').value.trim().toUpperCase() || null;
+  if(!razon){ toast('Ingresa la razon social', true); return; }
+  const btn = document.getElementById('btnGuardarClienteLev');
+  btn.disabled = true;
+  try{
+    let error;
+    if(id){
+      ({ error } = await sb.from('clientes').update({ ruc, razon_social: razon, alias }).eq('id', id));
+    } else {
+      ({ error } = await sb.from('clientes').insert({ ruc, razon_social: razon, alias }));
+    }
+    if(error){ console.error('guardarClienteLev', error); toast('No se pudo guardar el cliente (revisa si el RUC ya existe)', true); return; }
+    await refreshClientes();
+    cerrarClienteLevModal();
+    renderClientesLev();
+    levPoblarSelectCliente();
+    toast('Cliente guardado');
+  } finally {
+    btn.disabled = false;
+  }
+}
+async function toggleClienteLev(id){
+  const c = DB.clientes.find(x=>x.id===id);
+  if(!c) return;
+  const nuevoActivo = c.activo===false;
+  const { error } = await sb.from('clientes').update({ activo: nuevoActivo }).eq('id', id);
+  if(error){ console.error('toggleClienteLev', error); toast('No se pudo actualizar el cliente', true); return; }
+  await refreshClientes();
+  renderClientesLev();
+  levPoblarSelectCliente();
+  toast(nuevoActivo ? 'Cliente activado' : 'Cliente desactivado');
+}
+
 /* ---------- Comprobantes (lista completa) ---------- */
 // A que "destino" pertenece un comprobante, para filtrar/mostrar de forma
 // consistente con Nuevo Comprobante: CAJA_CHICA / ENTREGA (por el tipo del
@@ -9127,7 +9236,8 @@ const SIDE_GROUPS = {
   ]},
   levantamientos: { submenu:'groupLevantamientos', titulo:'Lev. Inf. de Equipos', items:[
     {sec:'nuevoLevantamiento', label:'Nueva Visita'},
-    {sec:'levantamientos', label:'Historial de Visitas'}
+    {sec:'levantamientos', label:'Historial de Visitas'},
+    {sec:'clientes', label:'Clientes'}
   ]}
 };
 function toggleSideGroup(btn){
@@ -9416,6 +9526,7 @@ function levDraftVacio(){
     editId: null, correlativo: null,
     cliente: { id:null, ruc:'', razonSocial:'' },
     contacto:'', cargo:'', celular:'', correo:'', sede:'',
+    observacionesCliente:'', disponibilidad:'',
     fechaVisita: yyyy+'-'+mm+'-'+dd,
     tecnicoId: me ? me.id : '',
     areas: [],
@@ -9492,6 +9603,7 @@ async function levCargarDesdeServidor(id){
     cliente: { id: cab.cliente_id, ruc: cab.cliente_ruc||'', razonSocial: cab.cliente_razon_social||'' },
     contacto: cab.persona_contacto||'', cargo: cab.cargo||'', celular: cab.celular||'', correo: cab.correo||'',
     sede: cab.sede_direccion||'', fechaVisita: cab.fecha_visita||'', tecnicoId: cab.tecnico_id||'',
+    observacionesCliente: cab.observaciones_cliente||'', disponibilidad: cab.disponibilidad_mantenimiento||'',
     areas: areas, _sinGuardarEnServidor:false, _intentoFinalizar:false
   };
 }
@@ -9538,6 +9650,8 @@ async function levPintarFormulario(){
   document.getElementById('levSede').value = levDraft.sede || '';
   document.getElementById('levFechaVisita').value = levDraft.fechaVisita || '';
   document.getElementById('levTecnico').value = levDraft.tecnicoId || '';
+  document.getElementById('levObservacionesCliente').value = levDraft.observacionesCliente || '';
+  document.getElementById('levDisponibilidad').value = levDraft.disponibilidad || '';
 
   document.getElementById('levCorrelativoLabel').textContent = levDraft.correlativo ? ('N.º ' + levDraft.correlativo) : 'Se asignará un número al guardar';
 
@@ -9574,6 +9688,8 @@ function levCampoDato(){
   levDraft.sede = document.getElementById('levSede').value.trim();
   levDraft.fechaVisita = document.getElementById('levFechaVisita').value;
   levDraft.tecnicoId = document.getElementById('levTecnico').value;
+  levDraft.observacionesCliente = document.getElementById('levObservacionesCliente').value.trim();
+  levDraft.disponibilidad = document.getElementById('levDisponibilidad').value.trim();
   levProgramarAutosave();
 }
 
@@ -10024,6 +10140,8 @@ async function levSincronizar(finalizar){
       persona_contacto: levDraft.contacto || null, cargo: levDraft.cargo || null,
       celular: levDraft.celular || null, correo: levDraft.correo || null,
       sede_direccion: levDraft.sede || null, fecha_visita: levDraft.fechaVisita || null,
+      observaciones_cliente: levDraft.observacionesCliente || null,
+      disponibilidad_mantenimiento: levDraft.disponibilidad || null,
       tecnico_id: levDraft.tecnicoId || null, estado: finalizar ? 'finalizado' : 'borrador',
       total_areas: t.areas, total_equipos: t.equipos
     };
@@ -10139,15 +10257,41 @@ async function refrescarLevantamientos(){
   renderLevantamientosLista();
   toast('Historial actualizado');
 }
-// Filtra y pinta la tabla a partir de lo que YA esta en cache (DB.levantamientos)
-// sin volver a pedirle nada a Supabase -- asi escribir en el buscador o cambiar
-// el filtro de estado responde al instante, en vez de esperar una consulta de
-// red por cada letra que se escribe.
+// Orden actual de la tabla (columna + direccion), igual que historialSort de
+// Historial de Movilidades -- se resetea con "Limpiar filtros".
+let levSort = { field:'fecha', dir:'desc' };
+function setLevSort(field){
+  if(levSort.field === field){
+    levSort.dir = levSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    levSort = { field, dir: field==='fecha' ? 'desc' : 'asc' };
+  }
+  renderLevantamientosLista();
+}
+function limpiarFiltrosLev(){
+  document.getElementById('levFiltroEstado').value = '';
+  document.getElementById('levFiltroTexto').value = '';
+  levSort = { field:'fecha', dir:'desc' };
+  renderLevantamientosLista();
+  toast('Filtros limpiados');
+}
+// Filtra, ordena y pinta la tabla a partir de lo que YA esta en cache
+// (DB.levantamientos) sin volver a pedirle nada a Supabase -- asi escribir en
+// el buscador, cambiar el filtro de estado u ordenar por columna responde al
+// instante, en vez de esperar una consulta de red por cada accion.
 function renderLevantamientosLista(){
   const body = document.getElementById('levListaBody');
   const empty = document.getElementById('levListaEmpty');
   const emptyFiltro = document.getElementById('levListaEmptyFiltro');
   if(!body) return;
+
+  document.querySelectorAll('.th-sort').forEach(th=>{
+    const active = th.dataset.levsort === levSort.field;
+    th.classList.toggle('sort-active', active);
+    const arrow = th.querySelector('.sort-arrow');
+    if(arrow) arrow.innerHTML = active ? (levSort.dir==='asc' ? '&#8593;' : '&#8595;') : '&#8645;';
+  });
+
   if(!DB.levantamientos.length){
     body.innerHTML = '';
     if(empty) empty.style.display = '';
@@ -10165,7 +10309,23 @@ function renderLevantamientosLista(){
     up(l.sede_direccion||'').includes(texto) ||
     up(l.correlativo||'').includes(texto)
   );
-  lista.sort((a,b)=> (a.fecha_visita < b.fecha_visita ? 1 : -1));
+
+  const dirMul = levSort.dir === 'asc' ? 1 : -1;
+  const claves = {
+    correlativo: l=> l.correlativo||'',
+    cliente: l=> up(l.cliente_razon_social||''),
+    fecha: l=> l.fecha_visita||'',
+    areas: l=> l.total_areas||0,
+    equipos: l=> l.total_equipos||0,
+    estado: l=> l.estado||''
+  };
+  const clave = claves[levSort.field] || claves.fecha;
+  lista.sort((a,b)=>{
+    const va = clave(a), vb = clave(b);
+    if(va < vb) return -1*dirMul;
+    if(va > vb) return 1*dirMul;
+    return 0;
+  });
 
   if(!lista.length){
     body.innerHTML = '';
@@ -10190,7 +10350,7 @@ function renderLevantamientosLista(){
         <div class="row-actions">
           <button class="icon-action" title="Editar" onclick="levAbrirExistente('${l.id}')">${ICO.editar}</button>
           <button class="icon-action" title="Descargar PDF" onclick="descargarLevantamientoPDF('${l.id}')">${ICO.pdf}</button>
-          <button class="icon-action" title="Exportar CSV" onclick="levExportarCSV('${l.id}')">${ICO.descargar}</button>
+          <button class="icon-action" title="Exportar CSV" onclick="levExportarCSV('${l.id}')">${ICO.csv}</button>
           <button class="icon-action danger" title="Eliminar visita" onclick="levEliminarVisita('${l.id}')">${ICO.eliminar}</button>
         </div>
       </td>
@@ -10307,80 +10467,300 @@ async function levFotoADataUrl(storagePath){
     });
   }catch(err){ console.error('levFotoADataUrl', err); return null; }
 }
-async function drawLevantamientoPdf(pdf, cab, tecnico, areas, equiposPorArea, fotosPorEquipo){
-  const doc = crearLienzoDocumento(pdf);
-  await dibujarEncabezadoDocumento(pdf, doc, cab.correlativo || '-', 'LEVANTAMIENTO DE EQUIPOS');
+/* ============================================================
+   PDF DE LEVANTAMIENTO DE EQUIPOS -- formato propio de MANGRO
+   Replica el formato en papel que ya usaba MANGRO antes de esta app (secciones
+   numeradas "01 · DATOS DEL CLIENTE", banda azul por area, tarjeta por equipo
+   con acento verde a la izquierda), y le agrega lo que el papel no podia
+   tener: las fotos de cada equipo, organizadas en una cuadricula dentro de
+   su propia tarjeta, para poder identificar visualmente que equipo es cada
+   uno sin tener que ir al celular/tablet. Es un dibujo a medida (no reutiliza
+   crearLienzoDocumento/dibujarEncabezadoDocumento, pensados para el estilo
+   tipo maquina de escribir de Planillas/Liquidaciones) para poder igualar
+   el formato de MANGRO tal cual lo pidio el usuario. */
+const LEV_PDF_COLOR = {
+  azul:[47,111,237], azulBg:[230,238,253], verde:[29,191,115],
+  gris:[138,138,163], grisLinea:[221,220,236], negro:[28,28,40], blanco:[255,255,255]
+};
+function levPdfColor(pdf, metodo, rgb){ pdf[metodo](rgb[0], rgb[1], rgb[2]); }
+function levPdfEncabezado(pdf, doc){
+  const { M, CW } = doc;
+  const topY = M + 14;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(19);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.azul);
+  pdf.text('MANGRO', M, topY);
+  const wMangro = pdf.getTextWidth('MANGRO');
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.6);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+  pdf.text('MANTENIMIENTO GASTRONÓMICO INDUSTRIAL', M+wMangro+9, topY-1);
 
-  pdf.setFontSize(9.2);
-  doc.y += 8;
-  doc.metaLine('CLIENTE', up(cab.cliente_razon_social||''), doc.M+10, doc.y);
-  doc.metaLine('RUC', cab.cliente_ruc||'-', doc.M+doc.CW*0.68, doc.y);
-  doc.y += 15.5;
-  doc.metaLine('SEDE / DIRECCION', up(cab.sede_direccion||'-'), doc.M+10, doc.y);
-  doc.y += 15.5;
-  doc.metaLine('FECHA DE VISITA', fmtFecha(cab.fecha_visita), doc.M+10, doc.y);
-  doc.metaLine('TECNICO', tecnico ? up(nombreCompleto(tecnico)) : '-', doc.M+doc.CW*0.5, doc.y);
-  doc.y += 15.5;
-  doc.metaLine('ESTADO', (cab.estado==='finalizado'?'FINALIZADO':'BORRADOR'), doc.M+10, doc.y);
-  doc.y += 12;
-  pdf.setLineWidth(1); pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
-  doc.y += 20;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(9.5);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+  pdf.text('LEVANTAMIENTO DE INFORMACIÓN DE EQUIPOS', M+CW, topY-6, {align:'right'});
+  pdf.setFont('helvetica','italic'); pdf.setFontSize(8);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+  pdf.text('Etapa previa a cotización', M+CW, topY+7, {align:'right'});
 
-  for(const area of areas){
-    doc.ensureSpace(26);
-    pdf.setFont('courier','bold'); pdf.setFontSize(10.5);
-    pdf.text('AREA: ' + up(area.nombre||'SIN NOMBRE'), doc.M+8, doc.y);
+  levPdfColor(pdf,'setFillColor', LEV_PDF_COLOR.azul);
+  pdf.rect(M, M+28, CW, 4, 'F');
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+}
+function levPdfPie(pdf, doc, pagina, totalPaginas){
+  const { M, CW, PAGE_H } = doc;
+  const y = PAGE_H - M - 8;
+  levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.azul);
+  pdf.setLineWidth(0.8);
+  pdf.line(M, y-10, M+CW, y-10);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.3);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+  pdf.text('MANGRO · MANTENIMIENTO GASTRONÓMICO INDUSTRIAL · mangro.com.pe', M, y);
+  pdf.setFont('helvetica','bold');
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.azul);
+  pdf.text('Pág. ' + pagina + ' de ' + totalPaginas, M+CW, y, {align:'right'});
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+}
+function crearLienzoLev(pdf){
+  const PAGE_W = pdf.internal.pageSize.getWidth();
+  const PAGE_H = pdf.internal.pageSize.getHeight();
+  const M = 36;
+  const CW = PAGE_W - 2*M;
+  const HEADER_BOTTOM = M + 48;
+  const FOOTER_TOP = PAGE_H - M - 26;
+  let y = HEADER_BOTTOM;
+  function ensureSpace(neededH){
+    if(y + neededH > FOOTER_TOP){
+      pdf.addPage();
+      levPdfEncabezado(pdf, { M, CW });
+      y = HEADER_BOTTOM;
+      return true;
+    }
+    return false;
+  }
+  return { PAGE_W, PAGE_H, M, CW, HEADER_BOTTOM, FOOTER_TOP, get y(){return y;}, set y(v){y=v;}, ensureSpace };
+}
+function levPdfBandaSeccion(pdf, doc, numero, titulo){
+  doc.ensureSpace(34);
+  doc.y += 6;
+  levPdfColor(pdf,'setFillColor', LEV_PDF_COLOR.azulBg);
+  pdf.rect(doc.M, doc.y-14, doc.CW, 22, 'F');
+  levPdfColor(pdf,'setFillColor', LEV_PDF_COLOR.azul);
+  pdf.rect(doc.M, doc.y-14, 4, 22, 'F');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(10.5);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.azul);
+  pdf.text(numero + ' · ' + titulo, doc.M+14, doc.y+1);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+  doc.y += 28;
+}
+// Fila de hasta 2 campos lado a lado (etiqueta gris chica arriba, valor negro
+// grande abajo) con una linea divisoria fina debajo -- asi Marca/Modelo/Serie
+// quedan cada uno en su propio recuadro en vez de todo el texto corrido.
+function levPdfFilaCampos(pdf, doc, campos){
+  doc.ensureSpace(36);
+  const colW = doc.CW/2;
+  campos.forEach((c,i)=>{
+    if(!c) return;
+    const x = doc.M + i*colW;
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(7.2);
+    levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+    pdf.text(up(c.label), x, doc.y);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10.5);
+    levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+    pdf.text(c.value || '—', x, doc.y+13);
+  });
+  doc.y += 21;
+  levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.grisLinea);
+  pdf.setLineWidth(0.6);
+  pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
+  doc.y += 13;
+}
+// Campo de ancho completo (Sede/Direccion, Observaciones, Disponibilidad):
+// el valor puede envolver a varias lineas, asi que primero se mide.
+function levPdfFilaCompleta(pdf, doc, label, value){
+  const texto = value || '—';
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(10.5);
+  const lineas = pdf.splitTextToSize(texto, doc.CW);
+  const altoValor = lineas.length*13;
+  doc.ensureSpace(16+altoValor+13);
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(7.2);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+  pdf.text(up(label), doc.M, doc.y);
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(10.5);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+  pdf.text(lineas, doc.M, doc.y+13);
+  doc.y += 13 + altoValor + 8;
+  levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.grisLinea);
+  pdf.setLineWidth(0.6);
+  pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
+  doc.y += 13;
+}
+function levPdfBandaArea(pdf, doc, nombre, cantidad){
+  doc.ensureSpace(30);
+  doc.y += 4;
+  levPdfColor(pdf,'setFillColor', LEV_PDF_COLOR.azul);
+  pdf.rect(doc.M, doc.y-14, doc.CW, 22, 'F');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.blanco);
+  pdf.text('ÁREA: ' + up(nombre||'SIN NOMBRE'), doc.M+10, doc.y+1);
+  pdf.text(cantidad + (cantidad===1?' EQUIPO':' EQUIPOS'), doc.M+doc.CW-10, doc.y+1, {align:'right'});
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+  doc.y += 26;
+}
+// Alto total que va a ocupar la tarjeta de un equipo -- se calcula ANTES de
+// dibujar nada para reservar el espacio de una sola vez (doc.ensureSpace) y
+// que la tarjeta completa salte de pagina junta en vez de partirse a la
+// mitad, igual que se ve en el formato de papel original.
+function levPdfAltoEquipo(pdf, doc, eq, fotos, thumbSize, gap, porFila){
+  let h = 14 + 15 + 21 + 21; // padding + titulo + 2 filas de campos
+  if(eq.observaciones){
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8.3);
+    const obsLineas = pdf.splitTextToSize(eq.observaciones, doc.CW-46);
+    h += 12 + obsLineas.length*10.5 + 10;
+  }
+  if(fotos.length){
+    const filas = Math.ceil(fotos.length/porFila);
+    h += 8 + filas*(thumbSize+gap);
+  } else {
+    h += 16;
+  }
+  h += 14;
+  return h;
+}
+async function levPdfCardEquipo(pdf, doc, indice, eq, fotos){
+  const thumbSize = 100, gap = 10;
+  const porFila = Math.max(1, Math.floor((doc.CW-24+gap) / (thumbSize+gap)));
+  const alto = levPdfAltoEquipo(pdf, doc, eq, fotos, thumbSize, gap, porFila);
+  doc.ensureSpace(alto + 12);
+  const top = doc.y;
+  doc.y += 14;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+  pdf.text('EQUIPO ' + indice + ': ' + up(eq.tipo_equipo || 'SIN TIPO'), doc.M+16, doc.y);
+  doc.y += 15;
+
+  const colW = (doc.CW-32)/2;
+  const filaCampo = (campos)=>{
+    campos.forEach((c,i)=>{
+      const x = doc.M+16 + i*colW;
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(7.2);
+      levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+      pdf.text(up(c.label), x, doc.y);
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(9.5);
+      levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+      pdf.text(c.value || '—', x, doc.y+12);
+    });
+    doc.y += 21;
+  };
+  filaCampo([{label:'Marca', value:eq.marca}, {label:'Modelo', value:eq.modelo}]);
+  filaCampo([{label:'N° de serie', value:eq.n_serie}, {label:'Código interno', value:eq.codigo_interno}]);
+
+  if(eq.observaciones){
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8.3);
+    const obsLineas = pdf.splitTextToSize(eq.observaciones, doc.CW-46);
+    const boxH = 10 + obsLineas.length*10.5;
+    levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.azul);
+    pdf.setLineWidth(0.8);
+    pdf.rect(doc.M+16, doc.y, doc.CW-32, boxH, 'S');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(7.4);
+    levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.azul);
+    pdf.text('OBS:', doc.M+22, doc.y+11);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8.3);
+    levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+    pdf.text(obsLineas, doc.M+42, doc.y+11);
+    doc.y += boxH + 10;
+  }
+
+  if(fotos.length){
+    let fx = doc.M+16, filaAlto = thumbSize;
+    fotos.forEach((foto, i)=>{
+      if(i>0 && i%porFila===0){ fx = doc.M+16; doc.y += thumbSize+gap; }
+      levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.grisLinea);
+      pdf.setLineWidth(0.6);
+      pdf.rect(fx, doc.y, thumbSize, thumbSize, 'S');
+      if(foto.dataUrl){
+        try{ pdf.addImage(foto.dataUrl, imgFormatFromDataURL(foto.dataUrl), fx+2, doc.y+2, thumbSize-4, thumbSize-4); }
+        catch(e){ pdf.setFontSize(7); pdf.text('ERROR', fx+thumbSize/2, doc.y+thumbSize/2, {align:'center'}); }
+      } else {
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5);
+        levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+        pdf.text('SIN FOTO', fx+thumbSize/2, doc.y+thumbSize/2, {align:'center'});
+        levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+      }
+      fx += thumbSize+gap;
+    });
+    doc.y += filaAlto + 8;
+  } else {
+    pdf.setFont('helvetica','italic'); pdf.setFontSize(8);
+    levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+    pdf.text('(sin fotos)', doc.M+16, doc.y+4);
+    levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
     doc.y += 16;
+  }
+
+  doc.y += 4;
+  const bottom = doc.y;
+  levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.grisLinea);
+  pdf.setLineWidth(0.7);
+  pdf.rect(doc.M, top, doc.CW, bottom-top, 'S');
+  levPdfColor(pdf,'setFillColor', LEV_PDF_COLOR.verde);
+  pdf.rect(doc.M, top, 3.5, bottom-top, 'F');
+  doc.y += 12;
+}
+async function drawLevantamientoPdf(pdf, cab, tecnico, areas, equiposPorArea, fotosPorEquipo){
+  const doc = crearLienzoLev(pdf);
+  levPdfEncabezado(pdf, doc);
+
+  levPdfBandaSeccion(pdf, doc, '01', 'DATOS DEL CLIENTE');
+  levPdfFilaCampos(pdf, doc, [{label:'N° de RUC', value:cab.cliente_ruc}, {label:'Razón social', value:up(cab.cliente_razon_social)}]);
+  levPdfFilaCampos(pdf, doc, [{label:'Persona de contacto', value:up(cab.persona_contacto)}, {label:'Cargo', value:up(cab.cargo)}]);
+  levPdfFilaCampos(pdf, doc, [{label:'Celular', value:cab.celular}, {label:'Correo electrónico', value:cab.correo}]);
+  levPdfFilaCompleta(pdf, doc, 'Sede / Dirección', up(cab.sede_direccion));
+  if(cab.observaciones_cliente) levPdfFilaCompleta(pdf, doc, 'Observaciones', cab.observaciones_cliente);
+  if(cab.disponibilidad_mantenimiento) levPdfFilaCompleta(pdf, doc, 'Disponibilidad para mantenimiento', cab.disponibilidad_mantenimiento);
+  levPdfFilaCampos(pdf, doc, [{label:'Fecha de visita', value:fmtFecha(cab.fecha_visita)}, {label:'Técnico responsable', value: tecnico ? up(nombreCompleto(tecnico)) : null}]);
+
+  levPdfBandaSeccion(pdf, doc, '02', 'EQUIPOS POR ÁREA');
+  for(const area of areas){
     const equipos = equiposPorArea[area.id] || [];
+    levPdfBandaArea(pdf, doc, area.nombre, equipos.length);
     if(!equipos.length){
-      pdf.setFont('courier','normal'); pdf.setFontSize(8.5);
-      pdf.text('Sin equipos registrados en esta area.', doc.M+10, doc.y);
-      doc.y += 16;
+      doc.ensureSpace(16);
+      pdf.setFont('helvetica','italic'); pdf.setFontSize(8.5);
+      levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+      pdf.text('Sin equipos registrados en esta área.', doc.M+16, doc.y+2);
+      levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+      doc.y += 20;
     }
     for(let i=0;i<equipos.length;i++){
-      const eq = equipos[i];
-      const fotos = fotosPorEquipo[eq.id] || [];
-      doc.ensureSpace(74);
-      pdf.setFont('courier','bold'); pdf.setFontSize(9);
-      pdf.text((i+1) + '. ' + up(eq.tipo_equipo || 'EQUIPO SIN TIPO'), doc.M+8, doc.y+10);
-      doc.y += 16;
-      pdf.setFont('courier','normal'); pdf.setFontSize(8);
-      pdf.text('Marca: ' + (eq.marca||'-') + '   Modelo: ' + (eq.modelo||'-') + '   N Serie: ' + (eq.n_serie||'-'), doc.M+8, doc.y);
-      doc.y += 12;
-      if(eq.codigo_interno){ pdf.text('Codigo interno: ' + eq.codigo_interno, doc.M+8, doc.y); doc.y += 12; }
-      if(eq.observaciones){
-        const obsLines = pdf.splitTextToSize('Obs: ' + eq.observaciones, doc.CW-20);
-        obsLines.forEach(l=>{ doc.ensureSpace(12); pdf.text(l, doc.M+8, doc.y); doc.y += 11; });
-      }
-      if(fotos.length){
-        doc.y += 4;
-        const thumbSize = 62, gap = 8;
-        doc.ensureSpace(thumbSize + 10);
-        let fx = doc.M + 8;
-        fotos.forEach(foto=>{
-          if(fx + thumbSize > doc.M + doc.CW){ fx = doc.M+8; doc.y += thumbSize + gap; doc.ensureSpace(thumbSize+10); }
-          pdf.setLineWidth(0.5); pdf.rect(fx, doc.y, thumbSize, thumbSize);
-          if(foto.dataUrl){
-            try{ pdf.addImage(foto.dataUrl, imgFormatFromDataURL(foto.dataUrl), fx+1, doc.y+1, thumbSize-2, thumbSize-2); }
-            catch(e){ pdf.setFontSize(6.5); pdf.text('ERROR', fx+thumbSize/2, doc.y+thumbSize/2, {align:'center'}); }
-          } else {
-            pdf.setFontSize(6.5); pdf.text('SIN FOTO', fx+thumbSize/2, doc.y+thumbSize/2, {align:'center'});
-          }
-          fx += thumbSize + gap;
-        });
-        doc.y += thumbSize + 10;
-      } else {
-        pdf.setFont('courier','normal'); pdf.setFontSize(7.5); pdf.setTextColor(150);
-        doc.y += 4; pdf.text('(sin fotos)', doc.M+8, doc.y); doc.y += 10;
-        pdf.setTextColor(0);
-      }
-      pdf.setLineWidth(0.5);
-      pdf.line(doc.M, doc.y, doc.M+doc.CW, doc.y);
-      doc.y += 12;
+      await levPdfCardEquipo(pdf, doc, i+1, equipos[i], fotosPorEquipo[equipos[i].id] || []);
     }
-    doc.y += 6;
   }
-  doc.closeBorder(doc.y);
+
+  const totalAreas = areas.length;
+  const totalEquipos = areas.reduce((s,a)=> s + (equiposPorArea[a.id]||[]).length, 0);
+  levPdfBandaSeccion(pdf, doc, '03', 'RESUMEN');
+  levPdfFilaCampos(pdf, doc, [{label:'Total de áreas', value:String(totalAreas)}, {label:'Total de equipos', value:String(totalEquipos)}]);
+  levPdfFilaCampos(pdf, doc, [{label:'Fecha del levantamiento', value:fmtFecha(cab.fecha_visita)}, {label:'Técnico responsable', value: tecnico ? up(nombreCompleto(tecnico)) : null}]);
+
+  doc.ensureSpace(70);
+  doc.y += 24;
+  const sigW = 220, sigGap = doc.CW - sigW*2;
+  levPdfColor(pdf,'setDrawColor', LEV_PDF_COLOR.negro);
+  pdf.setLineWidth(0.8);
+  pdf.line(doc.M, doc.y, doc.M+sigW, doc.y);
+  pdf.line(doc.M+sigW+sigGap, doc.y, doc.M+sigW+sigGap+sigW, doc.y);
+  doc.y += 13;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(8.3);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.gris);
+  pdf.text('FIRMA DEL TÉCNICO MANGRO', doc.M, doc.y);
+  pdf.text('FIRMA DEL CLIENTE / CONTACTO', doc.M+sigW+sigGap, doc.y);
+  doc.y += 13;
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+  levPdfColor(pdf,'setTextColor', LEV_PDF_COLOR.negro);
+  pdf.text(tecnico ? up(nombreCompleto(tecnico)) : '—', doc.M, doc.y);
+  pdf.text(cab.persona_contacto ? up(cab.persona_contacto) : '—', doc.M+sigW+sigGap, doc.y);
+
+  const totalPaginas = pdf.internal.getNumberOfPages();
+  for(let p=1;p<=totalPaginas;p++){ pdf.setPage(p); levPdfPie(pdf, doc, p, totalPaginas); }
 }
 async function descargarLevantamientoPDF(id){
   toast('Generando PDF...');

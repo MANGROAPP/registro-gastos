@@ -50,6 +50,8 @@ try{
     --red-bg:#FDEBEC;
     --orange:#FFA412;
     --orange-bg:#FFF3E0;
+    --teal:#12A594;
+    --teal-bg:#E3F7F3;
     --bg:#F4F5FA;
     --card:#FFFFFF;
     --border:#ECEBF5;
@@ -261,6 +263,98 @@ try{
     background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;
   }
 
+  /* Detalle de calculo de Renta de Quinta (modal individual) */
+  .qd-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+  .qd-grid-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;}
+  .qd-block{margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
+  .qd-block-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .qd-block-head h3{margin:0;font-size:14px;display:flex;align-items:center;gap:6px;}
+  .qd-block-sub{margin:0 0 10px;font-size:12px;color:var(--text-mut);line-height:1.5;}
+  .qd-info{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--border);color:var(--text-mut);font-size:10.5px;font-weight:700;cursor:help;flex-shrink:0;}
+  .qd-toggle{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-mut);font-weight:600;cursor:pointer;white-space:nowrap;}
+  .qd-toggle input{width:15px;height:15px;margin:0;}
+  /* Tramos del impuesto: una tarjeta por tramo, con acento de color como las
+     tarjetas del Inicio (.stat-card.acc-*), para que la progresividad se lea
+     de un vistazo en vez de como una tabla plana de numeros. */
+  .qd-tramos-label{font-size:11px;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 8px;}
+  .qd-tramos-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 6px;}
+  .qd-tramo-card{
+    background:var(--card);border:1px solid var(--border);border-top:3px solid var(--tc, var(--purple));
+    border-radius:12px;padding:10px 11px;transition:opacity .15s var(--ease);
+  }
+  .qd-tramo-card .qd-t-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+  .qd-tramo-card .qd-t-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--text-mut);}
+  .qd-tramo-card .qd-t-tasa{font-size:15px;font-weight:800;color:var(--tc, var(--purple));}
+  .qd-tramo-card .qd-t-rango{font-size:10.5px;color:var(--text-mut);margin-bottom:6px;line-height:1.3;}
+  .qd-tramo-card .qd-t-monto{font-size:13px;font-weight:700;}
+  .qd-tramo-card.qd-tramo-inactivo{opacity:.42;}
+  .qd-tramo-card.acc-0{--tc:var(--purple);}
+  .qd-tramo-card.acc-1{--tc:var(--green);}
+  .qd-tramo-card.acc-2{--tc:var(--teal);}
+  .qd-tramo-card.acc-3{--tc:var(--orange);}
+  .qd-tramo-card.acc-4{--tc:var(--red);}
+  .qd-concepto-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .qd-concepto-row .custom-select-wrap{flex:1;min-width:0;}
+  .qd-concepto-row input[type=number]{width:110px;min-width:0;text-align:right;flex-shrink:0;}
+  .qd-concepto-quitar{background:none;border:none;color:var(--red,#e5484d);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;}
+  .qd-subtotal{text-align:right;font-size:13px;color:var(--text-mut);margin-top:6px;}
+  .qd-waterfall{background:var(--purple-light);border-radius:var(--radius);padding:20px 22px;border-top:none;}
+  .qd-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13.5px;}
+  .qd-row b{font-weight:600;}
+  .qd-row-total{border-top:1px dashed rgba(47,111,237,.3);margin-top:6px;padding-top:11px;font-weight:600;}
+  .qd-row-final{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:2px solid var(--purple);}
+  .qd-row-final span{font-size:14px;font-weight:600;}
+  .qd-row-final b{font-size:24px;color:var(--purple-dark);}
+  @media (max-width:900px){ .qd-tramos-grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+  @media (max-width:480px){ .qd-tramos-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+  /* Levantamiento de equipos (visita a cliente) */
+  .lev-sync-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:14px 18px;flex-wrap:wrap;}
+  .lev-sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:6px 13px;border-radius:999px;background:var(--border);color:var(--text-mut);white-space:nowrap;}
+  .lev-sync-pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+  .lev-sync-pill.ok{background:var(--green-bg);color:var(--green);}
+  .lev-sync-pill.pending{background:var(--orange-bg);color:var(--orange);}
+  .lev-sync-pill.syncing{background:var(--purple-light);color:var(--purple);}
+  .lev-sync-pill.offline{background:var(--red-bg);color:var(--red);}
+  .lev-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;}
+  .lev-area-card{border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:18px;background:var(--card-2);}
+  .lev-area-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .lev-area-head .lev-area-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .lev-area-head input{flex:1;font-weight:700;font-size:15px;padding:10px 13px;border-radius:11px;border:1.5px solid var(--border);font-family:inherit;background:#FBFBFE;color:var(--text);text-transform:uppercase;}
+  .lev-area-head input:focus{outline:none;border-color:var(--purple);background-color:#fff;}
+  .lev-area-head input::placeholder{text-transform:none;color:#B7B6CC;}
+  html[data-theme="dark"] .lev-area-head input{background-color:#15141F;color:var(--text);border-color:var(--border);}
+  html[data-theme="dark"] .lev-area-head input:focus{background-color:#1D1C2B;}
+  html[data-theme="dark"] .lev-area-head input::placeholder{color:#57567A;}
+  .lev-equipo-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:var(--card);}
+  .lev-equipo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
+  .lev-equipo-head b{font-size:12.5px;color:var(--text-mut);text-transform:uppercase;letter-spacing:.03em;}
+  .lev-fotos-label{font-size:11px;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:.03em;margin:10px 0 6px;}
+  .lev-fotos-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .lev-foto-thumb{position:relative;width:66px;height:66px;border-radius:9px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;}
+  .lev-foto-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .lev-foto-thumb .lev-foto-quitar{position:absolute;top:2px;right:2px;background:rgba(20,15,40,.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:12px;line-height:1;cursor:pointer;padding:0;}
+  .lev-foto-thumb .lev-foto-pend{position:absolute;bottom:2px;left:2px;background:rgba(20,15,40,.6);color:#fff;border-radius:5px;font-size:8.5px;padding:1px 4px;font-weight:700;}
+  .lev-foto-add{width:66px;height:66px;border-radius:9px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-mut);cursor:pointer;font-size:24px;background:none;flex-shrink:0;}
+  .lev-foto-add:hover{border-color:var(--purple);color:var(--purple);}
+  .lev-foto-add:disabled{opacity:.4;cursor:not-allowed;}
+  .lev-resumen-stats{display:flex;gap:20px;flex-wrap:wrap;}
+  .lev-resumen-stats > div{display:flex;flex-direction:column;align-items:center;background:var(--card-2);border-radius:12px;padding:14px 22px;min-width:90px;}
+  .lev-resumen-stats b{font-size:22px;color:var(--purple);}
+  .lev-resumen-stats span{font-size:11px;color:var(--text-mut);text-transform:uppercase;letter-spacing:.02em;}
+  .lev-tag-nuevo{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--purple-light);color:var(--purple);padding:2px 8px;border-radius:999px;margin-left:8px;}
+  .field input[readonly]{background:var(--border);color:var(--text-mut);cursor:not-allowed;}
+  .lev-ocr-row{display:flex;align-items:center;gap:10px;margin:2px 0 12px;flex-wrap:wrap;}
+  .lev-ocr-estado{font-size:11.5px;color:var(--text-mut);}
+  .lev-ocr-detalle{margin:0 0 12px;font-size:12px;color:var(--text-mut);}
+  .lev-ocr-detalle summary{cursor:pointer;font-weight:600;color:var(--purple);}
+  .lev-ocr-detalle pre{white-space:pre-wrap;word-break:break-word;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:6px;font-family:inherit;font-size:11.5px;color:var(--text);}
+  @media (max-width:900px){
+    .lev-area-card{padding:14px;}
+    .lev-resumen-stats{gap:10px;}
+    .lev-resumen-stats > div{flex:1 1 auto;min-width:0;padding:12px 10px;}
+  }
+
   /* STAT CARDS */
   .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:22px 0;}
   .stat-card{
@@ -329,6 +423,8 @@ try{
   /* FORMS */
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   .form-grid.full{grid-template-columns:1fr;}
+  .form-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+  @media (max-width:1100px){ .form-grid-3{grid-template-columns:minmax(0,1fr) minmax(0,1fr);} }
   .field label{display:block;font-size:12.5px;font-weight:600;color:var(--text-mut);margin-bottom:7px;text-transform:uppercase;letter-spacing:.02em;}
   .field input[type=text],
   .field input[type=number],
@@ -410,6 +506,23 @@ try{
   .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
   .close-x{float:right;cursor:pointer;color:var(--text-mut);font-size:18px;background:none;border:none;}
 
+  /* MODAL PANTALLA COMPLETA (fichas extensas: colaborador, etc.) */
+  .modal-overlay.ov-full{padding:16px;}
+  .modal.modal-fullscreen{
+    width:100%;max-width:1400px;min-width:0;height:calc(100vh - 32px);max-height:calc(100vh - 32px);
+    border-radius:20px;padding:0;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .modal-fullscreen .modal-fs-head{padding:22px 28px 16px;border-bottom:1px solid var(--border);flex-shrink:0;position:relative;}
+  .modal-fullscreen .modal-fs-head h2{margin:0 0 4px;padding-right:32px;}
+  .modal-fullscreen .modal-fs-head p.sub{margin:0;}
+  .modal-fullscreen .modal-fs-head .close-x{position:absolute;top:20px;right:24px;float:none;}
+  .modal-fullscreen .modal-fs-body{padding:22px 28px;overflow:auto;flex:1;min-height:0;min-width:0;}
+  .modal-fullscreen .modal-actions{padding:16px 28px;margin:0;border-top:1px solid var(--border);flex-shrink:0;}
+  @media (max-width:900px){
+    .modal-overlay.ov-full{padding:0;}
+    .modal.modal-fullscreen{max-width:100%;height:100vh;max-height:100vh;border-radius:0;}
+  }
+
   .sig-preview{
     width:100%;height:110px;border:1.5px dashed var(--border);border-radius:12px;display:flex;align-items:center;
     justify-content:center;overflow:hidden;background:#FBFBFE;margin-top:6px;
@@ -484,6 +597,17 @@ try{
   @media (max-width:900px){
     .stats-row{grid-template-columns:repeat(2,1fr);}
     .form-grid{grid-template-columns:1fr;}
+    .form-grid-3{grid-template-columns:minmax(0,1fr);}
+    /* Con una sola columna, cualquier campo con "grid-column:span 2" (o
+       similar) inline sigue pidiendo 2 columnas: como solo existe 1, el grid
+       crea una columna implicita y el motor de auto-colocado puede terminar
+       superponiendo ese campo con el siguiente en la misma fila. Forzamos
+       cada campo a ocupar toda la fila unica para evitar la superposicion
+       (visto en "Datos del cliente" de Levantamientos: RUC/Razon social
+       encimados con Cliente/Persona de contacto). */
+    .form-grid-3 > .field{grid-column:1/-1 !important;}
+    .qd-grid-3{grid-template-columns:1fr;}
+    .qd-grid-2{grid-template-columns:1fr;}
     .app{display:block;}
     .sidebar{
       position:fixed;top:0;left:0;height:100%;width:250px !important;padding:20px 14px !important;
@@ -580,6 +704,7 @@ try{
     --green:#3DDC97;  --green-bg:#0F3229;
     --red:#FF6E7C;    --red-bg:#37202A;
     --orange:#FFB454; --orange-bg:#382B14;
+    --teal:#3FD9C7;   --teal-bg:#0E3531;
     --bg:#0E0D16;
     --card:#181724;
     --card-2:#201F2E;
@@ -1407,6 +1532,18 @@ try{
         <button class="nav-btn side-item side-subitem" data-section="comprobantes" title="Comprobantes" onclick="showSection('comprobantes')"><span class="side-label">Comprobantes</span></button>
         <button class="nav-btn side-item side-subitem" data-section="liquidaciones" title="Liquidaciones" onclick="showSection('liquidaciones')"><span class="side-label">Liquidaciones</span></button>
       </div>
+
+      <button class="nav-btn side-item side-group-btn" id="groupNominaBtn" data-group="nomina" title="Nómina" onclick="toggleSideGroup(this)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6z"/><path d="M13 3v6h6"/><path d="M9 13h6M9 17h4"/></svg></span><span class="side-label">Nómina</span><svg class="side-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="side-submenu" id="groupNomina">
+        <button class="nav-btn side-item side-subitem" data-section="planillaQuinta" title="Planilla mensual (Renta de Quinta)" onclick="showSection('planillaQuinta')"><span class="side-label">Planilla mensual</span></button>
+      </div>
+
+      <button class="nav-btn side-item side-group-btn" id="groupLevantamientosBtn" data-group="levantamientos" title="Levantamiento de Informaci&oacute;n de Equipos" onclick="toggleSideGroup(this)"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1z"/><path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M9 12l2 2 4-4"/></svg></span><span class="side-label">Lev. Inf. de Equipos</span><svg class="side-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="side-submenu" id="groupLevantamientos">
+        <button class="nav-btn side-item side-subitem" data-section="nuevoLevantamiento" title="Nueva Visita" onclick="showSection('nuevoLevantamiento')"><span class="side-label">Nueva Visita</span></button>
+        <button class="nav-btn side-item side-subitem" data-section="levantamientos" title="Historial de Visitas" onclick="showSection('levantamientos')"><span class="side-label">Historial de Visitas</span></button>
+      </div>
+
       <button class="nav-btn side-item" data-section="colaboradores" title="Colaboradores" onclick="showSection('colaboradores')"><span class="side-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20"/><circle cx="9.5" cy="8" r="3.5"/><path d="M20 20v-1.5a3.2 3.2 0 0 0-2.2-3.03"/><path d="M14.7 4.6a3.5 3.5 0 0 1 0 6.8"/></svg></span><span class="side-label">Colaboradores</span></button>
     </div>
     <div class="sidebar-divider"></div>
@@ -2080,7 +2217,211 @@ try{
       </div>
     </div>
 
+    <div class="section" id="section-planillaQuinta">
+      <h1 class="page-title">Planilla mensual &middot; Renta de Quinta</h1>
+      <p class="page-sub">C&aacute;lculo de la retenci&oacute;n mensual de renta de quinta categor&iacute;a (m&eacute;todo de proyecci&oacute;n anual, seg&uacute;n SUNAT) para los colaboradores con renta de quinta.</p>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="filters" style="align-items:center;">
+          <select id="pqAnio" style="max-width:110px;"></select>
+          <select id="pqMes" style="max-width:170px;"></select>
+          <button class="btn btn-purple btn-sm" onclick="pqBuscar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Buscar</button>
+          <div class="spacer" style="flex:1;"></div>
+          <span class="hint" style="margin:0;">UIT vigente: <b id="pqUitLabel">S/ 0.00</b> &middot; Deducci&oacute;n fija: <b>7 UIT</b></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tbl-scroll"><table class="tbl-cards">
+          <thead><tr>
+            <th>Colaborador</th>
+            <th>Cargo</th>
+            <th class="right">Sueldo b&aacute;sico</th>
+            <th class="right">Ingresos afectos en el a&ntilde;o</th>
+            <th class="right">Retenci&oacute;n del mes</th>
+            <th class="center">Estado</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="pqBody"></tbody>
+        </table></div>
+        <div class="empty-state" id="pqEmpty" style="display:none;">No hay colaboradores con renta de quinta categor&iacute;a registrados.</div>
+        <p class="hint" style="margin:14px 2px 2px;">Resumen. Haz clic en <b>Ver c&aacute;lculo</b> para el detalle completo de cada colaborador.</p>
+      </div>
+    </div>
+
+    <div class="section" id="section-nuevoLevantamiento">
+      <h1 class="page-title">Nueva Visita</h1>
+      <p class="page-sub">Levantamiento de informaci&oacute;n de equipos en visita a cliente &mdash; etapa previa a cotizaci&oacute;n.</p>
+      <input type="hidden" id="levEditId">
+
+      <div class="card lev-sync-bar">
+        <span class="lev-sync-pill" id="levSyncPill"><span class="dot"></span><span id="levSyncPillTexto">&nbsp;</span></span>
+        <button class="btn btn-outline btn-sm" onclick="levSincronizarAhora()">Sincronizar ahora</button>
+        <div class="spacer" style="flex:1;"></div>
+        <span class="hint" style="margin:0;" id="levCorrelativoLabel">&nbsp;</span>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0;">Datos del cliente</h3>
+        <div class="form-grid-3">
+          <div class="field" style="grid-column:1/-1;">
+            <label>Cliente</label>
+            <select id="levClienteSelect" onchange="levSeleccionarCliente()"><option value="">+ Cliente nuevo&hellip;</option></select>
+          </div>
+          <div class="field"><label>N&deg; de RUC</label><input type="text" id="levRuc" maxlength="11" placeholder="11 digitos" oninput="levCampoCliente()"></div>
+          <div class="field" style="grid-column:span 2;"><label>Raz&oacute;n social</label><input type="text" id="levRazonSocial" placeholder="RAZON SOCIAL" oninput="levCampoCliente()"></div>
+          <div class="field"><label>Persona de contacto</label><input type="text" id="levContacto" oninput="levCampoDato()"></div>
+          <div class="field"><label>Cargo</label><input type="text" id="levCargo" oninput="levCampoDato()"></div>
+          <div class="field"><label>Celular</label><input type="text" id="levCelular" oninput="levCampoDato()"></div>
+          <div class="field"><label>Correo electr&oacute;nico</label><input type="email" id="levCorreo" oninput="levCampoDato()"></div>
+          <div class="field" style="grid-column:span 2;"><label>Sede / Direcci&oacute;n</label><input type="text" id="levSede" oninput="levCampoDato()"></div>
+          <div class="field"><label>Fecha de visita</label><input type="text" class="date-input" id="levFechaVisita" readonly placeholder="Selecciona una fecha" onchange="levCampoDato()"></div>
+          <div class="field" style="grid-column:span 2;"><label>T&eacute;cnico responsable</label><select id="levTecnico" onchange="levCampoDato()"></select></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="lev-block-head">
+          <h3 style="margin:0;">&Aacute;reas y equipos</h3>
+          <button class="btn btn-purple btn-sm" onclick="levAgregarArea()">+ Agregar &aacute;rea</button>
+        </div>
+        <div id="levAreasBox"></div>
+        <div class="empty-state" id="levAreasEmpty"><span class="big">&#128230;</span>A&uacute;n no agregaste ninguna &aacute;rea. Empieza con &laquo;+ Agregar &aacute;rea&raquo;.</div>
+        <datalist id="levTiposEquipoList"></datalist>
+        <input type="file" id="levFotoInput" accept="image/*" capture="environment" multiple style="display:none;" onchange="levFotosSeleccionadas(event)">
+        <input type="file" id="levPlacaInput" accept="image/*" capture="environment" style="display:none;" onchange="levPlacaSeleccionada(event)">
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0;">Resumen</h3>
+        <div class="lev-resumen-stats">
+          <div><b id="levResTotalAreas">0</b><span>&Aacute;reas</span></div>
+          <div><b id="levResTotalEquipos">0</b><span>Equipos</span></div>
+          <div><b id="levResTotalFotos">0</b><span>Fotos</span></div>
+        </div>
+        <p class="hint" style="margin:14px 2px 0;">Revisa que todo est&eacute; correcto &mdash; puedes editar o quitar cualquier equipo arriba antes de guardar.</p>
+        <div class="modal-actions" style="margin-top:10px;">
+          <button class="btn btn-outline" onclick="levDescartarBorrador()">Descartar</button>
+          <button class="btn btn-purple" id="btnGuardarLevantamiento" onclick="levGuardarFinal()">Guardar visita</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="section-levantamientos">
+      <h1 class="page-title">Historial de Visitas</h1>
+      <p class="page-sub">Historial de visitas de levantamiento de equipos por cliente.</p>
+      <div class="card">
+        <div class="tbl-scroll"><table class="tbl-cards">
+          <thead><tr>
+            <th>Cliente</th>
+            <th>Sede</th>
+            <th>Fecha</th>
+            <th>T&eacute;cnico</th>
+            <th class="center">&Aacute;reas</th>
+            <th class="center">Equipos</th>
+            <th class="center">Estado</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="levListaBody"></tbody>
+        </table></div>
+        <div class="empty-state" id="levListaEmpty" style="display:none;"><span class="big">&#128230;</span>A&uacute;n no hay visitas registradas.</div>
+      </div>
+    </div>
+
   </div>
+
+<!-- ===================== MODAL DETALLE DE CALCULO - RENTA DE QUINTA ===================== -->
+<div class="modal-overlay" id="quintaDetalleModalOverlay">
+  <div class="modal" style="max-width:960px;">
+    <button class="close-x" onclick="cerrarDetalleQuinta()">&times;</button>
+    <h2 id="qdTitulo">C&aacute;lculo de Renta de Quinta</h2>
+    <p class="sub" id="qdSub">&nbsp;</p>
+
+    <div class="qd-grid-3">
+      <div class="field">
+        <label>Sueldo b&aacute;sico del mes</label>
+        <input type="number" min="0" step="0.01" id="qdBasico" oninput="qdRecalcular()">
+      </div>
+      <div class="field">
+        <label>Fecha de ingreso</label>
+        <input type="text" id="qdFechaIngreso" disabled>
+      </div>
+      <div class="field">
+        <label>Divisor del mes</label>
+        <input type="text" id="qdDivisor" disabled>
+      </div>
+    </div>
+
+    <div class="qd-block qd-grid-2">
+      <div>
+        <div class="qd-block-head">
+          <h3>Remuneraci&oacute;n Ordinaria <span class="qd-info" title="Conceptos regulares del mes ademas del sueldo basico: horas extra, asignacion familiar, comisiones, etc.">?</span></h3>
+          <button class="btn btn-outline btn-sm" onclick="qdAgregarConcepto('ordinario')">+ A&ntilde;adir</button>
+        </div>
+        <p class="qd-block-sub">Conceptos habituales del mes, aparte del b&aacute;sico (asignaci&oacute;n familiar, horas extra, comisiones). Se suman al b&aacute;sico y se <b>proyectan tambi&eacute;n a los meses que faltan</b> del a&ntilde;o.</p>
+        <div id="qdOrdinarioBox"></div>
+        <div class="qd-subtotal">Subtotal: <b id="qdSubtotalOrdinario">S/ 0.00</b></div>
+      </div>
+      <div>
+        <div class="qd-block-head">
+          <h3>Otras Remuneraciones <span class="qd-info" title="Gratificaciones extraordinarias, bonos, utilidades u otros conceptos no habituales.">?</span></h3>
+          <button class="btn btn-outline btn-sm" onclick="qdAgregarConcepto('extraordinario')">+ A&ntilde;adir</button>
+        </div>
+        <p class="qd-block-sub">Montos extraordinarios que solo caen <b>este mes</b> (gratificaciones, bonos, utilidades). No se proyectan a futuro, solo se suman una vez al c&aacute;lculo anual.</p>
+        <div id="qdExtraordinarioBox"></div>
+        <div class="qd-subtotal">Subtotal: <b id="qdSubtotalExtraordinario">S/ 0.00</b></div>
+      </div>
+    </div>
+
+    <div class="qd-block" id="qdPeriodoAnteriorBlock" style="display:none;">
+      <div class="qd-block-head">
+        <h3>Empleador anterior (este a&ntilde;o) <span class="qd-info" title="Este colaborador ingreso a MANGRO durante el año calculado. Si trabajo en otra empresa antes, ingresa aqui lo declarado en su Certificado de Retenciones.">?</span></h3>
+        <label class="qd-toggle"><input type="checkbox" id="qdTienePeriodoAnterior" onchange="qdToggleAnterior()"> Tuvo otro empleador este a&ntilde;o</label>
+      </div>
+      <p class="qd-block-sub">Solo si ingres&oacute; a MANGRO a mitad de a&ntilde;o y trabaj&oacute; antes en otra empresa. Lo declarado aqu&iacute; (seg&uacute;n su Certificado de Retenciones) se suma <b>una sola vez</b> al c&aacute;lculo anual, no cada mes.</p>
+      <div class="qd-grid-3" id="qdPeriodoAnteriorCampos" style="display:none;">
+        <div class="field">
+          <label>Empleador (opcional)</label>
+          <input type="text" id="qdEmpleadorAnterior" placeholder="Razon social">
+        </div>
+        <div class="field">
+          <label>Remuneraci&oacute;n afecta (S/)</label>
+          <input type="number" min="0" step="0.01" id="qdRemPeriodoAnterior" value="0" oninput="qdRecalcular()">
+        </div>
+        <div class="field">
+          <label>Retenci&oacute;n ya efectuada (S/)</label>
+          <input type="number" min="0" step="0.01" id="qdRetPeriodoAnterior" value="0" oninput="qdRecalcular()">
+        </div>
+      </div>
+    </div>
+
+    <div class="qd-block qd-waterfall">
+      <h3>C&aacute;lculo seg&uacute;n SUNAT</h3>
+      <div class="qd-row"><span>Remuneraci&oacute;n ya percibida en el a&ntilde;o<span id="qdConPeriodoAnteriorLabel"></span></span><b id="qdYaPercibido">S/ 0.00</b></div>
+      <div class="qd-row"><span>+ Proyecci&oacute;n de meses restantes</span><b id="qdProyeccionRestante">S/ 0.00</b></div>
+      <div class="qd-row"><span>+ Otras remuneraciones extraordinarias</span><b id="qdOtrasRemProy">S/ 0.00</b></div>
+      <div class="qd-row qd-row-total"><span>= Remuneraci&oacute;n Bruta Anual Proyectada</span><b id="qdBrutaAnual">S/ 0.00</b></div>
+      <div class="qd-row"><span>&minus; Deducci&oacute;n (7 UIT)</span><b id="qdDeduccion7Uit">S/ 0.00</b></div>
+      <div class="qd-row qd-row-total"><span>= Remuneraci&oacute;n Neta Anual</span><b id="qdNetaAnual">S/ 0.00</b></div>
+
+      <div class="qd-tramos-label">Impuesto por tramo (progresivo)</div>
+      <div class="qd-tramos-grid" id="qdTramosBox"></div>
+
+      <div class="qd-row qd-row-total"><span>= Impuesto Anual Proyectado</span><b id="qdImpuestoAnual">S/ 0.00</b></div>
+      <div class="qd-row"><span>&minus; Retenciones anteriores</span><b id="qdRetencionesAnteriores">S/ 0.00</b></div>
+      <div class="qd-row qd-row-total"><span>= Impuesto pendiente de retener</span><b id="qdImpuestoPendiente">S/ 0.00</b></div>
+      <div class="qd-row-final">
+        <span>Retenci&oacute;n de este mes</span>
+        <b id="qdRetencionMes">S/ 0.00</b>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="cerrarDetalleQuinta()">Cerrar</button>
+      <button class="btn btn-purple" id="btnGuardarDetalleQuinta" onclick="qdGuardar()">Guardar c&aacute;lculo confirmado</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== MODAL ASIGNAR FONDO (Caja Chica o Entrega) ===================== -->
 <div class="modal-overlay" id="asignarCajaModalOverlay">
@@ -2325,13 +2666,16 @@ try{
 </div>
 
 <!-- ===================== MODAL COLABORADOR ===================== -->
-<div class="modal-overlay" id="colabModalOverlay">
-  <div class="modal">
-    <button class="close-x" onclick="closeColabModal()">&times;</button>
-    <h2 id="colabModalTitle">Nuevo Colaborador</h2>
-    <p class="sub">Estos datos apareceran en la planilla oficial de movilidad.</p>
+<div class="modal-overlay ov-full" id="colabModalOverlay">
+  <div class="modal modal-fullscreen">
+    <div class="modal-fs-head">
+      <button class="close-x" onclick="closeColabModal()">&times;</button>
+      <h2 id="colabModalTitle">Nuevo Colaborador</h2>
+      <p class="sub">Estos datos apareceran en la planilla oficial de movilidad.</p>
+    </div>
+    <div class="modal-fs-body">
     <input type="hidden" id="colabEditId">
-    <div class="form-grid full">
+    <div class="form-grid-3">
       <div class="field">
         <label>Apellido Paterno</label>
         <input type="text" id="colabApPaterno" placeholder="EJ: LOPEZ">
@@ -2356,7 +2700,7 @@ try{
         <label>Correo MANGRO (para iniciar sesion)</label>
         <input type="email" id="colabEmail" placeholder="nombre@mangro.com.pe">
       </div>
-      <div class="field full" id="colabAccesoNota" style="display:none;">
+      <div class="field" id="colabAccesoNota" style="display:none;grid-column:1/-1;">
         <div class="nota-acceso">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           <div>
@@ -2371,26 +2715,114 @@ try{
         <input type="text" id="colabPassword" placeholder="Minimo 6 caracteres">
         <small class="hint">Es una contrase&ntilde;a <b>temporal</b>: compartesela al colaborador y, la primera vez que ingrese, la app le va a pedir que cree la suya. Desde ese momento la que le enviaste deja de servir y solo el conoce la nueva.</small>
       </div>
-      <div class="field full" style="display:flex;align-items:center;gap:8px;">
+      <div class="field" style="display:flex;align-items:center;gap:8px;grid-column:1/-1;">
         <input type="checkbox" id="colabIsAdmin" style="width:18px;height:18px;">
         <label for="colabIsAdmin" style="margin:0;">Es administrador (puede ver y gestionar a todo el personal)</label>
       </div>
-      <div class="field full" id="colabModulosField">
-        <label>M&oacute;dulos con acceso</label>
+      <div class="field" id="colabModulosField" style="grid-column:1/-1;">
+        <label>Módulos con acceso</label>
         <div id="colabModulosBox" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;"></div>
         <small class="hint">Define qu&eacute; partes de la app puede ver y usar este colaborador. Se puede cambiar despu&eacute;s en cualquier momento editando su ficha.</small>
       </div>
-      <div class="field full" id="colabAprobadorField" style="display:none;">
+      <div class="field" id="colabAprobadorField" style="display:none;grid-column:1/-1;">
         <label>Aprobador de sus gastos</label>
         <select id="colabAprobador"><option value="">Sin asignar (cualquier administrador puede aprobar)</option></select>
         <small class="hint">Solo esta persona podr&aacute; aprobar, observar, registrar el reintegro o cerrar las liquidaciones de este colaborador &mdash; ning&uacute;n otro administrador podr&aacute; hacerlo en su lugar, y nunca puede aprobarse a s&iacute; mismo. Mientras quede &laquo;Sin asignar&raquo;, cualquier administrador puede aprobarlas (como funcionaba antes).</small>
       </div>
-      <div class="field">
+      <div class="field" style="grid-column:1/-1;">
         <label>Firma (imagen escaneada)</label>
         <input type="file" id="colabFirmaFile" accept="image/*" onchange="previewFirma(event)">
         <div class="sig-preview" id="firmaPreviewBox"><span>Sin firma cargada</span></div>
         <small class="hint">Sube una foto o escaneo de la firma. Se optimiza automaticamente para verse nitida en el reporte y se reutiliza en todas sus planillas.</small>
       </div>
+
+      <div class="field" style="margin-top:8px;border-top:1px solid var(--border,#e5e7eb);padding-top:12px;grid-column:1/-1;">
+        <label style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-mut);">Datos laborales (N&oacute;mina)</label>
+      </div>
+      <div class="field">
+        <label>Fecha de ingreso</label>
+        <input type="date" id="colabFechaIngreso">
+      </div>
+      <div class="field">
+        <label>Fecha de cese (opcional)</label>
+        <input type="date" id="colabFechaCese">
+      </div>
+      <div class="field">
+        <label>Cargo</label>
+        <input type="text" id="colabCargo" placeholder="EJ: OPERARIO">
+      </div>
+      <div class="field">
+        <label>&Aacute;rea (opcional)</label>
+        <input type="text" id="colabArea" placeholder="EJ: LOGISTICA">
+      </div>
+      <div class="field">
+        <label>R&eacute;gimen laboral de la empresa</label>
+        <select id="colabRegimenLaboral" onchange="actualizarSugerenciaVacaciones()">
+          <option value="microempresa">Microempresa</option>
+          <option value="pequena_empresa">Peque&ntilde;a empresa</option>
+          <option value="general">R&eacute;gimen general</option>
+        </select>
+        <small class="hint">Se registra por colaborador (no solo por empresa) para que, si el r&eacute;gimen cambia a futuro, cada quien conserve el que ten&iacute;a mientras estuvo ah&iacute;.</small>
+      </div>
+      <div class="field">
+        <label>D&iacute;as de vacaciones al a&ntilde;o</label>
+        <input type="number" id="colabDiasVacaciones" min="0" step="1" placeholder="15">
+        <small class="hint">Sugerido: 15 en microempresa, 30 en peque&ntilde;a empresa o r&eacute;gimen general. Editable.</small>
+      </div>
+      <div class="field">
+        <label>Sueldo b&aacute;sico</label>
+        <input type="number" id="colabSueldoBasico" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>R&eacute;gimen pensionario</label>
+        <select id="colabRegimenPensionario">
+          <option value="">Sin definir</option>
+          <option value="ONP">ONP</option>
+          <option value="AFP HABITAT">AFP Habitat</option>
+          <option value="AFP INTEGRA">AFP Integra</option>
+          <option value="AFP PRIMA">AFP Prima</option>
+          <option value="AFP PROFUTURO">AFP Profuturo</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>CUSPP (si tiene AFP)</label>
+        <input type="text" id="colabCuspp" placeholder="Codigo CUSPP">
+      </div>
+      <div class="field" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="colabAsignacionFamiliar" style="width:18px;height:18px;">
+        <label for="colabAsignacionFamiliar" style="margin:0;">Recibe asignaci&oacute;n familiar</label>
+      </div>
+      <div class="field">
+        <label>Tipo de renta</label>
+        <select id="colabTipoRenta" onchange="actualizarCampoConstanciaSuspension()">
+          <option value="quinta">Renta de Quinta (planilla)</option>
+          <option value="cuarta">Renta de Cuarta (recibos por honorarios)</option>
+        </select>
+      </div>
+      <div class="field" id="colabConstanciaField" style="display:none;">
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="colabTieneConstancia" style="width:18px;height:18px;" onchange="actualizarCampoConstanciaSuspension()">
+          <span>Tiene Constancia de Suspensi&oacute;n de Retenciones vigente</span>
+        </label>
+        <input type="date" id="colabFechaVigenciaConstancia" style="margin-top:6px;display:none;">
+      </div>
+      <div class="field">
+        <label>Fecha de nacimiento (opcional)</label>
+        <input type="date" id="colabFechaNacimiento">
+      </div>
+      <div class="field">
+        <label>Sexo (opcional)</label>
+        <select id="colabSexo">
+          <option value="">Sin definir</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+        </select>
+      </div>
+      <div class="field" style="grid-column:1/-1;">
+        <label>Direcci&oacute;n (opcional)</label>
+        <input type="text" id="colabDireccion" placeholder="Direccion de domicilio">
+      </div>
+    </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeColabModal()">Cancelar</button>
@@ -2952,7 +3384,7 @@ const DISTRITOS_CALLAO = ["CALLAO","BELLAVISTA","CARMEN DE LA LEGUA REYNOSO","LA
    service-worker.js (const CACHE = 'mangro-gastos-vX.Y.Z'), si no los
    celulares siguen mostrando la version vieja.
    ============================================================ */
-const APP_VERSION = '2.13.1';
+const APP_VERSION = '2.19.0';
 /* Modulos de negocio que se pueden habilitar/deshabilitar por colaborador
    (control de acceso por modulo). Cada modulo nuevo que se agregue a la
    app suma una entrada aqui, y automaticamente aparece como checkbox en
@@ -2963,7 +3395,9 @@ const APP_VERSION = '2.13.1';
    exactamente con la que usan las políticas en supabase_modulos_acceso.sql. */
 const MODULOS_DISPONIBLES = [
   { key:'movilidad', label:'Movilidad', desc:'Nueva Movilidad, Movilidades e Historial, Generar Planilla.' },
-  { key:'gastos', label:'Gastos', desc:'Nuevo Comprobante, Caja Chica y Liquidaciones (Rendicion y Reembolso, proximamente).' }
+  { key:'gastos', label:'Gastos', desc:'Nuevo Comprobante, Caja Chica y Liquidaciones (Rendicion y Reembolso, proximamente).' },
+  { key:'nomina', label:'Nómina', desc:'Calculo mensual de renta de quinta categoria, planilla y (proximamente) recibos por honorarios / renta de cuarta.' },
+  { key:'levantamientos', label:'Lev. Inf. de Equipos', desc:'Levantamiento de informacion de equipos en visita a cliente (etapa previa a cotizacion): areas, equipos y fotos.' }
 ];
 function usuarioTieneModulo(modulo){
   const user = getCurrentUser();
@@ -3001,6 +3435,14 @@ function aplicarVisibilidadPorModulos(){
   if(qaGastos) qaGastos.style.display = tieneGastos ? '' : 'none';
   const bGastos = document.getElementById('dashboardBlockGastos');
   if(bGastos) bGastos.style.display = tieneGastos ? '' : 'none';
+
+  const tieneNomina = usuarioTieneModulo('nomina');
+  const nominaBtn = document.getElementById('groupNominaBtn');
+  if(nominaBtn) nominaBtn.style.display = tieneNomina ? '' : 'none';
+
+  const tieneLevantamientos = usuarioTieneModulo('levantamientos');
+  const levBtn = document.getElementById('groupLevantamientosBtn');
+  if(levBtn) levBtn.style.display = tieneLevantamientos ? '' : 'none';
 }
 
 const safeStorage = (function(){
@@ -3084,7 +3526,21 @@ const cache = {
   comprobantes: [],
   liquidaciones: [],
   fondosSaldo: [],       // espejo de la vista v_fondos_saldo (ya calculada en SQL)
-  saldosColaborador: []  // espejo de la vista v_saldos_colaborador
+  saldosColaborador: [], // espejo de la vista v_saldos_colaborador
+  // Modulo Nomina: calculo mensual de renta de quinta ya guardado (ver
+  // supabase_nomina_3_planilla_quinta.sql). Se recarga al entrar a la pantalla.
+  nominaPlanillaQuinta: [],
+  nominaConceptos: [],                  // catalogo de conceptos PLAME (categoria='ingreso')
+  nominaIngresosPeriodoAnterior: [],     // ingresos/retencion de un empleador anterior en el año, por colaborador
+  // Modulo Levantamientos: visita de toma de informacion de equipos, previa a
+  // cotizacion. clientes/tiposEquipo son catalogos reutilizables (mismo patron
+  // que proveedores); levantamientos es solo la cabecera para el listado --
+  // areas/equipos/fotos de cada uno viven en IndexedDB mientras se completan
+  // (ver motor de sincronizacion, funciones lev*) y se leen de Supabase solo
+  // al abrir uno ya guardado para editarlo.
+  clientes: [],
+  tiposEquipo: [],
+  levantamientos: []
 };
 
 function rowToColaborador(r){
@@ -3106,7 +3562,26 @@ function rowToColaborador(r){
     // supabase_rendiciones_4_aprobador.sql). null = todavia sin asignar, y
     // mientras tanto cualquier administrador puede aprobar (respaldo
     // transitorio, no un agujero de seguridad: lo decide el propio SQL).
-    aprobadorId: r.aprobador_id || null
+    aprobadorId: r.aprobador_id || null,
+    // Datos laborales / Nomina (ver supabase_nomina_2_colaborador_campos_y_vacaciones.sql).
+    fechaIngreso: r.fecha_ingreso || null,
+    fechaCese: r.fecha_cese || null,
+    cargo: r.cargo || '',
+    area: r.area || '',
+    tipoTrabajador: r.tipo_trabajador || '',
+    sueldoBasico: r.sueldo_basico != null ? Number(r.sueldo_basico) : 0,
+    regimenPensionario: r.regimen_pensionario || '',
+    cuspp: r.cuspp || '',
+    tieneAsignacionFamiliar: !!r.tiene_asignacion_familiar,
+    direccion: r.direccion || '',
+    fechaNacimiento: r.fecha_nacimiento || null,
+    sexo: r.sexo || '',
+    nacionalidad: r.nacionalidad || 'PERUANA',
+    regimenLaboral: r.regimen_laboral || 'microempresa',
+    diasVacacionesAnuales: r.dias_vacaciones_anuales != null ? Number(r.dias_vacaciones_anuales) : 15,
+    tipoRenta: r.tipo_renta || 'quinta',
+    tieneConstanciaSuspension: !!r.tiene_constancia_suspension,
+    fechaVigenciaConstancia: r.fecha_vigencia_constancia || null
   };
 }
 function rowToMovilidad(r){
@@ -3303,8 +3778,491 @@ const DB = {
   get comprobantes(){ return cache.comprobantes; },
   get liquidaciones(){ return cache.liquidaciones; },
   get fondosSaldo(){ return cache.fondosSaldo; },
-  get saldosColaborador(){ return cache.saldosColaborador; }
+  get saldosColaborador(){ return cache.saldosColaborador; },
+  get nominaPlanillaQuinta(){ return cache.nominaPlanillaQuinta; },
+  get nominaConceptos(){ return cache.nominaConceptos; },
+  get nominaIngresosPeriodoAnterior(){ return cache.nominaIngresosPeriodoAnterior; },
+  get clientes(){ return cache.clientes; },
+  get tiposEquipo(){ return cache.tiposEquipo; },
+  get levantamientos(){ return cache.levantamientos; }
 };
+// Tolerante a 42P01 (los scripts supabase_nomina_*.sql aun no corridos en este proyecto).
+async function refreshNominaPlanillaQuinta(){
+  const { data, error } = await sb.from('nomina_planilla_quinta').select('*');
+  if(error){
+    if(error.code !== '42P01') console.error('refreshNominaPlanillaQuinta', error);
+    cache.nominaPlanillaQuinta = [];
+    return;
+  }
+  cache.nominaPlanillaQuinta = data || [];
+}
+async function refreshNominaConceptos(){
+  const { data, error } = await sb.from('nomina_conceptos').select('*').eq('categoria','ingreso').order('codigo');
+  if(error){
+    if(error.code !== '42P01') console.error('refreshNominaConceptos', error);
+    cache.nominaConceptos = [];
+    return;
+  }
+  cache.nominaConceptos = data || [];
+}
+async function refreshNominaIngresosPeriodoAnterior(){
+  const { data, error } = await sb.from('nomina_ingresos_periodo_anterior').select('*');
+  if(error){
+    if(error.code !== '42P01') console.error('refreshNominaIngresosPeriodoAnterior', error);
+    cache.nominaIngresosPeriodoAnterior = [];
+    return;
+  }
+  cache.nominaIngresosPeriodoAnterior = data || [];
+}
+
+// Catalogo reutilizable de clientes (mismo patron que proveedores). Se carga
+// una vez y se reutiliza tanto en el selector del formulario como en el
+// alta rapida de cliente nuevo durante la visita.
+async function refreshClientes(){
+  const { data, error } = await sb.from('clientes').select('*').order('razon_social');
+  if(error){
+    if(error.code !== '42P01') console.error('refreshClientes', error);
+    cache.clientes = [];
+    return;
+  }
+  cache.clientes = data || [];
+}
+// Catalogo de tipos de equipo (para el datalist "catalogo + texto libre").
+async function refreshTiposEquipo(){
+  const { data, error } = await sb.from('tipos_equipo').select('*').order('nombre');
+  if(error){
+    if(error.code !== '42P01') console.error('refreshTiposEquipo', error);
+    cache.tiposEquipo = [];
+    return;
+  }
+  cache.tiposEquipo = data || [];
+}
+// Solo cabeceras (para el listado). Las areas/equipos/fotos de cada uno se
+// leen aparte solo al abrir un levantamiento ya guardado para editarlo
+// (ver levAbrirExistente), asi no se arrastra todo el arbol anidado al cache
+// global en cada refresco.
+async function refreshLevantamientos(){
+  const { data, error } = await sb.from('levantamientos').select('*').order('created_at', { ascending:false });
+  if(error){
+    if(error.code !== '42P01') console.error('refreshLevantamientos', error);
+    cache.levantamientos = [];
+    return;
+  }
+  cache.levantamientos = data || [];
+}
+
+/* ============================================================
+   NOMINA - CALCULO DE RENTA DE QUINTA CATEGORIA
+   Metodo de proyeccion anual (DS 122-94-EF y modificatorias): se proyecta
+   la remuneracion anual, se restan 7 UIT, se aplican los tramos progresivos
+   y el impuesto anual se reparte entre los meses segun el cronograma oficial
+   de retencion (ver mas abajo). Portado del prototipo probado en Python
+   (herramientas/calc_quinta.py) que valido la logica antes de este punto.
+   ============================================================ */
+const UIT_VIGENTE = 5500.00; // UIT 2026, confirmada por el usuario. Actualizar cada enero.
+const TRAMOS_RENTA_QUINTA = [
+  { limiteUit: 5,  tasa: 0.08 },
+  { limiteUit: 20, tasa: 0.14 },
+  { limiteUit: 35, tasa: 0.17 },
+  { limiteUit: 45, tasa: 0.20 },
+  { limiteUit: Infinity, tasa: 0.30 }
+];
+// Cuantos meses divide el impuesto anual proyectado, segun el mes que se
+// esta calculando (cronograma oficial de retencion mensual). Diciembre no
+// usa divisor: es el ajuste final (impuesto anual real - lo ya retenido).
+const DIVISOR_RETENCION_QUINTA = {1:12,2:12,3:12,4:9,5:8,6:8,7:8,8:5,9:4,10:4,11:4,12:null};
+const MESES_LABEL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// Desglosa la renta neta anual tramo por tramo (para mostrar en pantalla
+// cuanto impuesto aporta cada tramo, con sus limites en UIT). Cada tramo
+// trae `activo:false` cuando la renta neta anual ni siquiera lo alcanza,
+// para poder pintarlo atenuado en vez de ocultarlo (asi se ve toda la
+// escala de tramos, no solo los que aplican).
+function desglosarTramosQuinta(rentaNetaAnual, uit){
+  uit = uit || UIT_VIGENTE;
+  let limiteAnteriorUit = 0;
+  return TRAMOS_RENTA_QUINTA.map(tramo=>{
+    const limiteSoles = tramo.limiteUit === Infinity ? Infinity : tramo.limiteUit * uit;
+    const limiteAnteriorSoles = limiteAnteriorUit * uit;
+    const base = Math.max(0, Math.min(rentaNetaAnual, limiteSoles) - limiteAnteriorSoles);
+    const fila = {
+      limiteInferiorUit: limiteAnteriorUit, limiteSuperiorUit: tramo.limiteUit, tasa: tramo.tasa,
+      base: round2(base), impuesto: round2(base * tramo.tasa), activo: base > 0
+    };
+    limiteAnteriorUit = tramo.limiteUit;
+    return fila;
+  });
+}
+function calcularImpuestoAnualQuinta(rentaNetaAnual, uit){
+  if(rentaNetaAnual <= 0) return 0;
+  return desglosarTramosQuinta(rentaNetaAnual, uit).reduce((s,t)=>s + t.impuesto, 0);
+}
+
+/* Calcula la retencion de renta de quinta de UN colaborador para un mes
+   dado. `historialAnio` es el conjunto de filas YA GUARDADAS de ese
+   colaborador para el mismo año (nomina_planilla_quinta), en meses
+   anteriores al que se esta calculando: de ahi sale lo realmente ya
+   percibido/retenido en el año, en vez de adivinarlo. Si un mes anterior
+   no tiene fila guardada (por ejemplo, se empieza a usar el sistema a
+   mitad de año), se estima con el sueldo basico actual del colaborador.
+   Esta estimacion queda expuesta en el resultado (`esEstimado`).
+   `periodoAnterior` = {remuneracion, retencion}: lo que el colaborador ya
+   percibio/le retuvieron en OTRO empleador el mismo año, antes de
+   ingresar a MANGRO (dato anual, no mensual: sale de su Certificado de
+   Retenciones). Se suma una sola vez, fuera del recorrido mes a mes. */
+function calcularRetencionQuinta(colaborador, anio, mes, sueldoBasicoMes, extraordinarioMes, historialAnio, periodoAnterior){
+  periodoAnterior = periodoAnterior || {remuneracion:0, retencion:0};
+  let mesIngreso = 1;
+  if(colaborador.fechaIngreso){
+    const fi = new Date(colaborador.fechaIngreso + 'T00:00:00');
+    if(fi.getFullYear() === anio) mesIngreso = fi.getMonth() + 1;
+    else if(fi.getFullYear() > anio) mesIngreso = 13; // ingresa despues de este año: no deberia calcularse
+  }
+  let remuneracionesYaPercibidas = Number(periodoAnterior.remuneracion||0);
+  let retencionesAcumuladasPrevias = Number(periodoAnterior.retencion||0);
+  let huboEstimacion = false;
+  for(let m = mesIngreso; m < mes; m++){
+    const fila = (historialAnio||[]).find(f=>f.mes===m);
+    if(fila){
+      remuneracionesYaPercibidas += Number(fila.sueldo_basico_mes||0) + Number(fila.bono_extraordinario||0);
+      retencionesAcumuladasPrevias += Number(fila.retencion_mes||0);
+    } else {
+      remuneracionesYaPercibidas += Number(sueldoBasicoMes||0);
+      huboEstimacion = true;
+    }
+  }
+  const mesesRestantesInclActual = 12 - mes + 1;
+  const proyeccionOrdinaria = Number(sueldoBasicoMes||0) * mesesRestantesInclActual;
+  const proyeccionAnual = proyeccionOrdinaria + remuneracionesYaPercibidas + Number(extraordinarioMes||0);
+  const rentaNetaAnual = Math.max(0, proyeccionAnual - 7 * UIT_VIGENTE);
+  const impuestoAnualProyectado = calcularImpuestoAnualQuinta(rentaNetaAnual);
+  const divisor = DIVISOR_RETENCION_QUINTA[mes];
+  const impuestoPendiente = impuestoAnualProyectado - retencionesAcumuladasPrevias;
+  let retencionMes;
+  if(mes === 12){
+    retencionMes = impuestoPendiente;
+  } else {
+    retencionMes = (impuestoAnualProyectado / divisor) - retencionesAcumuladasPrevias;
+  }
+  retencionMes = Math.max(0, retencionMes);
+  return {
+    remuneracionesYaPercibidas: round2(remuneracionesYaPercibidas),
+    proyeccionOrdinaria: round2(proyeccionOrdinaria),
+    proyeccionAnual: round2(proyeccionAnual),
+    rentaNetaAnual: round2(rentaNetaAnual),
+    impuestoAnualProyectado: round2(impuestoAnualProyectado),
+    retencionesAcumuladasPrevias: round2(retencionesAcumuladasPrevias),
+    impuestoPendiente: round2(impuestoPendiente),
+    divisor: divisor,
+    retencionMes: round2(retencionMes),
+    esEstimado: huboEstimacion
+  };
+}
+function round2(n){ return Math.round((Number(n)||0) * 100) / 100; }
+
+function pqPoblarSelectores(){
+  const selAnio = document.getElementById('pqAnio');
+  const selMes = document.getElementById('pqMes');
+  if(selAnio.options.length === 0){
+    const hoy = new Date();
+    const anioActual = hoy.getFullYear();
+    for(let a = anioActual - 1; a <= anioActual + 1; a++){
+      const opt = document.createElement('option');
+      opt.value = a; opt.textContent = a;
+      if(a === anioActual) opt.selected = true;
+      selAnio.appendChild(opt);
+    }
+  }
+  if(selMes.options.length === 0){
+    const mesActual = new Date().getMonth() + 1;
+    MESES_LABEL.forEach((label, idx)=>{
+      const opt = document.createElement('option');
+      opt.value = idx + 1; opt.textContent = label;
+      if((idx+1) === mesActual) opt.selected = true;
+      selMes.appendChild(opt);
+    });
+  }
+  setupCustomSelect(selAnio);
+  setupCustomSelect(selMes);
+}
+
+// Boton "Buscar" de la pantalla resumen: re-carga y re-dibuja la tabla para
+// el año/mes elegidos, y confirma con un toast que se actualizo (el usuario
+// pidio una accion explicita en vez de que cambie solo al tocar el select).
+async function pqBuscar(){
+  const anio = document.getElementById('pqAnio').value;
+  const mesSel = document.getElementById('pqMes');
+  const mesLabel = mesSel.options[mesSel.selectedIndex] ? mesSel.options[mesSel.selectedIndex].textContent : '';
+  await renderPlanillaQuinta();
+  toast('Datos actualizados: ' + mesLabel + ' ' + anio);
+}
+async function renderPlanillaQuinta(){
+  pqPoblarSelectores();
+  const uitLabel = document.getElementById('pqUitLabel');
+  if(uitLabel) uitLabel.textContent = 'S/ ' + UIT_VIGENTE.toFixed(2);
+  await refreshNominaPlanillaQuinta();
+  await refreshNominaIngresosPeriodoAnterior();
+  const anio = Number(document.getElementById('pqAnio').value);
+  const mes = Number(document.getElementById('pqMes').value);
+  const colaboradoresQuinta = DB.colaboradores.filter(c=>c.activo && (c.tipoRenta||'quinta')==='quinta');
+  const body = document.getElementById('pqBody');
+  const empty = document.getElementById('pqEmpty');
+  if(!colaboradoresQuinta.length){
+    body.innerHTML = '';
+    if(empty) empty.style.display = '';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  body.innerHTML = colaboradoresQuinta.map(c=>pqFilaResumenHtml(c, anio, mes)).join('');
+}
+
+// Fila de SOLO RESUMEN en la tabla principal: el detalle/edicion real vive
+// en el modal individual (qdAbrir). Si ya hay un calculo guardado para este
+// mes se usa tal cual; si no, se muestra una vista previa con los datos
+// base de la ficha (sin persistir nada todavia).
+function pqFilaResumenHtml(c, anio, mes){
+  const historialAnio = DB.nominaPlanillaQuinta.filter(f=>f.colaborador_id===c.id && f.anio===anio);
+  const filaGuardada = historialAnio.find(f=>f.mes===mes);
+  const periodoAnterior = DB.nominaIngresosPeriodoAnterior.find(p=>p.colaborador_id===c.id && p.anio===anio);
+  const pa = periodoAnterior ? {remuneracion:Number(periodoAnterior.remuneracion_afecta||0), retencion:Number(periodoAnterior.retencion_efectuada||0)} : {remuneracion:0, retencion:0};
+  const sueldoBasicoMes = filaGuardada ? Number(filaGuardada.sueldo_basico_mes) : Number(c.sueldoBasico||0);
+  const extraordinarioSugerido = (!filaGuardada && (mes===7 || mes===12)) ? Number(c.sueldoBasico||0) : 0;
+  const extraordinario = filaGuardada ? Number(filaGuardada.bono_extraordinario) : extraordinarioSugerido;
+  const estado = filaGuardada ? filaGuardada.estado : 'borrador';
+  const r = calcularRetencionQuinta(c, anio, mes, sueldoBasicoMes, extraordinario, historialAnio.filter(f=>f.mes!==mes), pa);
+  const idc = c.id;
+  return `
+    <tr id="pqFila_${idc}">
+      <td data-label="Colaborador"><b>${nombreCompleto(c)}</b></td>
+      <td data-label="Cargo">${c.cargo||'&mdash;'}</td>
+      <td data-label="Sueldo basico" class="right">${money(sueldoBasicoMes)}</td>
+      <td data-label="Ingresos afectos en el año" class="right">${money(r.remuneracionesYaPercibidas + sueldoBasicoMes + extraordinario)}${r.esEstimado?' <span class="badge orange" title="Algunos meses anteriores no tenian calculo guardado y se estimaron con el sueldo basico actual.">EST.</span>':''}</td>
+      <td data-label="Retencion del mes" class="right"><b>${money(r.retencionMes)}</b></td>
+      <td data-label="Estado" class="center"><span class="badge ${estado==='confirmado'?'green':'orange'}">${estado==='confirmado'?'CONFIRMADO':'BORRADOR'}</span></td>
+      <td data-label="" class="center"><button class="btn btn-purple btn-sm" onclick="qdAbrir('${idc}')">Ver c&aacute;lculo</button></td>
+    </tr>`;
+}
+
+/* ============================================================
+   MODAL DE DETALLE INDIVIDUAL (qd = "Quinta Detalle")
+   Estado de edicion en memoria mientras el modal esta abierto: se arma en
+   qdAbrir, se lee/actualiza con cada cambio en pantalla, y solo se
+   persiste (fila de nomina_planilla_quinta + sus detalles) al hacer clic
+   en "Guardar calculo confirmado".
+   ============================================================ */
+let qdState = null;
+function qdBuscarConcepto(codigo){ return DB.nominaConceptos.find(x=>x.codigo===codigo); }
+
+async function qdAbrir(colabId){
+  const c = DB.colaboradores.find(x=>x.id===colabId);
+  if(!c) return;
+  if(!DB.nominaConceptos.length) await refreshNominaConceptos();
+  const anio = Number(document.getElementById('pqAnio').value);
+  const mes = Number(document.getElementById('pqMes').value);
+  const filaGuardada = DB.nominaPlanillaQuinta.find(f=>f.colaborador_id===colabId && f.anio===anio && f.mes===mes);
+  let detalleGuardado = [];
+  if(filaGuardada){
+    const { data, error } = await sb.from('nomina_planilla_quinta_detalle').select('*').eq('planilla_id', filaGuardada.id);
+    if(!error) detalleGuardado = data || [];
+  }
+  const periodoAnteriorFila = DB.nominaIngresosPeriodoAnterior.find(p=>p.colaborador_id===colabId && p.anio===anio);
+
+  qdState = {
+    colabId, anio, mes,
+    filaId: filaGuardada ? filaGuardada.id : null,
+    ordinario: detalleGuardado.filter(d=>d.tipo==='ordinario').map(d=>({codigo:d.codigo_concepto, importe:Number(d.importe)})),
+    extraordinario: detalleGuardado.filter(d=>d.tipo==='extraordinario').map(d=>({codigo:d.codigo_concepto, importe:Number(d.importe)})),
+    periodoAnteriorId: periodoAnteriorFila ? periodoAnteriorFila.id : null
+  };
+  // Sugerencia solo si es un calculo nuevo (sin guardar aun): en julio/diciembre
+  // MANGRO suele otorgar un bono extraordinario (0403), segun confirmo el usuario.
+  if(!filaGuardada && (mes===7 || mes===12) && qdBuscarConcepto('0403')){
+    qdState.extraordinario.push({codigo:'0403', importe: Number(c.sueldoBasico||0)});
+  }
+
+  document.getElementById('qdTitulo').textContent = 'Cálculo de Renta de Quinta — ' + nombreCompleto(c);
+  document.getElementById('qdSub').textContent = (c.cargo||'') + ' · ' + MESES_LABEL[mes-1] + ' ' + anio + (filaGuardada ? ' · ' + (filaGuardada.estado==='confirmado' ? 'ya confirmado, puedes corregir y volver a guardar' : 'borrador guardado') : ' · nuevo, sin guardar');
+  document.getElementById('qdBasico').value = filaGuardada ? Number(filaGuardada.sueldo_basico_mes) : Number(c.sueldoBasico||0);
+  document.getElementById('qdFechaIngreso').value = c.fechaIngreso ? fmtFecha(c.fechaIngreso) : 'Sin registrar';
+  document.getElementById('qdDivisor').value = mes===12 ? 'Ajuste final de diciembre' : ('entre ' + DIVISOR_RETENCION_QUINTA[mes]);
+
+  // Bloque de periodo anterior: solo tiene sentido si el colaborador ingreso
+  // a MANGRO DURANTE este mismo año (si ingreso antes, no puede haber tenido
+  // otro empleador simultaneo relevante para este calculo). Dentro del
+  // bloque, el checkbox arranca marcado solo si ya hay un monto guardado
+  // (asi la seccion empieza simple/colapsada salvo que ya aplique).
+  const fi = c.fechaIngreso ? new Date(c.fechaIngreso + 'T00:00:00') : null;
+  const mostrarPeriodoAnterior = fi && fi.getFullYear() === anio && fi.getMonth() > 0;
+  document.getElementById('qdPeriodoAnteriorBlock').style.display = mostrarPeriodoAnterior ? '' : 'none';
+  document.getElementById('qdEmpleadorAnterior').value = periodoAnteriorFila ? (periodoAnteriorFila.empleador_anterior||'') : '';
+  document.getElementById('qdRemPeriodoAnterior').value = periodoAnteriorFila ? Number(periodoAnteriorFila.remuneracion_afecta||0) : 0;
+  document.getElementById('qdRetPeriodoAnterior').value = periodoAnteriorFila ? Number(periodoAnteriorFila.retencion_efectuada||0) : 0;
+  const yaTienePeriodoAnterior = !!(periodoAnteriorFila && Number(periodoAnteriorFila.remuneracion_afecta||0) > 0);
+  document.getElementById('qdTienePeriodoAnterior').checked = yaTienePeriodoAnterior;
+  qdToggleAnterior();
+
+  qdRenderConceptoBox('ordinario');
+  qdRenderConceptoBox('extraordinario');
+  qdRecalcular();
+  document.getElementById('quintaDetalleModalOverlay').classList.add('open');
+}
+function qdToggleAnterior(){
+  const marcado = document.getElementById('qdTienePeriodoAnterior').checked;
+  document.getElementById('qdPeriodoAnteriorCampos').style.display = marcado ? '' : 'none';
+  if(qdState) qdRecalcular();
+}
+function cerrarDetalleQuinta(){
+  document.getElementById('quintaDetalleModalOverlay').classList.remove('open');
+  qdState = null;
+}
+function qdOpcionesConceptos(seleccionado){
+  return '<option value="">Selecciona un concepto&hellip;</option>' + DB.nominaConceptos
+    .filter(cc=>cc.codigo !== '0121') // 0121 = sueldo/jornal basico, ya tiene su propio campo
+    .map(cc=>`<option value="${cc.codigo}" ${cc.codigo===seleccionado?'selected':''}>${cc.codigo} &middot; ${cc.nombre}</option>`).join('');
+}
+function qdRenderConceptoBox(tipo){
+  const box = document.getElementById(tipo==='ordinario' ? 'qdOrdinarioBox' : 'qdExtraordinarioBox');
+  const lista = qdState[tipo];
+  if(!lista.length){ box.innerHTML = '<p class="hint" style="margin:2px 0 8px;">Sin conceptos adicionales.</p>'; return; }
+  box.innerHTML = lista.map((item, idx)=>`
+    <div class="qd-concepto-row">
+      <select onchange="qdCambiarConcepto('${tipo}', ${idx}, this.value)">${qdOpcionesConceptos(item.codigo)}</select>
+      <input type="number" min="0" step="0.01" value="${item.importe}" oninput="qdCambiarImporte('${tipo}', ${idx}, this.value)">
+      <button class="qd-concepto-quitar" title="Quitar" onclick="qdQuitarConcepto('${tipo}', ${idx})">&times;</button>
+    </div>`).join('');
+  // El <select> nativo con 50+ codigos es lento de recorrer; se convierte en el
+  // mismo buscador desplegable que usa el resto de la app (ver setupCustomSelect),
+  // asi el administrador escribe parte del nombre del concepto y lo encuentra.
+  box.querySelectorAll('select').forEach(setupCustomSelect);
+}
+function qdAgregarConcepto(tipo){
+  qdState[tipo].push({codigo:'', importe:0});
+  qdRenderConceptoBox(tipo);
+  qdRecalcular();
+}
+function qdQuitarConcepto(tipo, idx){
+  qdState[tipo].splice(idx, 1);
+  qdRenderConceptoBox(tipo);
+  qdRecalcular();
+}
+function qdCambiarConcepto(tipo, idx, codigo){
+  qdState[tipo][idx].codigo = codigo;
+  qdRecalcular();
+}
+function qdCambiarImporte(tipo, idx, valor){
+  qdState[tipo][idx].importe = Number(valor||0);
+  qdRecalcular();
+}
+function qdSubtotal(tipo){
+  return qdState[tipo].reduce((s,item)=>s + Number(item.importe||0), 0);
+}
+function qdRenderTramos(rentaNetaAnual){
+  const box = document.getElementById('qdTramosBox');
+  if(!box) return;
+  const tramos = desglosarTramosQuinta(rentaNetaAnual);
+  box.innerHTML = tramos.map((t, idx)=>{
+    const rango = t.limiteSuperiorUit === Infinity
+      ? ('M&aacute;s de ' + t.limiteInferiorUit + ' UIT')
+      : (t.limiteInferiorUit + ' &ndash; ' + t.limiteSuperiorUit + ' UIT');
+    return `<div class="qd-tramo-card acc-${idx} ${t.activo?'':'qd-tramo-inactivo'}">
+      <div class="qd-t-top"><span class="qd-t-tag">Tramo ${idx+1}</span><span class="qd-t-tasa">${(t.tasa*100).toFixed(0)}%</span></div>
+      <div class="qd-t-rango">${rango}</div>
+      <div class="qd-t-monto">${money(t.impuesto)}</div>
+    </div>`;
+  }).join('');
+}
+function qdRecalcular(){
+  if(!qdState) return;
+  const c = DB.colaboradores.find(x=>x.id===qdState.colabId);
+  const basico = Number(document.getElementById('qdBasico').value || 0);
+  const subtotalOrdinario = qdSubtotal('ordinario');
+  const subtotalExtraordinario = qdSubtotal('extraordinario');
+  document.getElementById('qdSubtotalOrdinario').textContent = money(subtotalOrdinario);
+  document.getElementById('qdSubtotalExtraordinario').textContent = money(subtotalExtraordinario);
+
+  const sueldoBasicoMes = basico + subtotalOrdinario;
+  const remPeriodoAnterior = Number(document.getElementById('qdRemPeriodoAnterior').value || 0);
+  const retPeriodoAnterior = Number(document.getElementById('qdRetPeriodoAnterior').value || 0);
+  const periodoAnteriorAplica = document.getElementById('qdPeriodoAnteriorBlock').style.display !== 'none' && document.getElementById('qdTienePeriodoAnterior').checked;
+  const periodoAnterior = periodoAnteriorAplica ? {remuneracion:remPeriodoAnterior, retencion:retPeriodoAnterior} : {remuneracion:0, retencion:0};
+
+  const historialAnio = DB.nominaPlanillaQuinta.filter(f=>f.colaborador_id===qdState.colabId && f.anio===qdState.anio && f.mes!==qdState.mes);
+  const r = calcularRetencionQuinta(c, qdState.anio, qdState.mes, sueldoBasicoMes, subtotalExtraordinario, historialAnio, periodoAnterior);
+
+  document.getElementById('qdConPeriodoAnteriorLabel').textContent = periodoAnteriorAplica ? ' + empleador anterior' : '';
+  document.getElementById('qdYaPercibido').textContent = money(r.remuneracionesYaPercibidas);
+  document.getElementById('qdProyeccionRestante').textContent = money(r.proyeccionOrdinaria);
+  document.getElementById('qdOtrasRemProy').textContent = money(subtotalExtraordinario);
+  document.getElementById('qdBrutaAnual').textContent = money(r.proyeccionAnual);
+  document.getElementById('qdDeduccion7Uit').textContent = money(7 * UIT_VIGENTE);
+  document.getElementById('qdNetaAnual').textContent = money(r.rentaNetaAnual);
+  qdRenderTramos(r.rentaNetaAnual);
+  document.getElementById('qdImpuestoAnual').textContent = money(r.impuestoAnualProyectado);
+  document.getElementById('qdRetencionesAnteriores').textContent = money(r.retencionesAcumuladasPrevias);
+  document.getElementById('qdImpuestoPendiente').textContent = money(Math.max(0, r.impuestoPendiente));
+  document.getElementById('qdRetencionMes').textContent = money(r.retencionMes);
+  qdState._ultimoCalculo = r;
+  qdState._ultimoSueldoBasicoMes = sueldoBasicoMes;
+  qdState._ultimoSubtotalExtraordinario = subtotalExtraordinario;
+}
+
+async function qdGuardar(){
+  if(!qdState) return;
+  const c = DB.colaboradores.find(x=>x.id===qdState.colabId);
+  if(!c) return;
+  qdRecalcular();
+  const r = qdState._ultimoCalculo;
+  const me = getCurrentUser();
+  const btn = document.getElementById('btnGuardarDetalleQuinta');
+  if(btn) btn.disabled = true;
+
+  // 1) Ingresos de periodo anterior (solo si el bloque aplica Y el
+  //    administrador marco el checkbox): un solo registro por
+  //    colaborador/año, independiente del mes.
+  const paAplica = document.getElementById('qdPeriodoAnteriorBlock').style.display !== 'none' && document.getElementById('qdTienePeriodoAnterior').checked;
+  if(paAplica){
+    const paPayload = {
+      colaborador_id: qdState.colabId, anio: qdState.anio,
+      empleador_anterior: document.getElementById('qdEmpleadorAnterior').value.trim() || null,
+      remuneracion_afecta: Number(document.getElementById('qdRemPeriodoAnterior').value || 0),
+      retencion_efectuada: Number(document.getElementById('qdRetPeriodoAnterior').value || 0),
+      created_by: me ? me.id : null
+    };
+    const { error: errPa } = await sb.from('nomina_ingresos_periodo_anterior').upsert(paPayload, { onConflict: 'colaborador_id,anio' });
+    if(errPa){ if(btn) btn.disabled=false; toast('No se pudo guardar el ingreso del periodo anterior: ' + errPa.message, true); return; }
+  } else if(qdState.periodoAnteriorId){
+    // El administrador desmarco el checkbox habiendo un registro previo: se
+    // elimina para que deje de sumarse en calculos futuros.
+    await sb.from('nomina_ingresos_periodo_anterior').delete().eq('id', qdState.periodoAnteriorId);
+  }
+
+  // 2) Fila principal del mes.
+  const payload = {
+    colaborador_id: qdState.colabId, anio: qdState.anio, mes: qdState.mes,
+    sueldo_basico_mes: qdState._ultimoSueldoBasicoMes, bono_extraordinario: qdState._ultimoSubtotalExtraordinario, otros_ingresos_afectos: 0,
+    proyeccion_remuneracion_anual: r.proyeccionAnual, renta_neta_anual: r.rentaNetaAnual,
+    impuesto_anual_proyectado: r.impuestoAnualProyectado, retenciones_acumuladas_previas: r.retencionesAcumuladasPrevias,
+    retencion_mes: r.retencionMes, estado: 'confirmado', created_by: me ? me.id : null
+  };
+  const { data: filaGuardada, error } = await sb.from('nomina_planilla_quinta').upsert(payload, { onConflict: 'colaborador_id,anio,mes' }).select().single();
+  if(error){ if(btn) btn.disabled=false; toast('No se pudo guardar el calculo del mes: ' + error.message, true); return; }
+
+  // 3) Detalle de conceptos: se reemplaza por completo (mas simple y seguro
+  //    que tratar de diffear altas/bajas/ediciones linea por linea).
+  await sb.from('nomina_planilla_quinta_detalle').delete().eq('planilla_id', filaGuardada.id);
+  const filasDetalle = []
+    .concat(qdState.ordinario.filter(x=>x.codigo).map(x=>({planilla_id:filaGuardada.id, codigo_concepto:x.codigo, tipo:'ordinario', importe:x.importe})))
+    .concat(qdState.extraordinario.filter(x=>x.codigo).map(x=>({planilla_id:filaGuardada.id, codigo_concepto:x.codigo, tipo:'extraordinario', importe:x.importe})));
+  if(filasDetalle.length){
+    const { error: errDet } = await sb.from('nomina_planilla_quinta_detalle').insert(filasDetalle);
+    if(errDet) console.error('nomina_planilla_quinta_detalle insert', errDet);
+  }
+
+  if(btn) btn.disabled = false;
+  toast('Cálculo de ' + MESES_LABEL[qdState.mes-1] + ' ' + qdState.anio + ' guardado para ' + nombreCompleto(c));
+  cerrarDetalleQuinta();
+  await renderPlanillaQuinta();
+}
 
 // Correlativo de movilidad calculado a partir del maximo existente en la base de datos
 // compartida (no un contador guardado por dispositivo). Asi se evita que dos celulares
@@ -3988,9 +4946,14 @@ const CRUMBS = {
   cajaChica:{parent:'Gastos', current:'Caja Chica'},
   comprobantes:{parent:'Gastos', current:'Comprobantes'},
   liquidaciones:{parent:'Gastos', current:'Liquidaciones'},
+  planillaQuinta:{parent:'Nómina', current:'Planilla mensual'},
+  nuevoLevantamiento:{parent:'Lev. Inf. de Equipos', current:'Nueva Visita'},
+  levantamientos:{parent:'Lev. Inf. de Equipos', current:'Historial de Visitas'},
 };
 const SECCIONES_MOVILIDAD = ['nueva','historial','planillas'];
 const SECCIONES_GASTOS = ['nuevoComprobante','proveedores','cajaChica','comprobantes','liquidaciones'];
+const SECCIONES_NOMINA = ['planillaQuinta'];
+const SECCIONES_LEVANTAMIENTOS = ['nuevoLevantamiento','levantamientos'];
 
 function showSection(name){
   // Control de acceso por modulo: si el colaborador no tiene Movilidad o
@@ -4003,6 +4966,14 @@ function showSection(name){
   }
   if(SECCIONES_GASTOS.indexOf(name)!==-1 && !usuarioTieneModulo('gastos')){
     toast('No tienes acceso al modulo de Gastos', true);
+    name = 'dashboard';
+  }
+  if(SECCIONES_NOMINA.indexOf(name)!==-1 && !usuarioTieneModulo('nomina')){
+    toast('No tienes acceso al modulo de Nomina', true);
+    name = 'dashboard';
+  }
+  if(SECCIONES_LEVANTAMIENTOS.indexOf(name)!==-1 && !usuarioTieneModulo('levantamientos')){
+    toast('No tienes acceso al modulo de Lev. Inf. de Equipos', true);
     name = 'dashboard';
   }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -4042,6 +5013,9 @@ function showSection(name){
   if(name==='cajaChica') renderCajaChica();
   if(name==='comprobantes') renderComprobantes();
   if(name==='liquidaciones') renderLiquidaciones();
+  if(name==='planillaQuinta') renderPlanillaQuinta();
+  if(name==='nuevoLevantamiento' && !document.getElementById('levEditId').value) resetNuevoLevantamiento();
+  if(name==='levantamientos') renderLevantamientos();
   closeMobileSidebar();
 }
 
@@ -4880,10 +5854,40 @@ function actualizarCampoAprobador(){
     elegibles.map(c=>`<option value="${c.id}">${nombreCompleto(c)}</option>`).join('');
   if(actual && elegibles.some(c=>c.id===actual)) sel.value = actual;
 }
+// Sugiere los dias de vacaciones al año segun el regimen laboral elegido
+// (15 en microempresa, 30 en pequeña empresa/general) SOLO si el campo esta
+// vacio o todavia tiene el valor por defecto anterior: no pisa un valor que
+// el administrador ya haya puesto a mano.
+function actualizarSugerenciaVacaciones(){
+  const sel = document.getElementById('colabRegimenLaboral');
+  const campo = document.getElementById('colabDiasVacaciones');
+  if(!sel || !campo) return;
+  if(campo.value === '' || campo.dataset.autoSugerido === '1'){
+    campo.value = sel.value === 'microempresa' ? 15 : 30;
+    campo.dataset.autoSugerido = '1';
+  }
+}
+// El campo de Constancia de Suspension de Retenciones solo aplica a renta de
+// cuarta (recibos por honorarios); en renta de quinta no tiene sentido.
+function actualizarCampoConstanciaSuspension(){
+  const tipoRenta = document.getElementById('colabTipoRenta').value;
+  const field = document.getElementById('colabConstanciaField');
+  const chk = document.getElementById('colabTieneConstancia');
+  const fecha = document.getElementById('colabFechaVigenciaConstancia');
+  if(!field) return;
+  field.style.display = tipoRenta === 'cuarta' ? '' : 'none';
+  if(fecha) fecha.style.display = (chk && chk.checked) ? '' : 'none';
+}
 function openColabModal(id){
   document.getElementById('colabModalOverlay').classList.add('open');
   pendingFirma = '';
   document.getElementById('firmaPreviewBox').innerHTML = '<span>Sin firma cargada</span>';
+  // Mismos selects desplegables que el resto de la app (ver setupCustomSelect):
+  // sin esto se veian como el <select> plano del navegador, distinto al resto de la ficha.
+  ['colabRegimenLaboral','colabRegimenPensionario','colabTipoRenta','colabSexo','colabAprobador'].forEach(function(elId){
+    const el = document.getElementById(elId);
+    if(el) setupCustomSelect(el);
+  });
   if(id){
     const c = DB.colaboradores.find(x=>x.id===id);
     document.getElementById('colabModalTitle').textContent = 'Editar Colaborador';
@@ -4912,6 +5916,24 @@ function openColabModal(id){
     document.getElementById('colabAccesoNota').style.display = '';
     document.getElementById('colabEmail').value = '';
     document.getElementById('colabPassword').value = '';
+    document.getElementById('colabFechaIngreso').value = c.fechaIngreso || '';
+    document.getElementById('colabFechaCese').value = c.fechaCese || '';
+    document.getElementById('colabCargo').value = c.cargo || '';
+    document.getElementById('colabArea').value = c.area || '';
+    document.getElementById('colabRegimenLaboral').value = c.regimenLaboral || 'microempresa';
+    document.getElementById('colabDiasVacaciones').value = (c.diasVacacionesAnuales != null) ? c.diasVacacionesAnuales : 15;
+    document.getElementById('colabDiasVacaciones').dataset.autoSugerido = '0';
+    document.getElementById('colabSueldoBasico').value = c.sueldoBasico || '';
+    document.getElementById('colabRegimenPensionario').value = c.regimenPensionario || '';
+    document.getElementById('colabCuspp').value = c.cuspp || '';
+    document.getElementById('colabAsignacionFamiliar').checked = !!c.tieneAsignacionFamiliar;
+    document.getElementById('colabTipoRenta').value = c.tipoRenta || 'quinta';
+    document.getElementById('colabTieneConstancia').checked = !!c.tieneConstanciaSuspension;
+    document.getElementById('colabFechaVigenciaConstancia').value = c.fechaVigenciaConstancia || '';
+    document.getElementById('colabFechaNacimiento').value = c.fechaNacimiento || '';
+    document.getElementById('colabSexo').value = c.sexo || '';
+    document.getElementById('colabDireccion').value = c.direccion || '';
+    actualizarCampoConstanciaSuspension();
   } else {
     document.getElementById('colabModalTitle').textContent = 'Nuevo Colaborador';
     document.getElementById('colabEditId').value = '';
@@ -4931,6 +5953,24 @@ function openColabModal(id){
     document.getElementById('colabAccesoNota').style.display = 'none';
     document.getElementById('colabEmail').value = '';
     document.getElementById('colabPassword').value = '';
+    document.getElementById('colabFechaIngreso').value = '';
+    document.getElementById('colabFechaCese').value = '';
+    document.getElementById('colabCargo').value = '';
+    document.getElementById('colabArea').value = '';
+    document.getElementById('colabRegimenLaboral').value = 'microempresa';
+    document.getElementById('colabDiasVacaciones').value = 15;
+    document.getElementById('colabDiasVacaciones').dataset.autoSugerido = '1';
+    document.getElementById('colabSueldoBasico').value = '';
+    document.getElementById('colabRegimenPensionario').value = '';
+    document.getElementById('colabCuspp').value = '';
+    document.getElementById('colabAsignacionFamiliar').checked = false;
+    document.getElementById('colabTipoRenta').value = 'quinta';
+    document.getElementById('colabTieneConstancia').checked = false;
+    document.getElementById('colabFechaVigenciaConstancia').value = '';
+    document.getElementById('colabFechaNacimiento').value = '';
+    document.getElementById('colabSexo').value = '';
+    document.getElementById('colabDireccion').value = '';
+    actualizarCampoConstanciaSuspension();
   }
 }
 function closeColabModal(){
@@ -5002,6 +6042,30 @@ function previewFirma(ev){
   };
   reader.readAsDataURL(file);
 }
+// Lee los campos de "Datos laborales (Nomina)" de la ficha y arma el objeto
+// (llaves iguales a las columnas de colaboradores) para insertar/actualizar.
+// Centralizado aqui para no repetirlo en las dos ramas de saveColaborador.
+function leerColabDatosLaborales(){
+  const tipoRenta = document.getElementById('colabTipoRenta').value;
+  return {
+    fecha_ingreso: document.getElementById('colabFechaIngreso').value || null,
+    fecha_cese: document.getElementById('colabFechaCese').value || null,
+    cargo: document.getElementById('colabCargo').value.trim() || null,
+    area: document.getElementById('colabArea').value.trim() || null,
+    regimen_laboral: document.getElementById('colabRegimenLaboral').value,
+    dias_vacaciones_anuales: document.getElementById('colabDiasVacaciones').value ? Number(document.getElementById('colabDiasVacaciones').value) : null,
+    sueldo_basico: document.getElementById('colabSueldoBasico').value ? Number(document.getElementById('colabSueldoBasico').value) : 0,
+    regimen_pensionario: document.getElementById('colabRegimenPensionario').value || null,
+    cuspp: document.getElementById('colabCuspp').value.trim() || null,
+    tiene_asignacion_familiar: document.getElementById('colabAsignacionFamiliar').checked,
+    tipo_renta: tipoRenta,
+    tiene_constancia_suspension: tipoRenta === 'cuarta' ? document.getElementById('colabTieneConstancia').checked : false,
+    fecha_vigencia_constancia: (tipoRenta === 'cuarta' && document.getElementById('colabTieneConstancia').checked) ? (document.getElementById('colabFechaVigenciaConstancia').value || null) : null,
+    fecha_nacimiento: document.getElementById('colabFechaNacimiento').value || null,
+    sexo: document.getElementById('colabSexo').value || null,
+    direccion: document.getElementById('colabDireccion').value.trim() || null
+  };
+}
 async function saveColaborador(){
   const apellidoPaterno = up(document.getElementById('colabApPaterno').value).trim();
   const apellidoMaterno = up(document.getElementById('colabApMaterno').value).trim();
@@ -5021,11 +6085,11 @@ async function saveColaborador(){
 
   if(editId){
     const c = DB.colaboradores.find(x=>x.id===editId);
-    const patch = {
+    const patch = Object.assign({
       apellido_paterno: apellidoPaterno, apellido_materno: apellidoMaterno,
       primer_nombre: primerNombre, segundo_nombre: segundoNombre, dni,
       is_admin: isAdmin, modulos_acceso: modulosSeleccionados, aprobador_id: aprobadorId
-    };
+    }, leerColabDatosLaborales());
     if(pendingFirma) patch.firma = pendingFirma;
     const { error } = await sb.from('colaboradores').update(patch).eq('id', editId);
     if(btn) btn.disabled = false;
@@ -5053,12 +6117,12 @@ async function saveColaborador(){
       toast('No se pudo crear el acceso del colaborador', true);
       return;
     }
-    const { error: insertError } = await sb.from('colaboradores').insert({
+    const { error: insertError } = await sb.from('colaboradores').insert(Object.assign({
       id: newId, apellido_paterno: apellidoPaterno, apellido_materno: apellidoMaterno,
       primer_nombre: primerNombre, segundo_nombre: segundoNombre, dni,
       firma: pendingFirma || null, is_admin: isAdmin, modulos_acceso: modulosSeleccionados,
       aprobador_id: aprobadorId
-    });
+    }, leerColabDatosLaborales()));
     if(btn) btn.disabled = false;
     if(insertError){ toast('El acceso se creo pero no se pudo guardar el perfil: ' + insertError.message, true); return; }
     toast('Colaborador agregado. Ya puede ingresar con su correo y contraseña.');
@@ -7985,7 +9049,7 @@ function boot(){
   if(navConfig) navConfig.style.display = user.isAdmin ? '' : 'none';
   aplicarVisibilidadPorModulos();
   applyThemeToggleUI();
-  ['formFecha','planFechaInicio','planFechaFin','cmpFecha'].forEach(id=>{
+  ['formFecha','planFechaInicio','planFechaFin','cmpFecha','levFechaVisita'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) setupDatePicker(el);
   });
@@ -8007,6 +9071,13 @@ const SIDE_GROUPS = {
     {sec:'cajaChica', label:'Caja Chica'},
     {sec:'comprobantes', label:'Comprobantes'},
     {sec:'liquidaciones', label:'Liquidaciones'}
+  ]},
+  nomina: { submenu:'groupNomina', titulo:'Nómina', items:[
+    {sec:'planillaQuinta', label:'Planilla mensual'}
+  ]},
+  levantamientos: { submenu:'groupLevantamientos', titulo:'Lev. Inf. de Equipos', items:[
+    {sec:'nuevoLevantamiento', label:'Nueva Visita'},
+    {sec:'levantamientos', label:'Historial de Visitas'}
   ]}
 };
 function toggleSideGroup(btn){
@@ -8216,6 +9287,827 @@ sb.auth.onAuthStateChange(function(event, session){
     document.getElementById('loginScreen').style.display = 'flex';
   }
 });
+
+/* ============================================================
+   LEVANTAMIENTO DE EQUIPOS (lev*)
+   Toma de informacion en visita a cliente, etapa previa a cotizacion:
+   reemplaza el proceso en papel + fotos sueltas del celular. Dividido por
+   areas, cada area con N equipos, cada equipo con hasta 5 fotos.
+
+   Diseño resiliente (no offline-first completo, a proposito -- ver
+   conversacion con el usuario): mientras se llena el formulario, TODO se
+   guarda solo en memoria + IndexedDB (levDraft / levDb*), sin tocar
+   Supabase para nada -- por eso funciona igual con buena señal, con poca
+   señal o en un sotano sin cobertura. Supabase recien se toca cuando el
+   usuario pide guardar (boton "Guardar levantamiento", boton "Sincronizar
+   ahora", o el reintento automatico al recuperar conexion). Si ese intento
+   de guardado falla, el borrador NO se pierde: sigue completo en
+   IndexedDB y se puede reintentar. El correlativo (LEV-2026-00001) se pide
+   una sola vez, la primera vez que el guardado tiene exito.
+   ============================================================ */
+
+// ---- IndexedDB: borrador local (sobrevive cierre de app / perdida de señal) ----
+const LEV_DB_NOMBRE = 'mangroLevantamientosDB', LEV_DB_STORE = 'borrador';
+function levDbAbrir(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(LEV_DB_NOMBRE, 1);
+    req.onupgradeneeded = ()=>{ req.result.createObjectStore(LEV_DB_STORE); };
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function levDbGuardar(draft){
+  try{
+    const db = await levDbAbrir();
+    await new Promise((resolve, reject)=>{
+      const tx = db.transaction(LEV_DB_STORE, 'readwrite');
+      tx.objectStore(LEV_DB_STORE).put(draft, 'actual');
+      tx.oncomplete = resolve; tx.onerror = ()=>reject(tx.error);
+    });
+  }catch(err){ console.error('levDbGuardar', err); }
+}
+async function levDbCargar(){
+  try{
+    const db = await levDbAbrir();
+    return await new Promise((resolve, reject)=>{
+      const tx = db.transaction(LEV_DB_STORE, 'readonly');
+      const req = tx.objectStore(LEV_DB_STORE).get('actual');
+      req.onsuccess = ()=> resolve(req.result || null);
+      req.onerror = ()=> reject(req.error);
+    });
+  }catch(err){ console.error('levDbCargar', err); return null; }
+}
+async function levDbBorrar(){
+  try{
+    const db = await levDbAbrir();
+    await new Promise((resolve, reject)=>{
+      const tx = db.transaction(LEV_DB_STORE, 'readwrite');
+      tx.objectStore(LEV_DB_STORE).delete('actual');
+      tx.oncomplete = resolve; tx.onerror = ()=>reject(tx.error);
+    });
+  }catch(err){ console.error('levDbBorrar', err); }
+}
+
+// ---- Estado en memoria ----
+const LEV_MAX_FOTOS = 5;
+let levDraft = null;          // borrador que se esta editando en pantalla (ver levDraftVacio para su forma)
+let levSyncEnCurso = false;   // true mientras hay un guardado en curso hacia Supabase
+let levAutosaveTimer = null;
+let levEquipoFotoTarget = null; // {areaLocalId, equipoLocalId}: a que equipo van las fotos elegidas en #levFotoInput
+
+function levNuevoIdLocal(){ return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function escHtml(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function levDraftVacio(){
+  const me = getCurrentUser();
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear(), mm = String(hoy.getMonth()+1).padStart(2,'0'), dd = String(hoy.getDate()).padStart(2,'0');
+  return {
+    editId: null, correlativo: null,
+    cliente: { id:null, ruc:'', razonSocial:'' },
+    contacto:'', cargo:'', celular:'', correo:'', sede:'',
+    fechaVisita: yyyy+'-'+mm+'-'+dd,
+    tecnicoId: me ? me.id : '',
+    areas: [],
+    _sinGuardarEnServidor: true,   // hay cambios que aun no existen (o cambiaron) en Supabase
+    _intentoFinalizar: false       // se marca true si un intento de "Guardar levantamiento" fallo por conexion, para que el reintento automatico sepa que debe finalizar (no solo respaldar)
+  };
+}
+
+// Entrando a "Nuevo levantamiento" sin editar uno existente: recupera el
+// borrador local si quedo alguno sin sincronizar (p.ej. se cerro la app a
+// mitad de la visita), o arranca uno vacio.
+async function resetNuevoLevantamiento(){
+  document.getElementById('levEditId').value = '';
+  const local = await levDbCargar();
+  if(local && !local.editId){
+    levDraft = local;
+    toast('Se recupero un borrador que aun no se habia guardado en el servidor');
+  } else {
+    levDraft = levDraftVacio();
+  }
+  await levPintarFormulario();
+}
+
+// Abrir uno YA guardado para editarlo ("por si nos falto algo"). Si hay un
+// borrador local sin sincronizar de ESTE MISMO levantamiento, se prefiere
+// ese (tiene cambios mas recientes que el servidor); si no, se trae del
+// servidor completo (cabecera + areas + equipos + fotos).
+async function levAbrirExistente(id){
+  document.getElementById('levEditId').value = id;
+  const local = await levDbCargar();
+  if(local && local.editId === id){
+    levDraft = local;
+    toast('Se recupero un borrador local sin guardar de esta visita');
+  } else {
+    const cargado = await levCargarDesdeServidor(id);
+    if(!cargado){ document.getElementById('levEditId').value = ''; return; }
+    levDraft = cargado;
+  }
+  showSection('nuevoLevantamiento');
+  await levPintarFormulario();
+}
+
+async function levCargarDesdeServidor(id){
+  if(!DB.levantamientos.length) await refreshLevantamientos();
+  const cab = DB.levantamientos.find(x=>x.id===id);
+  if(!cab){ toast('No se encontro la visita', true); return null; }
+  const [{ data: areasData, error: errA }, { data: equiposData, error: errE }, { data: fotosData, error: errF }] = await Promise.all([
+    sb.from('levantamiento_areas').select('*').eq('levantamiento_id', id).order('orden'),
+    sb.from('levantamiento_equipos').select('*').eq('levantamiento_id', id).order('orden'),
+    sb.from('levantamiento_equipo_fotos').select('*').eq('levantamiento_id', id).order('orden')
+  ]);
+  if(errA || errE || errF){ console.error('levCargarDesdeServidor', errA||errE||errF); toast('No se pudo cargar la visita', true); return null; }
+
+  // Bucket privado (igual que "comprobantes"): hay que pedir una URL firmada
+  // por cada foto para poder mostrar la miniatura.
+  const fotosConUrl = await Promise.all((fotosData||[]).map(async f=>{
+    const { data } = await sb.storage.from('levantamientos').createSignedUrl(f.storage_path, 3600);
+    return Object.assign({}, f, { _url: data ? data.signedUrl : '' });
+  }));
+
+  const areas = (areasData||[]).map(a=>({
+    localId: levNuevoIdLocal(), dbId: a.id, nombre: a.nombre || '',
+    equipos: (equiposData||[]).filter(e=>e.area_id===a.id).map(e=>({
+      localId: levNuevoIdLocal(), dbId: e.id, tipoEquipo: e.tipo_equipo||'', marca: e.marca||'', modelo: e.modelo||'',
+      nSerie: e.n_serie||'', codigoInterno: e.codigo_interno||'', observaciones: e.observaciones||'', ocrTexto:'',
+      fotos: fotosConUrl.filter(f=>f.equipo_id===e.id).map(f=>({
+        localId: levNuevoIdLocal(), dbId: f.id, storagePath: f.storage_path, blob:null, dataUrl: f._url, pendiente:false
+      }))
+    }))
+  }));
+
+  return {
+    editId: id, correlativo: cab.correlativo,
+    cliente: { id: cab.cliente_id, ruc: cab.cliente_ruc||'', razonSocial: cab.cliente_razon_social||'' },
+    contacto: cab.persona_contacto||'', cargo: cab.cargo||'', celular: cab.celular||'', correo: cab.correo||'',
+    sede: cab.sede_direccion||'', fechaVisita: cab.fecha_visita||'', tecnicoId: cab.tecnico_id||'',
+    areas: areas, _sinGuardarEnServidor:false, _intentoFinalizar:false
+  };
+}
+
+function levPoblarSelectCliente(){
+  const sel = document.getElementById('levClienteSelect');
+  if(!sel) return;
+  const activos = DB.clientes.filter(c=>c.activo!==false).slice().sort((a,b)=> up(a.razon_social) < up(b.razon_social) ? -1 : 1);
+  sel.innerHTML = '<option value="">+ Cliente nuevo&hellip;</option>' + activos.map(c=>
+    `<option value="${c.id}">${escHtml(c.razon_social)}${c.ruc?(' &middot; '+escHtml(c.ruc)):''}</option>`).join('');
+}
+function levPoblarSelectTecnico(){
+  const sel = document.getElementById('levTecnico');
+  if(!sel) return;
+  const activos = DB.colaboradores.filter(c=>c.activo);
+  sel.innerHTML = activos.map(c=>`<option value="${c.id}">${escHtml(nombreCompleto(c))}</option>`).join('');
+}
+function levPoblarDatalistTiposEquipo(){
+  const dl = document.getElementById('levTiposEquipoList');
+  if(!dl) return;
+  dl.innerHTML = DB.tiposEquipo.filter(t=>t.activo!==false).map(t=>`<option value="${escHtml(t.nombre)}">`).join('');
+}
+
+async function levPintarFormulario(){
+  if(!DB.clientes.length) await refreshClientes();
+  if(!DB.tiposEquipo.length) await refreshTiposEquipo();
+  if(!DB.colaboradores.length) await refreshColaboradores();
+  levPoblarSelectCliente();
+  levPoblarSelectTecnico();
+  levPoblarDatalistTiposEquipo();
+  setupCustomSelect(document.getElementById('levClienteSelect'));
+  setupCustomSelect(document.getElementById('levTecnico'));
+
+  const selCliente = document.getElementById('levClienteSelect');
+  selCliente.value = levDraft.cliente.id || '';
+  document.getElementById('levRuc').value = levDraft.cliente.ruc || '';
+  document.getElementById('levRazonSocial').value = levDraft.cliente.razonSocial || '';
+  document.getElementById('levRuc').readOnly = !!levDraft.cliente.id;
+  document.getElementById('levRazonSocial').readOnly = !!levDraft.cliente.id;
+  document.getElementById('levContacto').value = levDraft.contacto || '';
+  document.getElementById('levCargo').value = levDraft.cargo || '';
+  document.getElementById('levCelular').value = levDraft.celular || '';
+  document.getElementById('levCorreo').value = levDraft.correo || '';
+  document.getElementById('levSede').value = levDraft.sede || '';
+  document.getElementById('levFechaVisita').value = levDraft.fechaVisita || '';
+  document.getElementById('levTecnico').value = levDraft.tecnicoId || '';
+
+  document.getElementById('levCorrelativoLabel').textContent = levDraft.correlativo ? ('N.º ' + levDraft.correlativo) : 'Se asignará un número al guardar';
+
+  levRenderAreas();
+  levActualizarResumen();
+  levActualizarSyncPill();
+}
+
+function levSeleccionarCliente(){
+  const sel = document.getElementById('levClienteSelect');
+  const id = sel.value;
+  if(id){
+    const c = DB.clientes.find(x=>x.id===id);
+    levDraft.cliente = { id: c.id, ruc: c.ruc||'', razonSocial: c.razon_social };
+  } else {
+    levDraft.cliente = { id:null, ruc:'', razonSocial:'' };
+  }
+  document.getElementById('levRuc').value = levDraft.cliente.ruc;
+  document.getElementById('levRazonSocial').value = levDraft.cliente.razonSocial;
+  document.getElementById('levRuc').readOnly = !!id;
+  document.getElementById('levRazonSocial').readOnly = !!id;
+  levProgramarAutosave();
+}
+function levCampoCliente(){
+  levDraft.cliente.ruc = document.getElementById('levRuc').value.trim();
+  levDraft.cliente.razonSocial = document.getElementById('levRazonSocial').value.trim();
+  levProgramarAutosave();
+}
+function levCampoDato(){
+  levDraft.contacto = document.getElementById('levContacto').value.trim();
+  levDraft.cargo = document.getElementById('levCargo').value.trim();
+  levDraft.celular = document.getElementById('levCelular').value.trim();
+  levDraft.correo = document.getElementById('levCorreo').value.trim();
+  levDraft.sede = document.getElementById('levSede').value.trim();
+  levDraft.fechaVisita = document.getElementById('levFechaVisita').value;
+  levDraft.tecnicoId = document.getElementById('levTecnico').value;
+  levProgramarAutosave();
+}
+
+/* ---------- Areas y equipos ---------- */
+function levAgregarArea(){
+  const nueva = { localId: levNuevoIdLocal(), dbId:null, nombre:'', equipos:[] };
+  levDraft.areas.push(nueva);
+  levRenderAreas();
+  levActualizarResumen();
+  levProgramarAutosave();
+  setTimeout(()=>{ const el = document.getElementById('levAreaNombre_'+nueva.localId); if(el) el.focus(); }, 30);
+}
+function levQuitarArea(areaLocalId){
+  levDraft.areas = levDraft.areas.filter(a=>a.localId!==areaLocalId);
+  levRenderAreas();
+  levActualizarResumen();
+  levProgramarAutosave();
+}
+function levCambiarNombreArea(areaLocalId, valor){
+  const area = levDraft.areas.find(a=>a.localId===areaLocalId);
+  if(area){ area.nombre = valor; levProgramarAutosave(); }
+}
+function levAgregarEquipo(areaLocalId){
+  const area = levDraft.areas.find(a=>a.localId===areaLocalId);
+  if(!area) return;
+  area.equipos.push({ localId: levNuevoIdLocal(), dbId:null, tipoEquipo:'', marca:'', modelo:'', nSerie:'', codigoInterno:'', observaciones:'', fotos:[], ocrTexto:'' });
+  levRenderAreas();
+  levActualizarResumen();
+  levProgramarAutosave();
+}
+function levQuitarEquipo(areaLocalId, equipoLocalId){
+  const area = levDraft.areas.find(a=>a.localId===areaLocalId);
+  if(!area) return;
+  area.equipos = area.equipos.filter(e=>e.localId!==equipoLocalId);
+  levRenderAreas();
+  levActualizarResumen();
+  levProgramarAutosave();
+}
+function levBuscarEquipo(areaLocalId, equipoLocalId){
+  const area = levDraft.areas.find(a=>a.localId===areaLocalId);
+  return area ? area.equipos.find(e=>e.localId===equipoLocalId) : null;
+}
+function levCambiarCampoEquipo(areaLocalId, equipoLocalId, campo, valor){
+  const eq = levBuscarEquipo(areaLocalId, equipoLocalId);
+  if(!eq) return;
+  eq[campo] = valor;
+  levProgramarAutosave();
+}
+
+function levRenderAreas(){
+  const box = document.getElementById('levAreasBox');
+  const empty = document.getElementById('levAreasEmpty');
+  if(!box) return;
+  if(!levDraft.areas.length){
+    box.innerHTML = '';
+    if(empty) empty.style.display = '';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  box.innerHTML = levDraft.areas.map((area, idx)=>`
+    <div class="lev-area-card">
+      <div class="lev-area-head">
+        <span class="lev-area-num">${idx+1}</span>
+        <input type="text" id="levAreaNombre_${area.localId}" placeholder="Nombre del area (ej. COCINA, CAMARA DE FRIO...)" value="${escHtml(area.nombre)}"
+          oninput="levCambiarNombreArea('${area.localId}', this.value)">
+        <button class="icon-action danger" title="Quitar area" onclick="levQuitarArea('${area.localId}')">${ICO.eliminar}</button>
+      </div>
+      ${area.equipos.map((eq, eidx)=>levEquipoHtml(area, eq, eidx)).join('') || '<p class="hint" style="margin:0 0 12px;">Sin equipos todav&iacute;a en esta &aacute;rea.</p>'}
+      <button class="btn btn-outline btn-sm" onclick="levAgregarEquipo('${area.localId}')">+ Agregar equipo</button>
+    </div>`).join('');
+}
+function levEquipoHtml(area, eq, eidx){
+  const fotos = eq.fotos || [];
+  const fotosHtml = fotos.map(f=>`
+    <div class="lev-foto-thumb">
+      <img src="${f.dataUrl}">
+      ${f.pendiente ? '<span class="lev-foto-pend" title="Foto guardada en este dispositivo, pendiente de subir al servidor">LOCAL</span>' : ''}
+      <button type="button" class="lev-foto-quitar" title="Quitar foto" onclick="levQuitarFoto('${area.localId}','${eq.localId}','${f.localId}')">&times;</button>
+    </div>`).join('');
+  const puedeAgregarFoto = fotos.length < LEV_MAX_FOTOS;
+  return `
+    <div class="lev-equipo-card">
+      <div class="lev-equipo-head"><b>Equipo ${eidx+1}</b>
+        <button class="icon-action danger" title="Quitar equipo" onclick="levQuitarEquipo('${area.localId}','${eq.localId}')">${ICO.eliminar}</button>
+      </div>
+      <div class="form-grid-3">
+        <div class="field" style="grid-column:span 2;">
+          <label>Tipo de equipo</label>
+          <input type="text" list="levTiposEquipoList" placeholder="Ej. CAMARA FRIGORIFICA, COCINA INDUSTRIAL..." value="${escHtml(eq.tipoEquipo)}"
+            oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','tipoEquipo', this.value)">
+        </div>
+        <div class="field"><label>Marca</label><input type="text" value="${escHtml(eq.marca)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','marca', this.value)"></div>
+        <div class="field"><label>Modelo</label><input type="text" value="${escHtml(eq.modelo)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','modelo', this.value)"></div>
+        <div class="field"><label>N&deg; de serie</label><input type="text" value="${escHtml(eq.nSerie)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','nSerie', this.value)"></div>
+        <div class="field"><label>C&oacute;digo interno (opcional)</label><input type="text" value="${escHtml(eq.codigoInterno)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','codigoInterno', this.value)"></div>
+        <div class="field" style="grid-column:1/-1;"><label>Observaciones</label><input type="text" value="${escHtml(eq.observaciones)}" oninput="levCambiarCampoEquipo('${area.localId}','${eq.localId}','observaciones', this.value)"></div>
+      </div>
+      <div class="lev-ocr-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="levLeerPlaca('${area.localId}','${eq.localId}')">Leer placa (autocompletar)</button>
+        <span class="lev-ocr-estado" id="levOcrEstado_${eq.localId}"></span>
+      </div>
+      ${eq.ocrTexto ? `<details class="lev-ocr-detalle"><summary>Texto detectado en la placa</summary><pre>${escHtml(eq.ocrTexto)}</pre></details>` : ''}
+      <div class="lev-fotos-label">Fotos (m&aacute;ximo ${LEV_MAX_FOTOS})</div>
+      <div class="lev-fotos-row">
+        ${fotosHtml}
+        ${puedeAgregarFoto ? `<button type="button" class="lev-foto-add" title="Agregar foto" onclick="levElegirFotos('${area.localId}','${eq.localId}')">+</button>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ---------- Fotos ---------- */
+function levElegirFotos(areaLocalId, equipoLocalId){
+  levEquipoFotoTarget = { areaLocalId, equipoLocalId };
+  const input = document.getElementById('levFotoInput');
+  input.value = '';
+  input.click();
+}
+async function levFotosSeleccionadas(ev){
+  const target = levEquipoFotoTarget;
+  levEquipoFotoTarget = null;
+  if(!target) return;
+  const eq = levBuscarEquipo(target.areaLocalId, target.equipoLocalId);
+  if(!eq) return;
+  const files = Array.from(ev.target.files || []);
+  if(!files.length) return;
+  const cupo = LEV_MAX_FOTOS - (eq.fotos ? eq.fotos.length : 0);
+  if(cupo <= 0){ toast('Este equipo ya tiene el máximo de ' + LEV_MAX_FOTOS + ' fotos', true); return; }
+  const aProcesar = files.slice(0, cupo);
+  if(files.length > cupo) toast('Solo se agregaron ' + aProcesar.length + ' foto(s): el equipo llega al máximo de ' + LEV_MAX_FOTOS, true);
+  for(const file of aProcesar){
+    try{
+      const { blob, dataUrl } = await levComprimirImagen(file);
+      eq.fotos.push({ localId: levNuevoIdLocal(), dbId:null, storagePath:null, blob, dataUrl, pendiente:true });
+    }catch(err){ console.error('levComprimirImagen', err); toast('No se pudo procesar una de las fotos', true); }
+  }
+  levRenderAreas();
+  levActualizarResumen();
+  levProgramarAutosave();
+}
+function levQuitarFoto(areaLocalId, equipoLocalId, fotoLocalId){
+  const eq = levBuscarEquipo(areaLocalId, equipoLocalId);
+  if(!eq) return;
+  eq.fotos = eq.fotos.filter(f=>f.localId!==fotoLocalId);
+  levRenderAreas();
+  levActualizarResumen();
+  levProgramarAutosave();
+}
+// Redimensiona a un ancho/alto maximo razonable para fotos de equipo y
+// comprime a JPEG: reduce muchisimo el peso antes de guardarlo en IndexedDB
+// (limite de almacenamiento del navegador con varias decenas de fotos) y
+// antes de subirlo, que puede ser con señal muy limitada.
+function levComprimirImagen(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = ()=>reject(reader.error);
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onerror = ()=>reject(new Error('No se pudo leer la imagen'));
+      img.onload = ()=>{
+        const maxDim = 1280;
+        let w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          const s = Math.min(maxDim/w, maxDim/h);
+          w = Math.round(w*s); h = Math.round(h*s);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob((blob)=>{
+          if(!blob){ reject(new Error('toBlob fallo')); return; }
+          resolve({ blob, dataUrl: canvas.toDataURL('image/jpeg', 0.72) });
+        }, 'image/jpeg', 0.72);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- Lectura de placa (OCR local, sin costo ni API key) ----------
+   El usuario pidio explicitamente que sea gratis y sin depender de una
+   cuenta/llave: se usa Tesseract.js, que corre 100% en el navegador del
+   celular (nada se sube a ningun servidor para "leer" la placa). La
+   primera vez que se usa necesita internet para descargar el motor (~unos
+   MB, se queda en cache del navegador); despues de esa primera vez puede
+   volver a usarse sin señal. Es un ASISTENTE, no un lector perfecto: por
+   eso solo completa los campos que estan vacios y deja siempre visible el
+   texto crudo detectado, para que el tecnico corrija a mano lo que no
+   identifico bien (placas metalicas con reflejos, marcas poco comunes, etc.) */
+let levPlacaTarget = null; // {areaLocalId, equipoLocalId}: a que equipo va la placa elegida en #levPlacaInput
+let levTesseractCargando = null;
+function levCargarTesseract(){
+  if(window.Tesseract) return Promise.resolve();
+  if(levTesseractCargando) return levTesseractCargando;
+  levTesseractCargando = new Promise((resolve, reject)=>{
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js';
+    script.onload = ()=> resolve();
+    script.onerror = ()=>{ levTesseractCargando = null; reject(new Error('No se pudo cargar el lector de placas (revisa tu conexion e intenta de nuevo)')); };
+    document.head.appendChild(script);
+  });
+  return levTesseractCargando;
+}
+function levLeerPlaca(areaLocalId, equipoLocalId){
+  levPlacaTarget = { areaLocalId, equipoLocalId };
+  const input = document.getElementById('levPlacaInput');
+  input.value = '';
+  input.click();
+}
+async function levPlacaSeleccionada(ev){
+  const target = levPlacaTarget;
+  levPlacaTarget = null;
+  const file = ev.target.files && ev.target.files[0];
+  if(!target || !file) return;
+  const eq = levBuscarEquipo(target.areaLocalId, target.equipoLocalId);
+  if(!eq) return;
+  const estadoEl = document.getElementById('levOcrEstado_' + eq.localId);
+  if(estadoEl) estadoEl.textContent = 'Cargando lector de placas...';
+  try{
+    await levCargarTesseract();
+    if(estadoEl) estadoEl.textContent = 'Leyendo placa... 0%';
+    const resultado = await Tesseract.recognize(file, 'eng', {
+      logger: (m)=>{
+        if(estadoEl && m && m.status === 'recognizing text'){
+          estadoEl.textContent = 'Leyendo placa... ' + Math.round((m.progress || 0) * 100) + '%';
+        }
+      }
+    });
+    const texto = ((resultado && resultado.data && resultado.data.text) || '').trim();
+    eq.ocrTexto = texto;
+    const campos = levParsearPlaca(texto);
+    let completoAlgo = false;
+    if(campos.marca && !eq.marca){ eq.marca = campos.marca; completoAlgo = true; }
+    if(campos.modelo && !eq.modelo){ eq.modelo = campos.modelo; completoAlgo = true; }
+    if(campos.serie && !eq.nSerie){ eq.nSerie = campos.serie; completoAlgo = true; }
+    levRenderAreas();
+    levProgramarAutosave();
+    toast(completoAlgo
+      ? 'Placa leida: revisa y corrige los campos si hace falta'
+      : 'No se identifico marca/modelo/serie automaticamente. Revisa el texto detectado abajo del equipo y completa a mano.', !completoAlgo);
+  }catch(err){
+    console.error('levPlacaSeleccionada', err);
+    if(estadoEl) estadoEl.textContent = '';
+    toast((err && err.message) ? err.message : 'No se pudo leer la placa', true);
+  }
+}
+// Lista de marcas comunes en equipos de refrigeracion/cocina industrial (Peru
+// y en general): permite reconocer la MARCA aunque la placa no traiga una
+// etiqueta explicita "Marca:" (lo usual es que la placa sea del fabricante y
+// su nombre aparezca suelto en el texto, no como un campo rotulado).
+const LEV_MARCAS_CONOCIDAS = [
+  'TECUMSEH','EMBRACO','DANFOSS','COPELAND','BOHN','IMBERA','TORREY','FOGEL','CIC','INDURAMA',
+  'TRUE','HOSHIZAKI','MANITOWOC','SCOTSMAN','CARRIER','YORK','LG','SAMSUNG','WHIRLPOOL','MABE',
+  'ELECTROLUX','BOSCH','FRIGIDAIRE','HAIER','MIDEA','GREE','DAIKIN','TRANE','HUSSMANN','TAYLOR',
+  'VULCAN','GARLAND','HOBART','BLODGETT','SOUTHBEND','VICTORY','BEVERAGE-AIR','TURBO AIR',
+  'MASTER-BILT','NORLAKE','KOLPAK','AMANA','CROWN','LIEBHERR','GODREJ','MIRAI','GENERAL ELECTRIC'
+];
+// Heuristica simple (no inteligencia artificial): busca lineas con palabras
+// clave tipicas de una placa ("MODEL", "S/N", etc.) y, si no encuentra el
+// valor en la misma linea, prueba con la linea siguiente (comun cuando el
+// OCR separa la etiqueta y el valor en renglones distintos). Nunca inventa
+// un valor: si no encuentra la clave, deja ese campo vacio.
+function levParsearPlaca(texto){
+  const resultado = { marca:'', modelo:'', serie:'' };
+  if(!texto) return resultado;
+  const lineas = texto.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+
+  function extraerValor(linea, claves){
+    const l = linea.toUpperCase();
+    for(const clave of claves){
+      const idx = l.indexOf(clave);
+      if(idx !== -1){
+        const resto = linea.slice(idx + clave.length).replace(/^[\s:._\-\/]+/, '').trim();
+        return resto || null; // null = la clave esta pero el valor viene en la linea de abajo
+      }
+    }
+    return undefined; // clave no encontrada en esta linea
+  }
+
+  const CLAVES_MODELO = ['MODEL NO','MODELO','MODEL'];
+  const CLAVES_SERIE = ['SERIAL NO','SERIAL NUMBER','NO. SERIE','SER NO','S/N','SERIE','SERIAL'];
+
+  lineas.forEach((linea, idx)=>{
+    if(!resultado.modelo){
+      const v = extraerValor(linea, CLAVES_MODELO);
+      if(v){ resultado.modelo = v; }
+      else if(v === null && lineas[idx+1]){ resultado.modelo = lineas[idx+1]; }
+    }
+    if(!resultado.serie){
+      const v = extraerValor(linea, CLAVES_SERIE);
+      if(v){ resultado.serie = v; }
+      else if(v === null && lineas[idx+1]){ resultado.serie = lineas[idx+1]; }
+    }
+  });
+
+  const textoUp = texto.toUpperCase();
+  const marcaEncontrada = LEV_MARCAS_CONOCIDAS.find(m => textoUp.indexOf(m) !== -1);
+  if(marcaEncontrada) resultado.marca = marcaEncontrada;
+
+  // Limpieza basica de ruido tipico del OCR al final de un valor extraido.
+  ['modelo','serie'].forEach(k=>{
+    if(resultado[k]) resultado[k] = resultado[k].replace(/[|_~]+$/,'').trim().slice(0,60);
+  });
+  return resultado;
+}
+
+/* ---------- Resumen ---------- */
+function levContarTotales(){
+  let areas = levDraft.areas.length, equipos = 0, fotos = 0;
+  levDraft.areas.forEach(a=>{ equipos += a.equipos.length; a.equipos.forEach(e=>{ fotos += (e.fotos||[]).length; }); });
+  return { areas, equipos, fotos };
+}
+function levActualizarResumen(){
+  const t = levContarTotales();
+  const elA = document.getElementById('levResTotalAreas'); if(elA) elA.textContent = t.areas;
+  const elE = document.getElementById('levResTotalEquipos'); if(elE) elE.textContent = t.equipos;
+  const elF = document.getElementById('levResTotalFotos'); if(elF) elF.textContent = t.fotos;
+}
+
+/* ---------- Sincronizacion con Supabase ---------- */
+function levActualizarSyncPill(){
+  const pill = document.getElementById('levSyncPill');
+  const texto = document.getElementById('levSyncPillTexto');
+  if(!pill || !texto) return;
+  pill.classList.remove('ok','pending','syncing','offline');
+  if(levSyncEnCurso){
+    pill.classList.add('syncing'); texto.textContent = 'Guardando en el servidor...';
+  } else if(!navigator.onLine){
+    pill.classList.add('offline'); texto.textContent = 'Sin conexión: tus datos están a salvo en este dispositivo';
+  } else if(levDraft && levDraft._sinGuardarEnServidor){
+    pill.classList.add('pending'); texto.textContent = 'Guardado en este dispositivo, pendiente de enviar al servidor';
+  } else {
+    pill.classList.add('ok'); texto.textContent = 'Todo guardado en el servidor';
+  }
+}
+function levProgramarAutosave(){
+  if(!levDraft) return;
+  levDraft._sinGuardarEnServidor = true;
+  levActualizarResumen();
+  levActualizarSyncPill();
+  clearTimeout(levAutosaveTimer);
+  levAutosaveTimer = setTimeout(()=>{ levDbGuardar(levDraft); }, 350);
+}
+async function levDescartarBorrador(){
+  if(!levDraft) return;
+  const t = levContarTotales();
+  const esNuevo = !levDraft.editId;
+  const seguro = window.confirm(esNuevo
+    ? 'Descartar esta visita? Se perdera todo lo registrado (' + t.areas + ' area(s), ' + t.equipos + ' equipo(s)) que aun no se guardo en el servidor.'
+    : 'Descartar los cambios sin guardar de esta visita? Lo ya guardado en el servidor no se pierde.');
+  if(!seguro) return;
+  await levDbBorrar();
+  levDraft = null;
+  document.getElementById('levEditId').value = '';
+  toast('Cambios descartados');
+  showSection(esNuevo ? 'dashboard' : 'levantamientos');
+}
+// Guarda el borrador completo en Supabase: cliente (reutiliza o crea por
+// RUC, igual que proveedores), fila principal (correlativo solo la primera
+// vez), y TODAS las areas/equipos/fotos reemplazadas por completo -- mismo
+// criterio que nomina_planilla_quinta_detalle: mas simple y seguro que
+// diffear altas/bajas/ediciones linea por linea. Si algo falla (tipicamente
+// por falta de señal), el borrador local no se toca: sigue completo y se
+// puede reintentar con "Sincronizar ahora" o automaticamente al reconectar.
+async function levSincronizar(finalizar){
+  if(!levDraft || levSyncEnCurso) return false;
+  const t = levContarTotales();
+  if(finalizar && t.areas === 0){
+    toast('Agrega al menos un area antes de guardar', true);
+    return false;
+  }
+  if(!levDraft.cliente.id && !levDraft.cliente.razonSocial){
+    toast('Ingresa la razón social del cliente', true);
+    return false;
+  }
+  const btn = document.getElementById('btnGuardarLevantamiento');
+  levSyncEnCurso = true;
+  levActualizarSyncPill();
+  if(btn && finalizar) btn.disabled = true;
+  try{
+    const me = getCurrentUser();
+
+    let clienteId = levDraft.cliente.id;
+    if(!clienteId){
+      const ruc = levDraft.cliente.ruc;
+      const razon = levDraft.cliente.razonSocial;
+      const existente = ruc ? DB.clientes.find(c=>c.ruc===ruc) : null;
+      if(existente){
+        clienteId = existente.id;
+      } else {
+        const { data: nuevoCli, error: errCli } = await sb.from('clientes')
+          .insert({ ruc: ruc || null, razon_social: razon }).select().single();
+        if(errCli) throw errCli;
+        clienteId = nuevoCli.id;
+        await refreshClientes();
+      }
+      levDraft.cliente.id = clienteId;
+    }
+
+    if(!levDraft.correlativo){
+      levDraft.correlativo = await nextCorrelativoGastos('LEV', 5);
+    }
+
+    const payloadHead = {
+      correlativo: levDraft.correlativo, cliente_id: clienteId,
+      cliente_ruc: levDraft.cliente.ruc || null, cliente_razon_social: levDraft.cliente.razonSocial,
+      persona_contacto: levDraft.contacto || null, cargo: levDraft.cargo || null,
+      celular: levDraft.celular || null, correo: levDraft.correo || null,
+      sede_direccion: levDraft.sede || null, fecha_visita: levDraft.fechaVisita || null,
+      tecnico_id: levDraft.tecnicoId || null, estado: finalizar ? 'finalizado' : 'borrador',
+      total_areas: t.areas, total_equipos: t.equipos
+    };
+    let levantamientoId = levDraft.editId;
+    if(levantamientoId){
+      const { error: errUpd } = await sb.from('levantamientos').update(payloadHead).eq('id', levantamientoId);
+      if(errUpd) throw errUpd;
+    } else {
+      const { data: nuevoLev, error: errIns } = await sb.from('levantamientos')
+        .insert(Object.assign({ created_by: me ? me.id : null }, payloadHead)).select().single();
+      if(errIns) throw errIns;
+      levantamientoId = nuevoLev.id;
+      levDraft.editId = levantamientoId;
+      document.getElementById('levEditId').value = levantamientoId;
+    }
+
+    // Reemplazo completo de areas/equipos/fotos (el borrado en cascada se
+    // encarga de limpiar equipos y fotos huerfanas de este levantamiento).
+    await sb.from('levantamiento_areas').delete().eq('levantamiento_id', levantamientoId);
+    for(const area of levDraft.areas){
+      const { data: areaFila, error: errArea } = await sb.from('levantamiento_areas')
+        .insert({ levantamiento_id: levantamientoId, nombre: area.nombre || 'AREA SIN NOMBRE' }).select().single();
+      if(errArea) throw errArea;
+      for(const eq of area.equipos){
+        const { data: eqFila, error: errEq } = await sb.from('levantamiento_equipos').insert({
+          levantamiento_id: levantamientoId, area_id: areaFila.id,
+          tipo_equipo: eq.tipoEquipo || 'SIN ESPECIFICAR', marca: eq.marca || null, modelo: eq.modelo || null,
+          n_serie: eq.nSerie || null, codigo_interno: eq.codigoInterno || null, observaciones: eq.observaciones || null
+        }).select().single();
+        if(errEq) throw errEq;
+        for(const foto of (eq.fotos||[])){
+          let storagePath = foto.storagePath;
+          if(foto.blob){
+            const path = levantamientoId + '/' + eqFila.id + '/' + levNuevoIdLocal() + '.jpg';
+            const { error: errUp } = await sb.storage.from('levantamientos').upload(path, foto.blob, { upsert:true, contentType:'image/jpeg' });
+            if(errUp) throw errUp;
+            storagePath = path;
+          }
+          if(storagePath){
+            const { error: errFoto } = await sb.from('levantamiento_equipo_fotos').insert({
+              levantamiento_id: levantamientoId, equipo_id: eqFila.id, storage_path: storagePath
+            });
+            if(errFoto) throw errFoto;
+          }
+        }
+      }
+    }
+
+    levDraft._sinGuardarEnServidor = false;
+    levDraft._intentoFinalizar = false;
+    levSyncEnCurso = false;
+    if(finalizar){
+      await levDbBorrar();
+      await refreshLevantamientos();
+      toast('Visita ' + levDraft.correlativo + ' guardada');
+      levDraft = null;
+      document.getElementById('levEditId').value = '';
+      showSection('levantamientos');
+    } else {
+      await levDbGuardar(levDraft);
+      levActualizarSyncPill();
+      const lbl = document.getElementById('levCorrelativoLabel');
+      if(lbl) lbl.textContent = 'N.º ' + levDraft.correlativo;
+    }
+    return true;
+  }catch(err){
+    console.error('levSincronizar', err);
+    levSyncEnCurso = false;
+    if(finalizar){
+      levDraft._intentoFinalizar = true;
+      toast('No se pudo guardar en el servidor todavía. Tus datos siguen a salvo en este dispositivo: reintenta con "Sincronizar ahora" o al recuperar señal.', true);
+    } else {
+      toast('No se pudo sincronizar con el servidor. Tus datos siguen a salvo en este dispositivo.', true);
+    }
+    await levDbGuardar(levDraft);
+    levActualizarSyncPill();
+    return false;
+  } finally {
+    if(btn && finalizar) btn.disabled = false;
+  }
+}
+async function levGuardarFinal(){ await levSincronizar(true); }
+async function levSincronizarAhora(){
+  const ok = await levSincronizar(false);
+  if(ok) toast('Borrador respaldado en el servidor');
+}
+// Reintento automatico al recuperar señal: solo respalda (no finaliza) salvo
+// que el ultimo intento de "Guardar levantamiento" haya fallado justamente
+// por falta de conexion, en cuyo caso complementa la intencion del usuario.
+window.addEventListener('online', function(){
+  levActualizarSyncPill();
+  if(!levDraft || levSyncEnCurso || !levDraft._sinGuardarEnServidor) return;
+  const pantalla = document.getElementById('section-nuevoLevantamiento');
+  if(!pantalla || !pantalla.classList.contains('active')) return;
+  const finalizar = !!levDraft._intentoFinalizar;
+  levSincronizar(finalizar).then(ok=>{
+    if(ok) toast(finalizar ? 'Conexión recuperada: visita guardada automáticamente' : 'Conexión recuperada: borrador respaldado en el servidor');
+  });
+});
+window.addEventListener('offline', levActualizarSyncPill);
+
+/* ---------- Listado ---------- */
+async function renderLevantamientos(){
+  await refreshLevantamientos();
+  if(!DB.colaboradores.length) await refreshColaboradores();
+  const body = document.getElementById('levListaBody');
+  const empty = document.getElementById('levListaEmpty');
+  if(!body) return;
+  if(!DB.levantamientos.length){
+    body.innerHTML = '';
+    if(empty) empty.style.display = '';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  body.innerHTML = DB.levantamientos.map(l=>{
+    const tec = DB.colaboradores.find(c=>c.id===l.tecnico_id);
+    return `
+    <tr>
+      <td data-label="Cliente"><b>${escHtml(l.cliente_razon_social)}</b>${l.correlativo?(' <span class="hint" style="margin:0;">'+escHtml(l.correlativo)+'</span>'):''}</td>
+      <td data-label="Sede">${escHtml(l.sede_direccion)||'&mdash;'}</td>
+      <td data-label="Fecha">${fmtFecha(l.fecha_visita)}</td>
+      <td data-label="T&eacute;cnico">${tec ? escHtml(nombreCompleto(tec)) : '&mdash;'}</td>
+      <td data-label="&Aacute;reas" class="center">${l.total_areas||0}</td>
+      <td data-label="Equipos" class="center">${l.total_equipos||0}</td>
+      <td data-label="Estado" class="center"><span class="badge ${l.estado==='finalizado'?'green':'orange'}">${l.estado==='finalizado'?'FINALIZADO':'BORRADOR'}</span></td>
+      <td data-label="" class="center">
+        <div class="row-actions">
+          <button class="icon-action" title="Editar" onclick="levAbrirExistente('${l.id}')">${ICO.editar}</button>
+          <button class="icon-action" title="Exportar CSV" onclick="levExportarCSV('${l.id}')">${ICO.descargar}</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ---------- Exportar CSV (mejor opcion sin depender de internet ni de una
+   libreria externa: se abre directo en Excel, y el navegador lo genera
+   100% local con lo que ya se cargo de Supabase) ---------- */
+async function levExportarCSV(id){
+  const cab = DB.levantamientos.find(x=>x.id===id);
+  if(!cab){ toast('No se encontro la visita', true); return; }
+  const [{ data: areasData, error: errA }, { data: equiposData, error: errE }, { data: fotosData, error: errF }] = await Promise.all([
+    sb.from('levantamiento_areas').select('*').eq('levantamiento_id', id),
+    sb.from('levantamiento_equipos').select('*').eq('levantamiento_id', id),
+    sb.from('levantamiento_equipo_fotos').select('equipo_id').eq('levantamiento_id', id)
+  ]);
+  if(errA || errE || errF){ console.error('levExportarCSV', errA||errE||errF); toast('No se pudo exportar la visita', true); return; }
+  if(!equiposData || !equiposData.length){ toast('Esta visita no tiene equipos registrados todavía', true); return; }
+
+  const tec = DB.colaboradores.find(c=>c.id===cab.tecnico_id);
+  const conteoFotos = {};
+  (fotosData||[]).forEach(f=>{ conteoFotos[f.equipo_id] = (conteoFotos[f.equipo_id]||0) + 1; });
+  const areasPorId = {};
+  (areasData||[]).forEach(a=>{ areasPorId[a.id] = a.nombre; });
+
+  const encabezados = ['Cliente','RUC','Sede/Direccion','Fecha de visita','Tecnico','Area','Tipo de equipo','Marca','Modelo','N Serie','Codigo interno','Observaciones','Cantidad de fotos'];
+  const filas = equiposData.map(e=>[
+    cab.cliente_razon_social||'', cab.cliente_ruc||'', cab.sede_direccion||'', fmtFecha(cab.fecha_visita),
+    tec ? nombreCompleto(tec) : '', areasPorId[e.area_id]||'', e.tipo_equipo||'', e.marca||'', e.modelo||'',
+    e.n_serie||'', e.codigo_interno||'', e.observaciones||'', String(conteoFotos[e.id]||0)
+  ]);
+  const csvEscape = (v)=> '"' + String(v).replace(/"/g,'""') + '"';
+  // Separador ";" (no ",") porque Excel en español usa la coma como decimal;
+  // BOM UTF-8 al inicio para que tildes/eñes se vean bien al abrirlo.
+  const lineas = [encabezados.map(csvEscape).join(';')].concat(filas.map(f=>f.map(csvEscape).join(';')));
+  const csvContent = '﻿' + lineas.join('\r\n');
+  const blob = new Blob([csvContent], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'levantamiento_' + String(cab.correlativo||id).replace(/[^a-zA-Z0-9_-]/g,'_') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  toast('CSV descargado');
+}
 
 try{
   applyThemeToggleUI();
